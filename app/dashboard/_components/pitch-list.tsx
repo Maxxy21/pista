@@ -85,7 +85,7 @@ export const PitchList = ({ orgId, query }: PitchListProps) => {
     }
 
     if (!data?.length) {
-        return <EmptyPitches />;
+        return <EmptyPitches orgId={orgId} />;
     }
 
     return (

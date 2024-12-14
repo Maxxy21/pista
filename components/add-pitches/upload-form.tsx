@@ -63,9 +63,10 @@ export const UploadForm = ({orgId}:UploadFormProps) => {
     const handleSubmit = async (data: z.infer<typeof FormSchema>) => {
         try {
             setIsProcessing(true);
-            const {pitchTitle, contentType, content} = data;
+            const { pitchTitle, contentType, content } = data;
             let transcriptionText = "";
 
+            // Process content based on type
             if (contentType === 'text') {
                 transcriptionText = content || "";
             } else if (files.length > 0) {
@@ -98,16 +99,16 @@ export const UploadForm = ({orgId}:UploadFormProps) => {
                 throw new Error("No valid text content provided");
             }
 
-            // Evaluate with timeout handling
+            // Evaluate the pitch
             let evaluationResults;
             try {
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 240000); // 4 minutes
+                const timeoutId = setTimeout(() => controller.abort(), 240000);
 
                 const evaluationResponse = await fetch('/api/evaluate', {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({text: transcriptionText}),
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: transcriptionText }),
                     signal: controller.signal
                 });
 
@@ -126,15 +127,14 @@ export const UploadForm = ({orgId}:UploadFormProps) => {
                 }
             }
 
+            // Create the pitch with all required fields
             const id = await mutate({
+                orgId,
                 title: pitchTitle,
                 text: transcriptionText,
                 type: contentType,
                 status: "evaluated",
                 evaluation: evaluationResults,
-                createdAt: Date.now(),
-                updatedAt: Date.now(),
-                orgId:orgId
             });
 
             toast.success("Pitch created successfully");
@@ -143,12 +143,11 @@ export const UploadForm = ({orgId}:UploadFormProps) => {
             form.reset();
         } catch (error: any) {
             console.error("Submission error:", error);
-            toast.error(error.message || "Failed to create pitch");
+            toast.error("Failed to create pitch");
         } finally {
             setIsProcessing(false);
         }
     };
-
 
     return (
         <Form {...form}>

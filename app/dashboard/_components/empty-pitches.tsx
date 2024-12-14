@@ -2,7 +2,11 @@ import Image from "next/image";
 import {FileDialog} from "@/components/add-pitches/file-dialog";
 import {Button} from "@/components/ui/button";
 
-export const EmptyPitches = () => {
+
+interface EmptyPitchesProps {
+    orgId: string;
+}
+export const EmptyPitches = ({orgId}:EmptyPitchesProps) => {
     return (
         <div className="h-full flex flex-col items-center justify-center">
             <Image
@@ -18,7 +22,7 @@ export const EmptyPitches = () => {
                 Start by uploading or writing your pitch
             </p>
             <div className="mt-6">
-                <FileDialog>
+                <FileDialog orgId={orgId}>
                     <Button size="lg">
                         Create pitch
                     </Button>

@@ -121,13 +121,19 @@ export const create = mutation({
         text: v.string(),
         type: v.string(),
         status: v.string(),
-        evaluation: evaluationArgs
+        evaluation: evaluationArgs,
     },
     handler: async (ctx, args) => {
         const identity = await validateUser(ctx);
 
+        // Create the pitch with all required fields
         return await ctx.db.insert("pitches", {
-            ...args,
+            title: args.title,
+            text: args.text,
+            type: args.type,
+            status: args.status,
+            evaluation: args.evaluation,
+            orgId: args.orgId,
             userId: identity.subject,
             authorName: identity.name!,
             createdAt: Date.now(),
