@@ -6,12 +6,16 @@ import { FileDialog } from "@/components/add-pitches/file-dialog";
 import {Button} from "@/components/ui/button";
 
 interface NewPitchButtonProps {
+   orgId: string;
     disabled?: boolean;
 }
 
-export const NewPitchButton = ({ disabled }: NewPitchButtonProps) => {
+export const NewPitchButton = ({orgId, disabled }: NewPitchButtonProps) => {
     return (
-        <FileDialog disabled={disabled}>
+        <FileDialog
+            orgId={orgId}
+            disabled={disabled}
+        >
             <motion.div
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}

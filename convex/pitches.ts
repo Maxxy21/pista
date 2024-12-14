@@ -1,4 +1,4 @@
-import {DatabaseReader, DatabaseWriter, mutation, MutationCtx, query, QueryCtx} from "./_generated/server";
+import {DatabaseReader, DatabaseWriter, mutation, query, QueryCtx} from "./_generated/server";
 import {ConvexError, v} from "convex/values";
 import {Doc} from "@/convex/_generated/dataModel";
 import {getAllOrThrow} from "convex-helpers/server/relationships";
@@ -21,119 +21,55 @@ export const evaluationArgs = v.object({
 
 type Pitch = Doc<"pitches">;
 
+interface PitchStats {
+    totalPitches: number;
+    averageScore: number;
+    bestPitch: Doc<"pitches"> | undefined;
+    recentPitches: Doc<"pitches">[];
+    scoreDistribution: Record<number, number>;
+}
 
-// Helper function for auth check
-const validateUser = async (ctx: { auth: any, db: DatabaseReader | DatabaseWriter }) => {
+
+const validateUser = async (ctx: { auth: any }) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
-        throw new ConvexError("Unauthorized: Please log in to continue");
+        throw new ConvexError("Unauthorized");
     }
     return identity;
 };
 
-// Queries
-export const getPitches = query({
-    args: {
-        status: v.optional(v.string()),
-        sortBy: v.optional(v.string()),
-        limit: v.optional(v.number()),
-    },
-    handler: async (ctx: QueryCtx, args) => {
-        const identity = await validateUser(ctx);
-
-        const queryBuilder = ctx.db
-            .query("pitches")
-            .filter((q) => q.eq(q.field("userId"), identity.subject));
-
-        if (args.status) {
-            queryBuilder.filter((q) =>
-                q.eq(q.field("status"), args.status)
-            );
-        }
-
-        const finalQuery = args.sortBy === "recent"
-            ? queryBuilder.order("desc")
-            : queryBuilder.order("asc");
-
-        const result = args.limit
-            ? await finalQuery.take(args.limit)
-            : await finalQuery.collect();
-
-        return result;
-    },
-});
-
-export const searchPitches = query({
-    args: {
-        searchTerm: v.string(),
-        sortBy: v.optional(v.string())
-    },
-    handler: async (ctx: QueryCtx, args) => {
-        const identity = await validateUser(ctx);
-        const searchTerm = args.searchTerm.toLowerCase();
-
-        let queryBuilder = ctx.db
-            .query("pitches")
-            .filter((q) => q.eq(q.field("userId"), identity.subject))
-            .order("desc");
-
-        const allPitches = await queryBuilder.collect();
-
-        // Filter for search
-        const filteredPitches = allPitches.filter(pitch =>
-            pitch.title.toLowerCase().includes(searchTerm) ||
-            pitch.text.toLowerCase().includes(searchTerm) ||
-            pitch.evaluation.overallFeedback.toLowerCase().includes(searchTerm) ||
-            pitch.evaluation.evaluations.some(evali =>
-                evali.comment.toLowerCase().includes(searchTerm)
-            )
-        );
-
-        if (args.sortBy === "score") {
-            return filteredPitches.sort((a, b) =>
-                b.evaluation.overallScore - a.evaluation.overallScore
-            );
-        }
-
-        return filteredPitches;
-    },
-});
-
-
+// Get all pitches for an organization
 export const get = query({
     args: {
+        orgId: v.string(),
         search: v.optional(v.string()),
         favorites: v.optional(v.string()),
     },
-    handler: async (ctx: QueryCtx, args) => {
+    handler: async (ctx, args) => {
         const identity = await validateUser(ctx);
-        const userId = identity.subject;
 
-        // Get user's favorited pitches
-        const userFavorites = await ctx.db
-            .query("userFavorites")
-            .withIndex("by_user", (q) => q.eq("userId", userId))
-            .collect();
-
-        // Create a Set of favorited pitch IDs for efficient lookup
-        const favoritedPitchIds = new Set(userFavorites.map(f => f.pitchId));
-
+        // Handle favorites
         if (args.favorites) {
-            // If viewing favorites, only get the favorited pitches
-            const pitches = await Promise.all(
-                userFavorites.map(favorite =>
-                    ctx.db.get(favorite.pitchId)
+            const favoritedPitches = await ctx.db
+                .query("userFavorites")
+                .withIndex("by_user_org_pitch", (q) =>
+                    q
+                        .eq("userId", identity.subject)
+                        .eq("orgId", args.orgId)
                 )
-            );
+                .order("desc")
+                .collect();
 
-            return pitches
-                .filter(Boolean) // Remove any null values
-                .map(pitch => ({
-                    ...pitch,
-                    isFavorite: true
-                }));
+            const ids = favoritedPitches.map((f) => f.pitchId);
+            const pitches = await getAllOrThrow(ctx.db, ids);
+
+            return pitches.map((pitch) => ({
+                ...pitch,
+                isFavorite: true,
+            }));
         }
 
+        // Handle search
         const title = args.search as string;
         let pitches = [];
 
@@ -141,25 +77,167 @@ export const get = query({
             pitches = await ctx.db
                 .query("pitches")
                 .withSearchIndex("search_title", (q) =>
-                    q.search("title", title)
-                        .eq("userId", userId)
+                    q
+                        .search("title", title)
+                        .eq("orgId", args.orgId)
                 )
                 .collect();
         } else {
             pitches = await ctx.db
                 .query("pitches")
-                .withIndex("by_userId", (q) =>
-                    q.eq("userId", userId)
-                )
+                .withIndex("by_org", (q) => q.eq("orgId", args.orgId))
                 .order("desc")
                 .collect();
         }
 
-        // Map the pitches with their favorite status
-        return pitches.map(pitch => ({
-            ...pitch,
-            isFavorite: favoritedPitchIds.has(pitch._id)
-        }));
+        // Add favorite status to each pitch
+        const pitchesWithFavoriteRelation = pitches.map((pitch) => {
+            return ctx.db
+                .query("userFavorites")
+                .withIndex("by_user_org_pitch", (q) =>
+                    q
+                        .eq("userId", identity.subject)
+                        .eq("orgId", args.orgId)
+                        .eq("pitchId", pitch._id)
+                )
+                .unique()
+                .then((favorite) => {
+                    return {
+                        ...pitch,
+                        isFavorite: !!favorite,
+                    };
+                });
+        });
+
+        return Promise.all(pitchesWithFavoriteRelation);
+    },
+});
+
+// Create a new pitch
+export const create = mutation({
+    args: {
+        orgId: v.string(),
+        title: v.string(),
+        text: v.string(),
+        type: v.string(),
+        status: v.string(),
+        evaluation: evaluationArgs
+    },
+    handler: async (ctx, args) => {
+        const identity = await validateUser(ctx);
+
+        return await ctx.db.insert("pitches", {
+            ...args,
+            userId: identity.subject,
+            authorName: identity.name!,
+            createdAt: Date.now(),
+            updatedAt: Date.now(),
+        });
+    },
+});
+
+// Update existing pitch
+export const update = mutation({
+    args: {
+        id: v.id("pitches"),
+        orgId: v.string(),
+        title: v.optional(v.string()),
+        text: v.optional(v.string()),
+        status: v.optional(v.string()),
+        evaluation: v.optional(evaluationArgs),
+    },
+    handler: async (ctx, args) => {
+        const identity = await validateUser(ctx);
+
+        const pitch = await ctx.db.get(args.id);
+        if (!pitch) {
+            throw new Error("Pitch not found");
+        }
+
+        if (pitch.orgId !== args.orgId) {
+            throw new Error("Unauthorized");
+        }
+
+        const updates = {
+            ...(args.title && { title: args.title }),
+            ...(args.text && { text: args.text }),
+            ...(args.status && { status: args.status }),
+            ...(args.evaluation && { evaluation: args.evaluation }),
+            updatedAt: Date.now(),
+        };
+
+        return await ctx.db.patch(args.id, updates);
+    },
+});
+
+// Favorite/unfavorite functions
+export const favorite = mutation({
+    args: {
+        id: v.id("pitches"),
+        orgId: v.string()
+    },
+    handler: async (ctx, args) => {
+        const identity = await validateUser(ctx);
+
+        const pitch = await ctx.db.get(args.id);
+        if (!pitch) {
+            throw new Error("Pitch not found");
+        }
+
+        const existingFavorite = await ctx.db
+            .query("userFavorites")
+            .withIndex("by_user_org_pitch", (q) =>
+                q
+                    .eq("userId", identity.subject)
+                    .eq("orgId", args.orgId)
+                    .eq("pitchId", pitch._id)
+            )
+            .unique();
+
+        if (existingFavorite) {
+            throw new Error("Pitch already favorited");
+        }
+
+        await ctx.db.insert("userFavorites", {
+            userId: identity.subject,
+            pitchId: pitch._id,
+            orgId: args.orgId,
+        });
+
+        return pitch;
+    },
+});
+
+export const unfavorite = mutation({
+    args: {
+        id: v.id("pitches"),
+        orgId: v.string()
+    },
+    handler: async (ctx, args) => {
+        const identity = await validateUser(ctx);
+
+        const pitch = await ctx.db.get(args.id);
+        if (!pitch) {
+            throw new Error("Pitch not found");
+        }
+
+        const existingFavorite = await ctx.db
+            .query("userFavorites")
+            .withIndex("by_user_org_pitch", (q) =>
+                q
+                    .eq("userId", identity.subject)
+                    .eq("orgId", args.orgId)
+                    .eq("pitchId", pitch._id)
+            )
+            .unique();
+
+        if (!existingFavorite) {
+            throw new Error("Favorited pitch not found");
+        }
+
+        await ctx.db.delete(existingFavorite._id);
+
+        return pitch;
     },
 });
 
@@ -182,88 +260,6 @@ export const getPitch = query({
         return pitch;
     },
 });
-
-// Mutations
-export const createPitch = mutation({
-    args: {
-        title: v.string(),
-        text: v.string(),
-        type: v.string(),
-        status: v.string(),
-        evaluation: evaluationArgs,
-        createdAt: v.number(),
-        updatedAt: v.number(),
-    },
-    handler: async (ctx: MutationCtx, args) => {
-        const identity = await validateUser(ctx);
-
-        return await ctx.db.insert("pitches", {
-            ...args,
-            userId: identity.subject,
-        });
-    },
-});
-
-export const updatePitch = mutation({
-    args: {
-        id: v.id("pitches"),
-        title: v.optional(v.string()),
-        text: v.optional(v.string()),
-        status: v.optional(v.string()),
-        evaluation: v.optional(evaluationArgs),
-    },
-    handler: async (ctx: MutationCtx, args) => {
-        const identity = await validateUser(ctx);
-
-        const pitch = await ctx.db.get(args.id);
-        if (!pitch) {
-            throw new Error("Pitch not found");
-        }
-
-        if (pitch.userId !== identity.subject) {
-            throw new Error("Unauthorized: You don't have permission to update this pitch");
-        }
-
-        const updates = {
-            ...(args.title && {title: args.title}),
-            ...(args.text && {text: args.text}),
-            ...(args.status && {status: args.status}),
-            ...(args.evaluation && {evaluation: args.evaluation}),
-            updatedAt: Date.now(),
-        };
-
-        return await ctx.db.patch(args.id, updates);
-    },
-});
-
-export const removePitch = mutation({
-    args: {
-        id: v.id("pitches"),
-    },
-    handler: async (ctx: MutationCtx, {id}) => {
-        const identity = await validateUser(ctx);
-
-        const pitch = await ctx.db.get(id);
-        if (!pitch) {
-            throw new Error("Pitch not found");
-        }
-
-        if (pitch.userId !== identity.subject) {
-            throw new Error("Unauthorized: You don't have permission to delete this pitch");
-        }
-
-        await ctx.db.delete(id);
-    },
-});
-
-
-interface PitchStats {
-    totalPitches: number;
-    averageScore: number;
-    bestPitch: Doc<"pitches"> | undefined;
-    recentPitches: Doc<"pitches">[];
-    scoreDistribution: Record<number, number>;
-}
 
 export const getPitchStats = query({
     args: {},
@@ -334,20 +330,39 @@ export const updatePitchCategories = mutation({
 export const togglePitchFavorite = mutation({
     args: {
         pitchId: v.id("pitches"),
+        orgId: v.string(),
     },
     handler: async (ctx, args) => {
         const identity = await validateUser(ctx);
+        const userId = identity.subject;
 
         const pitch = await ctx.db.get(args.pitchId);
         if (!pitch) throw new Error("Pitch not found");
-        if (pitch.userId !== identity.subject) {
+        if (pitch.orgId !== args.orgId) {
             throw new Error("Unauthorized");
         }
 
-        return await ctx.db.patch(args.pitchId, {
-            isFavorite: !pitch.isFavorite,
-            updatedAt: Date.now(),
-        });
+        // Check if already favorited
+        const existingFavorite = await ctx.db
+            .query("userFavorites")
+            .withIndex("by_user_org_pitch", (q) =>
+                q.eq("userId", userId)
+                    .eq("orgId", args.orgId)
+                    .eq("pitchId", args.pitchId)
+            )
+            .unique();
+
+        if (existingFavorite) {
+            await ctx.db.delete(existingFavorite._id);
+        } else {
+            await ctx.db.insert("userFavorites", {
+                userId,
+                orgId: args.orgId,
+                pitchId: args.pitchId,
+            });
+        }
+
+        return await ctx.db.get(args.pitchId);
     },
 });
 
@@ -356,19 +371,22 @@ export const addPitchNote = mutation({
     args: {
         pitchId: v.id("pitches"),
         note: v.string(),
+        orgId: v.string(),
     },
     handler: async (ctx, args) => {
         const identity = await validateUser(ctx);
 
         const pitch = await ctx.db.get(args.pitchId);
         if (!pitch) throw new Error("Pitch not found");
-        if (pitch.userId !== identity.subject) {
+        if (pitch.orgId !== args.orgId) {
             throw new Error("Unauthorized");
         }
 
         const notes = pitch.notes || [];
         notes.push({
             content: args.note,
+            authorId: identity.subject,
+            authorName: identity.name!,
             createdAt: Date.now(),
             updatedAt: Date.now(),
         });
@@ -379,7 +397,6 @@ export const addPitchNote = mutation({
         });
     },
 });
-
 // Get pitch history/versions
 export const getPitchHistory = query({
     args: {
@@ -430,60 +447,9 @@ export const comparePitches = query({
     },
 });
 
-export const favorite = mutation({
-    args: {id: v.id("pitches")},
-    handler: async (ctx, args) => {
-        const identity = await validateUser(ctx);
-        const userId = identity.subject;
 
-        const existingFavorite = await ctx.db
-            .query("userFavorites")
-            .withIndex("by_user_pitch", (q) =>
-                q
-                    .eq("userId", userId)
-                    .eq("pitchId", args.id)
-            )
-            .unique();
 
-        if (existingFavorite) {
-            throw new Error("Pitch already favorited");
-        }
 
-        await ctx.db.insert("userFavorites", {
-            userId,
-            pitchId: args.id,
-        });
-
-        return await ctx.db.get(args.id);
-    },
-});
-
-export const unfavorite = mutation({
-    args: {id: v.id("pitches")},
-    handler: async (ctx, args) => {
-        const identity = await validateUser(ctx);
-        const userId = identity.subject;
-
-        const existingFavorite = await ctx.db
-            .query("userFavorites")
-            .withIndex("by_user_pitch", (q) =>
-                q
-                    .eq("userId", userId)
-                    .eq("pitchId", args.id)
-            )
-            .unique();
-
-        if (!existingFavorite) {
-            throw new Error("Favorited pitch not found");
-        }
-
-        await ctx.db.delete(existingFavorite._id);
-
-        return await ctx.db.get(args.id);
-    },
-});
-
-// convex/pitches.ts - Add these types and queries
 
 // Types
 export const categoryObject = v.object({
@@ -495,6 +461,7 @@ export const categoryObject = v.object({
 // Get pitches with filters
 export const getFilteredPitches = query({
     args: {
+        orgId: v.string(), // Add orgId to args
         search: v.optional(v.string()),
         favorites: v.optional(v.boolean()),
         categories: v.optional(v.array(v.string())),
@@ -512,18 +479,24 @@ export const getFilteredPitches = query({
         const identity = await validateUser(ctx);
         const userId = identity.subject;
 
-        // Get user's favorited pitches
+        // Get user's favorited pitches for this org
         const userFavorites = await ctx.db
             .query("userFavorites")
-            .withIndex("by_user", (q) => q.eq("userId", userId))
+            .withIndex("by_user_org_pitch", (q) =>
+                q.eq("userId", userId)
+                    .eq("orgId", args.orgId)
+            )
             .collect();
 
         const favoritedPitchIds = new Set(userFavorites.map(f => f.pitchId));
 
-        // Base query
+        // Base query using correct index
         let queryBuilder = ctx.db
             .query("pitches")
-            .withIndex("by_userId", (q) => q.eq("userId", userId));
+            .withIndex("by_user_org", (q) =>
+                q.eq("userId", userId)
+                    .eq("orgId", args.orgId)
+            );
 
         // Apply filters
         let pitches = await queryBuilder.collect();
@@ -588,109 +561,109 @@ export const getFilteredPitches = query({
 });
 
 // Get available categories
-export const getCategories = query({
-    handler: async (ctx) => {
-        const identity = await validateUser(ctx);
-
-        return await ctx.db
-            .query("categories")
-            .filter(q => q.eq(q.field("userId"), identity.subject))
-            .collect();
-    }
-});
-
-// Add new category
-export const addCategory = mutation({
-    args: {
-        name: v.string(),
-        color: v.optional(v.string())
-    },
-    handler: async (ctx, args) => {
-        const identity = await validateUser(ctx);
-
-        // Check if category already exists
-        const existing = await ctx.db
-            .query("categories")
-            .filter(q =>
-                q.and(
-                    q.eq(q.field("userId"), identity.subject),
-                    q.eq(q.field("name"), args.name)
-                )
-            )
-            .unique();
-
-        if (existing) {
-            throw new Error("Category already exists");
-        }
-
-        return await ctx.db.insert("categories", {
-            userId: identity.subject,
-            name: args.name,
-            color: args.color,
-            createdAt: Date.now()
-        });
-    }
-});
-
-// Update pitch categories
-export const updateCategories = mutation({
-    args: {
-        pitchId: v.id("pitches"),
-        categories: v.array(v.string())
-    },
-    handler: async (ctx, args) => {
-        const identity = await validateUser(ctx);
-
-        const pitch = await ctx.db.get(args.pitchId);
-        if (!pitch || pitch.userId !== identity.subject) {
-            throw new Error("Unauthorized or pitch not found");
-        }
-
-        // Validate categories exist
-        const existingCategories = await ctx.db
-            .query("categories")
-            .filter(q => q.eq(q.field("userId"), identity.subject))
-            .collect();
-
-        const validCategories = args.categories.filter(cat =>
-            existingCategories.some(existingCat => existingCat.name === cat)
-        );
-
-        return await ctx.db.patch(args.pitchId, {
-            categories: validCategories,
-            updatedAt: Date.now()
-        });
-    }
-});
-
-// Delete category
-export const deleteCategory = mutation({
-    args: {
-        id: v.id("categories")
-    },
-    handler: async (ctx, args) => {
-        const identity = await validateUser(ctx);
-
-        const category = await ctx.db.get(args.id);
-        if (!category || category.userId !== identity.subject) {
-            throw new Error("Unauthorized or category not found");
-        }
-
-        // Remove category from all pitches
-        const pitches = await ctx.db
-            .query("pitches")
-            .filter(q => q.eq(q.field("userId"), identity.subject))
-            .collect();
-
-        for (const pitch of pitches) {
-            if (pitch.categories?.includes(category.name)) {
-                await ctx.db.patch(pitch._id, {
-                    categories: pitch.categories.filter(cat => cat !== category.name),
-                    updatedAt: Date.now()
-                });
-            }
-        }
-
-        await ctx.db.delete(args.id);
-    }
-});
+// export const getCategories = query({
+//     handler: async (ctx) => {
+//         const identity = await validateUser(ctx);
+//
+//         return await ctx.db
+//             .query("categories")
+//             .filter(q => q.eq(q.field("userId"), identity.subject))
+//             .collect();
+//     }
+// });
+//
+// // Add new category
+// export const addCategory = mutation({
+//     args: {
+//         name: v.string(),
+//         color: v.optional(v.string())
+//     },
+//     handler: async (ctx, args) => {
+//         const identity = await validateUser(ctx);
+//
+//         // Check if category already exists
+//         const existing = await ctx.db
+//             .query("categories")
+//             .filter(q =>
+//                 q.and(
+//                     q.eq(q.field("userId"), identity.subject),
+//                     q.eq(q.field("name"), args.name)
+//                 )
+//             )
+//             .unique();
+//
+//         if (existing) {
+//             throw new Error("Category already exists");
+//         }
+//
+//         return await ctx.db.insert("categories", {
+//             userId: identity.subject,
+//             name: args.name,
+//             color: args.color,
+//             createdAt: Date.now()
+//         });
+//     }
+// });
+//
+// // Update pitch categories
+// export const updateCategories = mutation({
+//     args: {
+//         pitchId: v.id("pitches"),
+//         categories: v.array(v.string())
+//     },
+//     handler: async (ctx, args) => {
+//         const identity = await validateUser(ctx);
+//
+//         const pitch = await ctx.db.get(args.pitchId);
+//         if (!pitch || pitch.userId !== identity.subject) {
+//             throw new Error("Unauthorized or pitch not found");
+//         }
+//
+//         // Validate categories exist
+//         const existingCategories = await ctx.db
+//             .query("categories")
+//             .filter(q => q.eq(q.field("userId"), identity.subject))
+//             .collect();
+//
+//         const validCategories = args.categories.filter(cat =>
+//             existingCategories.some(existingCat => existingCat.name === cat)
+//         );
+//
+//         return await ctx.db.patch(args.pitchId, {
+//             categories: validCategories,
+//             updatedAt: Date.now()
+//         });
+//     }
+// });
+//
+// // Delete category
+// export const deleteCategory = mutation({
+//     args: {
+//         id: v.id("categories")
+//     },
+//     handler: async (ctx, args) => {
+//         const identity = await validateUser(ctx);
+//
+//         const category = await ctx.db.get(args.id);
+//         if (!category || category.userId !== identity.subject) {
+//             throw new Error("Unauthorized or category not found");
+//         }
+//
+//         // Remove category from all pitches
+//         const pitches = await ctx.db
+//             .query("pitches")
+//             .filter(q => q.eq(q.field("userId"), identity.subject))
+//             .collect();
+//
+//         for (const pitch of pitches) {
+//             if (pitch.categories?.includes(category.name)) {
+//                 await ctx.db.patch(pitch._id, {
+//                     categories: pitch.categories.filter(cat => cat !== category.name),
+//                     updatedAt: Date.now()
+//                 });
+//             }
+//         }
+//
+//         await ctx.db.delete(args.id);
+//     }
+// });

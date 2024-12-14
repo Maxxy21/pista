@@ -6,13 +6,13 @@ import { NewPitchButton } from "./new-pitch-button";
 import { EmptySearch } from "./empty-search";
 import { EmptyFavorites } from "./empty-favorites";
 import { EmptyPitches } from "./empty-pitches";
-import { PitchCardSkeleton } from "./pitch-card/pitch-card-skeleton";
-import { PitchCard } from "./pitch-card/pitch-card";
+
 import { AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
-import React, {useState} from "react";
-import {FilterPanel} from "@/components/filters/filter-panel";
-import {ScrollArea} from "@/components/ui/scroll-area";
+import React from "react";
+import { FilterPanel } from "@/components/filters/filter-panel";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { PitchCard } from "./pitch-card/pitch-card";
 
 interface FilterState {
     categories: string[];
@@ -24,13 +24,14 @@ interface FilterState {
 }
 
 interface PitchListProps {
+    orgId: string;
     query: {
         search?: string;
         favorites?: string;
     }
 }
 
-export const PitchList = ({ query }: PitchListProps) => {
+export const PitchList = ({ orgId, query }: PitchListProps) => {
     const [filters, setFilters] = React.useState<FilterState>({
         categories: [],
         scoreRange: {
@@ -45,6 +46,7 @@ export const PitchList = ({ query }: PitchListProps) => {
     }, []);
 
     const data = useQuery(api.pitches.getFilteredPitches, {
+        orgId,
         search: query.search,
         favorites: query.favorites === "true",
         categories: filters.categories,
@@ -56,16 +58,18 @@ export const PitchList = ({ query }: PitchListProps) => {
 
     if (data === undefined) {
         return (
-            <div className="p-4">
+            <div className="flex-none p-4">
                 <div className="flex items-center justify-between mb-6">
                     <h2 className="text-3xl font-semibold">
-                        {query.favorites ? "Favorite Pitches" : "Pitches"}
+                        {query.favorites ? "Favorite Pitches" : "Team Pitches"}
                     </h2>
-                    <NewPitchButton disabled />
+                    <NewPitchButton orgId={orgId} disabled />
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-5 mt-8 pb-10">
                     {[...Array(4)].map((_, index) => (
-                        <PitchCardSkeleton key={index} />
+                        <div key={index} className="h-[250px]">
+                            <div className="w-full h-full animate-pulse bg-gray-200 rounded-lg" />
+                        </div>
                     ))}
                 </div>
             </div>
@@ -89,14 +93,14 @@ export const PitchList = ({ query }: PitchListProps) => {
             <div className="flex-none p-4">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <h2 className="text-2xl font-semibold">
-                        {query.favorites ? "Favorite Pitches" : "Pitches"}
+                        {query.favorites ? "Favorite Pitches" : "Team Pitches"}
                     </h2>
                     <div className="flex items-center justify-between gap-2">
                         <FilterPanel
                             filters={filters}
                             onChange={handleFiltersChange}
                         />
-                        <NewPitchButton />
+                        <NewPitchButton orgId={orgId} />
                     </div>
                 </div>
             </div>
@@ -106,7 +110,14 @@ export const PitchList = ({ query }: PitchListProps) => {
                         {data?.map((pitch) => (
                             <PitchCard
                                 key={pitch._id}
-                                pitch={pitch}
+                                id={pitch._id}
+                                title={pitch.title}
+                                text={pitch.text}
+                                authorId={pitch.userId}
+                                authorName={pitch.authorName}
+                                createdAt={pitch._creationTime}
+                                orgId={pitch.orgId}
+                                isFavorite={pitch.isFavorite}
                                 onClick={() => router.push(`/pitch/${pitch._id}`)}
                             />
                         ))}

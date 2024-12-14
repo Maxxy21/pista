@@ -9,6 +9,8 @@ import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {ScrollArea} from "@/components/ui/scroll-area";
 import {EvaluationContent} from "@/app/pitch/[id]/_components/evaluation-content";
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from "@/components/ui/resizable";
+import {SidebarInset} from "@/components/ui/sidebar";
+import PitchDetailsHeader from "@/app/pitch/[id]/_components/pitch-details-header";
 
 
 const PitchDetails = () => {
@@ -34,7 +36,7 @@ const PitchDetails = () => {
 
             <TabsContent value="evaluation" className="flex-1 overflow-hidden">
                 <ScrollArea className="h-full">
-                    <EvaluationContent data={data} />
+                    <EvaluationContent data={data}/>
                 </ScrollArea>
             </TabsContent>
         </Tabs>
@@ -50,11 +52,11 @@ const PitchDetails = () => {
                     </ScrollArea>
                 </div>
             </ResizablePanel>
-            <ResizableHandle withHandle />
+            <ResizableHandle withHandle/>
             <ResizablePanel defaultSize={50} minSize={30}>
                 <div className="h-full p-4">
                     <ScrollArea className="h-flex-1">
-                        <EvaluationContent data={data} />
+                        <EvaluationContent data={data}/>
                     </ScrollArea>
                 </div>
             </ResizablePanel>
@@ -62,15 +64,18 @@ const PitchDetails = () => {
     );
 
     return (
-        <div className="h-screen flex flex-col">
-            <h1 className="p-4 text-xl font-semibold">
-                {data.title} Evaluation
-            </h1>
-            <div className="flex-1 overflow-hidden">
-                <div className="md:hidden h-full">{mobileView}</div>
-                <div className="hidden md:block h-full">{desktopView}</div>
+        <SidebarInset>
+            <div className="h-screen flex flex-col">
+                <PitchDetailsHeader/>
+                <h1 className="p-4 text-xl font-semibold">
+                    {data.title} Evaluation
+                </h1>
+                <ScrollArea className="flex-1 px-4">
+                    <div className="md:hidden h-full">{mobileView}</div>
+                    <div className="hidden md:block h-full">{desktopView}</div>
+                </ScrollArea>
             </div>
-        </div>
+        </SidebarInset>
     );
 };
 

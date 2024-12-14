@@ -4,10 +4,11 @@ import {UploadForm} from "./upload-form";
 
 interface FileDialogProps {
     children: React.ReactNode;
+    orgId: string;
     disabled?: boolean;
 }
 
-export const FileDialog = ({children, disabled}: FileDialogProps) => {
+export const FileDialog = ({children, disabled, orgId}: FileDialogProps) => {
     return (
         <Dialog>
             <DialogTrigger asChild>
@@ -20,7 +21,7 @@ export const FileDialog = ({children, disabled}: FileDialogProps) => {
                         Upload your audio, text file, or write your pitch directly.
                     </DialogDescription>
                 </DialogHeader>
-                <UploadForm/>
+                <UploadForm orgId={orgId}/>
             </DialogContent>
         </Dialog>
     );
