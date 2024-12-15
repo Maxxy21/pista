@@ -1,8 +1,7 @@
 "use client"
 
 import { LucideIcon } from "lucide-react"
-import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import qs from "query-string";
 
 import {
@@ -20,17 +19,24 @@ interface NavMainProps {
 }
 
 export function NavMain({ items }: NavMainProps) {
+    const router = useRouter();
+    const pathname = usePathname();
     const searchParams = useSearchParams();
     const currentView = searchParams.get("view");
 
-    const getUrl = (value: string) => {
-        return qs.stringifyUrl({
-            url: "/dashboard",
-            query: {
-                ...Object.fromEntries(searchParams.entries()),
-                view: value === "home" ? undefined : value
-            }
-        }, { skipEmptyString: true, skipNull: true });
+    const handleNavigation = (value: string) => {
+        const current = new URLSearchParams(Array.from(searchParams.entries()));
+
+        if (value === "home") {
+            current.delete("view");
+        } else {
+            current.set("view", value);
+        }
+
+        const search = current.toString();
+        const query = search ? `?${search}` : "";
+
+        router.push(`${pathname}${query}`);
     };
 
     return (
@@ -40,18 +46,14 @@ export function NavMain({ items }: NavMainProps) {
                     (item.value === "home" && !currentView) ||
                     currentView === item.value;
 
-                const url = getUrl(item.value);
-
                 return (
                     <SidebarMenuItem key={item.title}>
                         <SidebarMenuButton
-                            asChild
                             isActive={isActive}
+                            onClick={() => handleNavigation(item.value)}
                         >
-                            <Link href={url}>
-                                <item.icon className="h-4 w-4 mr-2" />
-                                <span>{item.title}</span>
-                            </Link>
+                            <item.icon className="h-4 w-4 mr-2" />
+                            <span>{item.title}</span>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                 );

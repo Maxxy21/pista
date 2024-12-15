@@ -9,9 +9,18 @@ import {SignUpButton, useUser} from "@clerk/clerk-react";
 import {SignInButton} from "@clerk/nextjs";
 import {useRouter} from "next/navigation";
 import LogoIcon from "@/components/ui/logo-icon";
-import React from "react";
+import React, {useEffect} from "react";
 
 export default function LandingPage() {
+    const { isSignedIn } = useUser();
+    const router = useRouter();
+
+    useEffect(() => {
+        if (isSignedIn) {
+            router.push("/dashboard");
+        }
+    }, [isSignedIn, router]);
+
     return (
         <main className="bg-gradient-to-r from-black-200 to-blue-200 h-full min-h-screen">
             <div className="container relative m-0 mx-auto py-10 md:px-10">
