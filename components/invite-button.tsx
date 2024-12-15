@@ -1,6 +1,6 @@
 "use client"
 
-import {Plus, UserPlus} from "lucide-react";
+import {UserPlus} from "lucide-react";
 import { OrganizationProfile } from "@clerk/nextjs";
 import {
     Dialog,

@@ -15,16 +15,22 @@ import {
 } from "@/components/ui/sidebar";
 import {Hint} from "@/components/hint";
 
-export function SearchForm({ className, ...props }: React.ComponentProps<"form">) {
-    const router = useRouter();
-    const pathname = usePathname();
-    const [value, setValue] = useState("");
-    const [debouncedValue] = useDebounceValue(value, 500);
+interface SearchFormProps {
+    value: string;
+    onChange: (value: string) => void;
+    className?: string;
+}
+
+export function SearchForm({
+                               value,
+                               onChange,
+                               className
+                           }: SearchFormProps) {
     const { state, toggleSidebar } = useSidebar();
     const inputRef = useRef<HTMLInputElement>(null);
 
-    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-        setValue(e.target.value);
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        onChange(e.target.value);
     };
 
     useEffect(() => {
@@ -33,19 +39,8 @@ export function SearchForm({ className, ...props }: React.ComponentProps<"form">
         }
     }, [state]);
 
-    useEffect(() => {
-        const url = qs.stringifyUrl({
-            url: pathname || "/dashboard",
-            query: {
-                search: debouncedValue,
-            },
-        }, { skipEmptyString: true, skipNull: true });
-
-        router.push(url);
-    }, [debouncedValue, router, pathname]);
-
     return (
-        <form {...props} onSubmit={(e) => e.preventDefault()}>
+        <form onSubmit={(e) => e.preventDefault()}>
             <SidebarGroup className="py-0">
                 <SidebarGroupContent className="relative">
                     <Label htmlFor="search" className="sr-only">
@@ -60,7 +55,6 @@ export function SearchForm({ className, ...props }: React.ComponentProps<"form">
                                 <Search className="size-4"/>
                             </button>
                         </Hint>
-
                     ) : (
                         <div className="relative">
                             <Search
@@ -71,8 +65,8 @@ export function SearchForm({ className, ...props }: React.ComponentProps<"form">
                                 id="search"
                                 placeholder="Search pitches..."
                                 className="pl-8 w-full"
-                                onChange={handleChange}
                                 value={value}
+                                onChange={handleChange}
                             />
                         </div>
                     )}

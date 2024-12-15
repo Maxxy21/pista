@@ -11,6 +11,7 @@ import {EvaluationContent} from "@/app/pitch/[id]/_components/evaluation-content
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from "@/components/ui/resizable";
 import {SidebarInset} from "@/components/ui/sidebar";
 import PitchDetailsHeader from "@/app/pitch/[id]/_components/pitch-details-header";
+import {Separator} from "@/components/ui/separator";
 
 
 const PitchDetails = () => {
@@ -29,15 +30,11 @@ const PitchDetails = () => {
             </TabsList>
 
             <TabsContent value="transcript" className="flex-1 overflow-hidden">
-                <ScrollArea className="h-full px-4">
                     <p className="whitespace-pre-wrap">{data.text}</p>
-                </ScrollArea>
             </TabsContent>
 
             <TabsContent value="evaluation" className="flex-1 overflow-hidden">
-                <ScrollArea className="h-full">
                     <EvaluationContent data={data}/>
-                </ScrollArea>
             </TabsContent>
         </Tabs>
     );
@@ -47,17 +44,13 @@ const PitchDetails = () => {
             <ResizablePanel defaultSize={50} minSize={30}>
                 <div className="h-full p-4">
                     <h2 className="font-semibold mb-2">Transcript</h2>
-                    <ScrollArea className="h-[calc(100%-2rem)]">
                         <p className="whitespace-pre-wrap">{data.text}</p>
-                    </ScrollArea>
                 </div>
             </ResizablePanel>
             <ResizableHandle withHandle/>
             <ResizablePanel defaultSize={50} minSize={30}>
                 <div className="h-full p-4">
-                    <ScrollArea className="h-flex-1">
                         <EvaluationContent data={data}/>
-                    </ScrollArea>
                 </div>
             </ResizablePanel>
         </ResizablePanelGroup>
@@ -66,10 +59,8 @@ const PitchDetails = () => {
     return (
         <SidebarInset>
             <div className="h-screen flex flex-col">
-                <PitchDetailsHeader/>
-                <h1 className="p-4 text-xl font-semibold">
-                    {data.title} Evaluation
-                </h1>
+                <PitchDetailsHeader title={data.title}/>
+                <Separator orientation="horizontal"/>
                 <ScrollArea className="flex-1 px-4">
                     <div className="md:hidden h-full">{mobileView}</div>
                     <div className="hidden md:block h-full">{desktopView}</div>

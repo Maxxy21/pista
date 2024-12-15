@@ -8,11 +8,13 @@ import { EmptyFavorites } from "./empty-favorites";
 import { EmptyPitches } from "./empty-pitches";
 
 import { AnimatePresence } from "framer-motion";
-import { useRouter } from "next/navigation";
+import {usePathname, useRouter} from "next/navigation";
 import React from "react";
 import { FilterPanel } from "@/components/filters/filter-panel";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { PitchCard } from "./pitch-card/pitch-card";
+import { PitchCardSkeleton } from "./pitch-card/pitch-card-skeleton";
+import qs from "query-string";
 
 interface FilterState {
     categories: string[];
@@ -27,60 +29,85 @@ interface PitchListProps {
     orgId: string;
     query: {
         search?: string;
-        favorites?: string;
+        view?: string;
     }
 }
 
 export const PitchList = ({ orgId, query }: PitchListProps) => {
+    const router = useRouter();
+    const pathname = usePathname();
+
     const [filters, setFilters] = React.useState<FilterState>({
         categories: [],
         scoreRange: {
             min: 0,
             max: 10
         },
-        sortBy: "date"
+        sortBy: query.view === "recent" ? "date" : "score"
     });
 
     const handleFiltersChange = React.useCallback((newFilters: FilterState) => {
         setFilters(newFilters);
-    }, []);
+    }, [])
+
+    const handlePitchClick = (pitchId: string) => {
+        // Preserve the current view parameter when navigating to pitch details
+        const url = qs.stringifyUrl({
+            url: `/pitch/${pitchId}`,
+            query: {
+                view: query.view
+            }
+        }, { skipEmptyString: true, skipNull: true });
+
+        router.push(url);
+    };
 
     const data = useQuery(api.pitches.getFilteredPitches, {
         orgId,
         search: query.search,
-        favorites: query.favorites === "true",
+        favorites: query.view === "favorites",
+        sortBy: query.view === "recent" ? "date" : filters.sortBy,
         categories: filters.categories,
         scoreRange: filters.scoreRange,
-        sortBy: filters.sortBy,
     });
 
-    const router = useRouter();
+    const getTitle = () => {
+        switch (query.view) {
+            case "recent":
+                return "Recent Pitches";
+            case "favorites":
+                return "Favorite Pitches";
+            default:
+                return "Team Pitches";
+        }
+    };
+
+
 
     if (data === undefined) {
         return (
             <div className="flex-none p-4">
                 <div className="flex items-center justify-between mb-6">
                     <h2 className="text-3xl font-semibold">
-                        {query.favorites ? "Favorite Pitches" : "Team Pitches"}
+                        {getTitle()}
                     </h2>
-                    <NewPitchButton orgId={orgId} disabled />
+                    <NewPitchButton orgId={orgId} disabled/>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-5 mt-8 pb-10">
-                    {[...Array(4)].map((_, index) => (
-                        <div key={index} className="h-[250px]">
-                            <div className="w-full h-full animate-pulse bg-gray-200 rounded-lg" />
-                        </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {[...Array(6)].map((_, index) => (
+                        <PitchCardSkeleton key={index}/>
                     ))}
                 </div>
+
             </div>
         );
     }
 
     if (!data?.length && query.search) {
-        return <EmptySearch />;
+        return <EmptySearch/>;
     }
 
-    if (!data?.length && query.favorites) {
+    if (!data?.length && query.view === "favorites") {
         return <EmptyFavorites />;
     }
 
@@ -91,21 +118,21 @@ export const PitchList = ({ orgId, query }: PitchListProps) => {
     return (
         <div className="flex flex-col h-full">
             <div className="flex-none p-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <h2 className="text-2xl font-semibold">
-                        {query.favorites ? "Favorite Pitches" : "Team Pitches"}
-                    </h2>
-                    <div className="flex items-center justify-between gap-2">
-                        <FilterPanel
-                            filters={filters}
-                            onChange={handleFiltersChange}
-                        />
-                        <NewPitchButton orgId={orgId} />
+                <div className="flex flex-col gap-4">
+                    <div className="flex items-center justify-between">
+                        <h2 className="text-2xl font-semibold">
+                            {getTitle()}
+                        </h2>
+                        <NewPitchButton orgId={orgId}/>
                     </div>
+                    <FilterPanel
+                        filters={filters}
+                        onChange={handleFiltersChange}
+                    />
                 </div>
             </div>
             <ScrollArea className="flex-1 px-4">
-                <div className="grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 gap-4 pb-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pb-4">
                     <AnimatePresence mode="popLayout">
                         {data?.map((pitch) => (
                             <PitchCard
@@ -118,7 +145,7 @@ export const PitchList = ({ orgId, query }: PitchListProps) => {
                                 createdAt={pitch._creationTime}
                                 orgId={pitch.orgId}
                                 isFavorite={pitch.isFavorite}
-                                onClick={() => router.push(`/pitch/${pitch._id}`)}
+                                onClick={() => handlePitchClick(pitch._id)}
                             />
                         ))}
                     </AnimatePresence>

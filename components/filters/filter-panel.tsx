@@ -1,10 +1,7 @@
 "use client";
-import {Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger} from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/slider";
-import { SlidersHorizontal } from "lucide-react";
-import { CategoryFilter } from "./category-filter";
 import React from "react";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 
 interface FilterState {
     categories: string[];
@@ -18,88 +15,78 @@ interface FilterState {
 interface FilterPanelProps {
     filters: FilterState;
     onChange: (filters: FilterState) => void;
+    className?: string;
 }
 
-export const FilterPanel = React.memo(({ filters, onChange }: FilterPanelProps) => {
-    const [isOpen, setIsOpen] = React.useState(false);
-
-    const handleScoreRangeChange = (value: number[]) => {
-        onChange({
-            ...filters,
-            scoreRange: {
-                min: value[0],
-                max: value[1]
-            }
-        });
-    };
-
-    const handleSortChange = (sortBy: "date" | "score") => {
-        onChange({
-            ...filters,
-            sortBy
-        });
-    };
-
+export const FilterPanel = React.memo(({ filters, onChange, className }: FilterPanelProps) => {
     return (
-        <Sheet open={isOpen} onOpenChange={setIsOpen}>
-            <SheetTrigger asChild>
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        setIsOpen(true);
+        <div className={cn("flex items-center gap-4", className)}>
+            <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">Filter by</span>
+                <Select
+                    value="all"
+                    onValueChange={(value) => {
+                        // Handle filter change
                     }}
                 >
-                    <SlidersHorizontal className="h-4 w-4 mr-2" />
-                    Filters
-                </Button>
-            </SheetTrigger>
-            <SheetContent>
-                <SheetHeader>
-                    <SheetTitle>Filter Pitches</SheetTitle>
-                </SheetHeader>
-                <SheetDescription>
-                    Filter pitches by category, score range, and sort order.
-                </SheetDescription>
-                <div className="space-y-6 mt-4" onClick={(e) => e.stopPropagation()}>
-                    <div className="space-y-2">
-                        <h3 className="text-sm font-medium">Score Range</h3>
-                        <Slider
-                            min={0}
-                            max={10}
-                            step={0.1}
-                            value={[filters.scoreRange.min, filters.scoreRange.max]}
-                            onValueChange={handleScoreRangeChange}
-                            className="w-full"
-                        />
-                        <div className="flex justify-between text-xs text-muted-foreground">
-                            <span>{filters.scoreRange.min.toFixed(1)}</span>
-                            <span>{filters.scoreRange.max.toFixed(1)}</span>
-                        </div>
-                    </div>
-                    <div>
-                        <h3 className="text-sm font-medium mb-2">Sort By</h3>
-                        <div className="flex gap-2">
-                            <Button
-                                size="sm"
-                                variant={filters.sortBy === "date" ? "default" : "outline"}
-                                onClick={() => handleSortChange("date")}
-                            >
-                                Date
-                            </Button>
-                            <Button
-                                size="sm"
-                                variant={filters.sortBy === "score" ? "default" : "outline"}
-                                onClick={() => handleSortChange("score")}
-                            >
-                                Score
-                            </Button>
-                        </div>
-                    </div>
-                </div>
-            </SheetContent>
-        </Sheet>
+                    <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="All boards" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectGroup>
+                            <SelectItem value="all">All pitches</SelectItem>
+                            <SelectItem value="high-score">High Score (8+)</SelectItem>
+                            <SelectItem value="medium-score">Medium Score (5-8)</SelectItem>
+                            <SelectItem value="low-score">Low Score (5)</SelectItem>
+                        </SelectGroup>
+                    </SelectContent>
+                </Select>
+            </div>
+
+            <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">Owned by</span>
+                <Select
+                    value="anyone"
+                    onValueChange={(value) => {
+                        // Handle ownership filter
+                    }}
+                >
+                    <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Owned by anyone" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectGroup>
+                            <SelectItem value="anyone">Anyone</SelectItem>
+                            <SelectItem value="me">Me</SelectItem>
+                            <SelectItem value="team">Team members</SelectItem>
+                        </SelectGroup>
+                    </SelectContent>
+                </Select>
+            </div>
+
+            <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">Sort by</span>
+                <Select
+                    value={filters.sortBy}
+                    onValueChange={(value: "date" | "score") => {
+                        onChange({
+                            ...filters,
+                            sortBy: value
+                        });
+                    }}
+                >
+                    <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Sort by" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectGroup>
+                            <SelectItem value="date">Last opened</SelectItem>
+                            <SelectItem value="score">Highest score</SelectItem>
+                        </SelectGroup>
+                    </SelectContent>
+                </Select>
+            </div>
+        </div>
     );
 });
 

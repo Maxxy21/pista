@@ -1,73 +1,84 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 import {
-    AudioWaveform,
-    BookOpen,
-    Bot,
-    Command,
-    Frame,
-    GalleryVerticalEnd,
-    Map,
-    PieChart,
-    Settings2,
-    SquareTerminal,
     Home,
     Clock,
     Star
-} from "lucide-react"
+} from "lucide-react";
+import { useOrganization } from "@clerk/nextjs";
+import { useTheme } from "next-themes";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useDebounceValue } from "usehooks-ts";
+import qs from "query-string";
 
-import { NavMain } from "@/components/nav-main"
-import { NavUser } from "@/components/nav-user"
-import { TeamSwitcher } from "@/components/team-switcher"
+import { NavMain } from "@/components/nav-main";
+import { NavUser } from "@/components/nav-user";
+import { TeamSwitcher } from "@/components/team-switcher";
 import {
     Sidebar,
     SidebarContent,
     SidebarFooter,
     SidebarHeader,
     SidebarRail,
-} from "@/components/ui/sidebar"
-import { SearchForm } from "@/components/search-form"
-import { useOrganization } from "@clerk/nextjs"
-import { InviteButton } from "@/components/invite-button"
-import { useTheme } from "next-themes"
-import { dark } from "@clerk/themes"
+} from "@/components/ui/sidebar";
+import { SearchForm } from "@/components/search-form";
+import { InviteButton } from "@/components/invite-button";
 
-// This is sample data.
-const data = {
-    navMain: [
-        {
-            title: "Home",
-            url: "/dashboard",
-            icon: Home,
-            isActive: true,
-        },
-        {
-            title: "Recent",
-            url: "#",
-            icon: Clock,
-        },
-        {
-            title: "Favourites",
-            url: "#",
-            icon: Star,
-        },
-    ]
-}
+const navigationItems = [
+    {
+        title: "Home",
+        icon: Home,
+        value: "home"
+    },
+    {
+        title: "Recent",
+        icon: Clock,
+        value: "recent"
+    },
+    {
+        title: "Favourites",
+        icon: Star,
+        value: "favorites"
+    },
+];
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const { organization } = useOrganization();
     const { resolvedTheme } = useTheme();
     const isDark = resolvedTheme === 'dark';
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const [search, setSearch] = React.useState("");
+    const [debouncedSearch] = useDebounceValue(search, 500);
+
+    React.useEffect(() => {
+        const url = qs.stringifyUrl({
+            url: window.location.pathname,
+            query: {
+                ...Object.fromEntries(searchParams.entries()),
+                search: debouncedSearch,
+            },
+        }, { skipEmptyString: true, skipNull: true });
+
+        router.push(url);
+    }, [debouncedSearch, router, searchParams]);
+
+    const handleSearchChange = (value: string) => {
+        setSearch(value);
+    };
 
     return (
         <Sidebar collapsible="icon" {...props}>
             <SidebarHeader>
                 <TeamSwitcher isDark={isDark} />
-                <SearchForm />
+                <SearchForm
+                    value={search}
+                    onChange={handleSearchChange}
+                />
             </SidebarHeader>
             <SidebarContent>
-                <NavMain items={data.navMain} />
+                <NavMain items={navigationItems} />
             </SidebarContent>
             <SidebarFooter>
                 {organization && (
@@ -77,5 +88,5 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </SidebarFooter>
             <SidebarRail />
         </Sidebar>
-    )
+    );
 }
