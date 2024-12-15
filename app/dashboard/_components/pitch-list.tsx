@@ -8,7 +8,7 @@ import { EmptyFavorites } from "./empty-favorites";
 import { EmptyPitches } from "./empty-pitches";
 
 import { AnimatePresence } from "framer-motion";
-import {usePathname, useRouter} from "next/navigation";
+import {usePathname, useRouter, useSearchParams} from "next/navigation";
 import React from "react";
 import { FilterPanel } from "@/components/filters/filter-panel";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -36,6 +36,9 @@ interface PitchListProps {
 export const PitchList = ({ orgId, query }: PitchListProps) => {
     const router = useRouter();
     const pathname = usePathname();
+    const searchParams = useSearchParams();
+    const currentView = searchParams.get("view");
+    const searchQuery = searchParams.get("search") || "";
 
     const [filters, setFilters] = React.useState<FilterState>({
         categories: [],
@@ -64,7 +67,7 @@ export const PitchList = ({ orgId, query }: PitchListProps) => {
 
     const data = useQuery(api.pitches.getFilteredPitches, {
         orgId,
-        search: query.search,
+        search: searchQuery,
         favorites: query.view === "favorites",
         sortBy: query.view === "recent" ? "date" : filters.sortBy,
         categories: filters.categories,
