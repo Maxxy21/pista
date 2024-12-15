@@ -35,7 +35,6 @@ interface PitchListProps {
 
 export const PitchList = ({ orgId, query }: PitchListProps) => {
     const router = useRouter();
-    const pathname = usePathname();
     const searchParams = useSearchParams();
     const currentView = searchParams.get("view");
     const searchQuery = searchParams.get("search") || "";
@@ -46,8 +45,9 @@ export const PitchList = ({ orgId, query }: PitchListProps) => {
             min: 0,
             max: 10
         },
-        sortBy: query.view === "recent" ? "date" : "score"
+        sortBy: currentView === "recent" ? "date" : "score"
     });
+
 
     const handleFiltersChange = React.useCallback((newFilters: FilterState) => {
         setFilters(newFilters);
@@ -65,14 +65,16 @@ export const PitchList = ({ orgId, query }: PitchListProps) => {
         router.push(url);
     };
 
+
     const data = useQuery(api.pitches.getFilteredPitches, {
         orgId,
         search: searchQuery,
-        favorites: query.view === "favorites",
-        sortBy: query.view === "recent" ? "date" : filters.sortBy,
+        favorites: currentView === "favorites", // This needs to be a boolean
+        sortBy: currentView === "recent" ? "date" : filters.sortBy,
         categories: filters.categories,
         scoreRange: filters.scoreRange,
     });
+
 
     const getTitle = () => {
         switch (query.view) {

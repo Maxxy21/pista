@@ -33,10 +33,12 @@ export function NavMain({ items }: NavMainProps) {
             current.set("view", value);
         }
 
+        // Preserve other parameters like search
         const search = current.toString();
         const query = search ? `?${search}` : "";
 
-        router.push(`${pathname}${query}`);
+        // Use replace instead of push to avoid building up history
+        router.replace(`/dashboard${query}`);
     };
 
     return (
@@ -59,5 +61,5 @@ export function NavMain({ items }: NavMainProps) {
                 );
             })}
         </SidebarMenu>
-    )
+    );
 }
