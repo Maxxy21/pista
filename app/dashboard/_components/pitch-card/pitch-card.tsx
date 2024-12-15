@@ -50,7 +50,7 @@ export const PitchCard = ({
         e.preventDefault();
 
         if (isFavorite) {
-            onUnfavorite({ id })
+            onUnfavorite({ id, orgId})
                 .catch(() => toast.error("Failed to unfavorite"));
         } else {
             onFavorite({ id, orgId })

@@ -2,7 +2,6 @@
 
 import { LucideIcon } from "lucide-react"
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import qs from "query-string";
 
 import {
     SidebarMenu,
@@ -33,11 +32,10 @@ export function NavMain({ items }: NavMainProps) {
             current.set("view", value);
         }
 
-        // Preserve other parameters like search
+
         const search = current.toString();
         const query = search ? `?${search}` : "";
 
-        // Use replace instead of push to avoid building up history
         router.replace(`/dashboard${query}`);
     };
 
@@ -49,7 +47,7 @@ export function NavMain({ items }: NavMainProps) {
                     currentView === item.value;
 
                 return (
-                    <SidebarMenuItem key={item.title}>
+                    <SidebarMenuItem key={item.title} className="mx-2">
                         <SidebarMenuButton
                             isActive={isActive}
                             onClick={() => handleNavigation(item.value)}

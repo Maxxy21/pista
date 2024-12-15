@@ -30,6 +30,7 @@
     "@radix-ui/react-tooltip": "^1.1.5",
     "@tabler/icons-react": "^3.21.0",
     "@tanstack/react-table": "^8.19.3",
+    "@vercel/speed-insights": "^1.1.0",
     "axios": "1.7.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

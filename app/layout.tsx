@@ -2,6 +2,7 @@ import type {Metadata} from "next";
 import {Noto_Sans_Georgian} from "next/font/google";
 import "./globals.css";
 
+import { SpeedInsights } from "@vercel/speed-insights/next"
 import {ConvexClientProvider} from "@/providers/convex-client-provider";
 import {ThemeProvider} from "@/providers/theme-provider";
 import React, {Suspense} from "react";
@@ -46,6 +47,7 @@ export default function RootLayout({
                     <Toaster/>
                     <ModalProvider/>
                     {children}
+                    <SpeedInsights />
                 </ConvexClientProvider>
             </ThemeProvider>
         </Suspense>
