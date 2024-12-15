@@ -1,60 +1,61 @@
-"use client";
+"use client"
 
-import { LucideIcon } from "lucide-react";
-import { usePathname, useRouter } from "next/navigation";
+import { LucideIcon } from "lucide-react"
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import qs from "query-string";
 
 import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
-} from "@/components/ui/sidebar";
-
-interface NavItem {
-    title: string;
-    icon: LucideIcon;
-    value: string;
-}
+} from "@/components/ui/sidebar"
 
 interface NavMainProps {
-    items: NavItem[];
+    items: {
+        title: string
+        icon: LucideIcon
+        value: string
+    }[]
 }
 
 export function NavMain({ items }: NavMainProps) {
-    const router = useRouter();
-    const pathname = usePathname();
+    const searchParams = useSearchParams();
+    const currentView = searchParams.get("view");
 
-    const onClick = (value: string) => {
-        const url = qs.stringifyUrl({
-            url: pathname || "/dashboard",
+    const getUrl = (value: string) => {
+        return qs.stringifyUrl({
+            url: "/dashboard",
             query: {
-                view: value,
-            },
+                ...Object.fromEntries(searchParams.entries()),
+                view: value === "home" ? undefined : value
+            }
         }, { skipEmptyString: true, skipNull: true });
-
-        router.push(url);
     };
-
-    // Get current view from URL
-    const currentUrl = qs.parse(window.location.search);
-    const currentView = currentUrl.view as string;
 
     return (
         <SidebarMenu>
-            {items.map((item) => (
-                <SidebarMenuItem key={item.title} className="mx-2">
-                    <SidebarMenuButton
-                        asChild
-                        isActive={currentView === item.value}
-                        onClick={() => onClick(item.value)}
-                    >
-                        <button>
-                            <item.icon className="h-4 w-4 mr-2" />
-                            <span>{item.title}</span>
-                        </button>
-                    </SidebarMenuButton>
-                </SidebarMenuItem>
-            ))}
+            {items.map((item) => {
+                const isActive =
+                    (item.value === "home" && !currentView) ||
+                    currentView === item.value;
+
+                const url = getUrl(item.value);
+
+                return (
+                    <SidebarMenuItem key={item.title}>
+                        <SidebarMenuButton
+                            asChild
+                            isActive={isActive}
+                        >
+                            <Link href={url}>
+                                <item.icon className="h-4 w-4 mr-2" />
+                                <span>{item.title}</span>
+                            </Link>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                );
+            })}
         </SidebarMenu>
-    );
+    )
 }
