@@ -1,4 +1,4 @@
-import {DatabaseReader, DatabaseWriter, mutation, query, QueryCtx} from "./_generated/server";
+import {mutation, query, QueryCtx} from "./_generated/server";
 import {ConvexError, v} from "convex/values";
 import {Doc} from "@/convex/_generated/dataModel";
 import {getAllOrThrow} from "convex-helpers/server/relationships";
@@ -176,6 +176,30 @@ export const update = mutation({
     },
 });
 
+
+export const remove = mutation({
+    args: { id: v.id("pitches") },
+    handler: async (ctx, args) => {
+        const identity = await validateUser(ctx);
+
+        const userId = identity.subject;
+
+        const existingFavorite = await ctx.db
+            .query("userFavorites")
+            .withIndex("by_user_pitch", (q) =>
+                q
+                    .eq("userId", userId)
+                    .eq("pitchId", args.id)
+            )
+            .unique();
+
+        if (existingFavorite) {
+            await ctx.db.delete(existingFavorite._id);
+        }
+
+        await ctx.db.delete(args.id);
+    },
+});
 // Favorite/unfavorite functions
 export const favorite = mutation({
     args: {

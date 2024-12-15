@@ -33,7 +33,7 @@ export const Actions = ({
   title,
 }: ActionsProps) => {
   const { onOpen } = useRenameModal();
-  const { mutate, pending } = useApiMutation(api.pitches.removePitch);
+  const { mutate, pending } = useApiMutation(api.pitches.remove);
 
   const onDelete = () => {
     mutate({ id })
