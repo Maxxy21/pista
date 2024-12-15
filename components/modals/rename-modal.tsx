@@ -22,7 +22,7 @@ export const RenameModal = () => {
   const { 
     mutate, 
     pending
-  } = useApiMutation(api.pitches.updatePitch);
+  } = useApiMutation(api.pitches.update);
 
   const {
     isOpen,
