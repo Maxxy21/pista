@@ -12,9 +12,6 @@ const DashboardHeader  = () => {
                 <Separator orientation="vertical" className="mr-2 h-4"/>
                 <h1 className="text-2xl font-semibold">Pitch Perfect</h1>
             </div>
-            <div className="px-4">
-                <ModeToggle/>
-            </div>
         </header>
     );
 };

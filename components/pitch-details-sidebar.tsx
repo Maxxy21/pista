@@ -17,7 +17,7 @@ import {
     SidebarMenuItem,
     SidebarMenuButton,
     SidebarInput,
-    useSidebar,
+    useSidebar, SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -31,6 +31,7 @@ import { Hint } from "@/components/hint";
 import {InviteButton} from "@/components/invite-button";
 import {useTheme} from "next-themes";
 import {RecentPitches} from "@/components/recent-pitches";
+import LogoIcon from "@/components/ui/logo-icon";
 
 export function PitchDetailsSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const router = useRouter();
@@ -104,45 +105,54 @@ export function PitchDetailsSidebar({ ...props }: React.ComponentProps<typeof Si
     return (
         <Sidebar collapsible="icon" {...props}>
             <SidebarHeader>
-                {state === "expanded" ? (
-                    <div className="flex items-center gap-2 px-4 pb-2">
-                        <Button
-                            onClick={handleBack}
-                            variant="ghost"
-                            size="sm"
-                            className="flex items-center gap-2"
-                        >
-                            <ChevronLeft className="h-4 w-4" />
-                            <span>Home</span>
-                        </Button>
+                {state === "collapsed" ? (
+                    <div className="py-2">
+                        <LogoIcon />
                     </div>
                 ) : (
-                    <Hint label="Back to Home" side="right" sideOffset={12}>
-                        <button
-                            onClick={handleBack}
-                            className="w-full p-2 hover:bg-accent rounded-md"
-                        >
-                            <Home className="h-4 w-4" />
-                        </button>
-                    </Hint>
+                    <div className="flex items-center justify-between gap-2 mb-2">
+                        <div className="flex items-center gap-2">
+                            <LogoIcon/>
+                            <h1 className="text-lg font-semibold">Pitch Perfect</h1>
+                        </div>
+                        <SidebarTrigger/>
+                    </div>
                 )}
                 <SearchForm
                     value={search}
                     onChange={setSearch}
                 />
-
             </SidebarHeader>
             <SidebarContent>
                 <ScrollArea className="h-full">
                     {state === "expanded" ? (
-                        <RecentPitches
-                            pitches={pitches || []}
-                            currentPitchId={params.id as string}
-                            onPitchClick={navigateToPitch}
-                            searchQuery={search}
-                        />
+                        <div>
+                            <Button
+                                onClick={handleBack}
+                                variant="ghost"
+                                size="sm"
+                                className="flex items-center gap-2"
+                            >
+                                <ChevronLeft className="h-4 w-4" />
+                                <span>Home</span>
+                            </Button>
+                            <RecentPitches
+                                pitches={pitches || []}
+                                currentPitchId={params.id as string}
+                                onPitchClick={navigateToPitch}
+                                searchQuery={search}
+                            />
+                        </div>
+
                     ) : (
                         <SidebarMenu>
+                            <SidebarMenuItem>
+                                <Hint label="Home" side="right" sideOffset={12}>
+                                    <SidebarMenuButton className="ml-2">
+                                        <Home className="h-4 w-4 " />
+                                    </SidebarMenuButton>
+                                </Hint>
+                            </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <Hint label="All Pitches" side="right" sideOffset={12}>
                                     <SidebarMenuButton className="ml-2">
@@ -155,6 +165,10 @@ export function PitchDetailsSidebar({ ...props }: React.ComponentProps<typeof Si
                 </ScrollArea>
             </SidebarContent>
             <SidebarFooter>
+                {state === "collapsed" && (
+                    <SidebarTrigger/>
+
+                )}
                 {organization && (
                     <InviteButton isDark={isDark} />
                 )}

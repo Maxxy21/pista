@@ -21,8 +21,8 @@ const Dashboard = ({searchParams}: DashboardProps) => {
     const { organization } = useOrganization();
     return (
         <SidebarInset>
-            <DashboardHeader/>
-            <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+            {/*<DashboardHeader/>*/}
+            <div className="flex flex-1 flex-col gap-4 p-4 pt-3">
                 <DashboardStats/>
                 <PitchList
                     orgId={organization?.id as string}

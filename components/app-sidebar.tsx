@@ -4,7 +4,7 @@ import * as React from "react";
 import {
     Home,
     Clock,
-    Star
+    Star, ChevronRight
 } from "lucide-react";
 import { useOrganization } from "@clerk/nextjs";
 import { useTheme } from "next-themes";
@@ -20,10 +20,12 @@ import {
     SidebarContent,
     SidebarFooter,
     SidebarHeader,
-    SidebarRail,
+    SidebarRail, SidebarTrigger, useSidebar,
 } from "@/components/ui/sidebar";
 import { SearchForm } from "@/components/search-form";
 import { InviteButton } from "@/components/invite-button";
+import LogoIcon from "@/components/ui/logo-icon";
+import {Button} from "@/components/ui/button";
 
 const navigationItems = [
     {
@@ -51,6 +53,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const searchParams = useSearchParams();
     const [search, setSearch] = React.useState("");
     const [debouncedSearch] = useDebounceValue(search, 500);
+    const { state } = useSidebar()
 
     React.useEffect(() => {
         const url = qs.stringifyUrl({
@@ -71,16 +74,33 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     return (
         <Sidebar collapsible="icon" {...props}>
             <SidebarHeader>
-                <TeamSwitcher isDark={isDark} />
+                {state === "collapsed" ? (
+                    <div className="py-2">
+                        <LogoIcon />
+                    </div>
+                ) : (
+                    <div className="flex items-center justify-between gap-2 mb-2">
+                        <div className="flex items-center gap-2">
+                            <LogoIcon/>
+                            <h1 className="text-lg font-semibold">Pitch Perfect</h1>
+                        </div>
+                        <SidebarTrigger/>
+                    </div>
+                )}
+                <TeamSwitcher isDark={isDark}/>
                 <SearchForm
                     value={search}
                     onChange={handleSearchChange}
                 />
             </SidebarHeader>
             <SidebarContent>
-                <NavMain items={navigationItems} />
+                <NavMain items={navigationItems}/>
             </SidebarContent>
             <SidebarFooter>
+                {state === "collapsed" && (
+                    <SidebarTrigger/>
+
+                )}
                 {organization && (
                     <InviteButton isDark={isDark} />
                 )}
