@@ -1,12 +1,28 @@
 'use client';
 
 import { ArrowRight, CheckCircle2, Sparkles, Target, Zap } from "lucide-react";
-import { SignInButton, SignUpButton } from "@clerk/nextjs";
+import {SignInButton, SignUpButton, useUser} from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import LogoIcon from "@/components/ui/logo-icon";
+import { useRouter } from "next/navigation";
+import {useEffect} from "react";
+import Link from "next/link";
 
 export default function LandingPage() {
+    const { user } = useUser();
+    const router = useRouter();
+
+    useEffect(() => {
+        if (user) {
+            router.push("/dashboard");
+        }
+    }, [user, router]);
+
+    if (user) {
+        return null;
+    }
+
     const fadeIn = {
         hidden: { opacity: 0, y: 20 },
         visible: { opacity: 1, y: 0 }
@@ -51,16 +67,16 @@ export default function LandingPage() {
                         animate={{opacity: 1, x: 0}}
                         transition={{delay: 0.3}}
                     >
-                        <SignInButton mode="modal">
-                            <motion.div whileHover={{scale: 1.05}} whileTap={{scale: 0.95}}>
+                        <motion.div whileHover={{scale: 1.05}} whileTap={{scale: 0.95}}>
+                            <Link href="/sign-in">
                                 <Button variant="ghost">Sign In</Button>
-                            </motion.div>
-                        </SignInButton>
-                        <SignUpButton mode="modal">
-                            <motion.div whileHover={{scale: 1.05}} whileTap={{scale: 0.95}}>
+                            </Link>
+                        </motion.div>
+                        <motion.div whileHover={{scale: 1.05}} whileTap={{scale: 0.95}}>
+                            <Link href="/sign-up">
                                 <Button>Get Started</Button>
-                            </motion.div>
-                        </SignUpButton>
+                            </Link>
+                        </motion.div>
                     </motion.div>
                 </nav>
             </motion.header>
@@ -98,11 +114,13 @@ export default function LandingPage() {
                                 variants={fadeIn}
                                 className="flex flex-wrap justify-center gap-4"
                             >
-                                <SignUpButton mode="modal">
-                                    <Button size="lg" className="gap-2">
-                                        Start Now <ArrowRight className="h-4 w-4"/>
-                                    </Button>
-                                </SignUpButton>
+                                <motion.div whileHover={{scale: 1.05}} whileTap={{scale: 0.95}}>
+                                    <Link href="/sign-up">
+                                        <Button size="lg" className="gap-2">
+                                            Start Now <ArrowRight className="h-4 w-4"/>
+                                        </Button>
+                                    </Link>
+                                </motion.div>
                             </motion.div>
                         </motion.div>
                     </div>
@@ -180,13 +198,13 @@ export default function LandingPage() {
                                 Join thousands of startups who have improved their pitch decks with our
                                 AI-powered platform.
                             </p>
-                            <SignUpButton mode="modal">
-                                <motion.div whileHover={{scale: 1.05}}>
+                            <motion.div whileHover={{scale: 1.05}}>
+                                <Link href="/sign-up">
                                     <Button size="lg" className="gap-2">
                                         Get Started Now <ArrowRight className="h-4 w-4"/>
                                     </Button>
-                                </motion.div>
-                            </SignUpButton>
+                                </Link>
+                            </motion.div>
                         </div>
                     </motion.div>
                 </section>

@@ -2,13 +2,31 @@
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { cn } from "@/lib/utils";
-import { LucideIcon, LineChart, ChevronUp, CalendarDays } from 'lucide-react'
+import { LucideIcon, LineChart, ChevronUp, CalendarDays } from 'lucide-react';
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { useRouter } from "next/navigation";
+import { useConvexAuth } from "convex/react";
 
 export function DashboardStats() {
+    const { isAuthenticated, isLoading } = useConvexAuth();
+    const router = useRouter();
     const stats = useQuery(api.pitches.getPitchStats);
 
-    if (!stats) return null;
+    // Redirect if not authenticated
+    if (!isAuthenticated && !isLoading) {
+        router.push("/");
+        return null;
+    }
+
+    // Show nothing while loading
+    if (isLoading) {
+        return null;
+    }
+
+    // Handle the case where stats might be undefined
+    if (!stats) {
+        return null;
+    }
 
     return (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
