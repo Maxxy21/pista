@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { formatDistanceToNow } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Actions } from "@/components/actions";
-import { MoreHorizontal, Star } from "lucide-react";
+import { MoreHorizontal, Star } from 'lucide-react';
 import React from "react";
 import { useApiMutation } from "@/hooks/use-api-mutation";
 import { api } from "@/convex/_generated/api";
@@ -25,7 +25,7 @@ interface PitchCardProps {
     onClick: () => void;
 }
 
-export const PitchCard = ({
+export function PitchCard({
                               id,
                               title,
                               text,
@@ -35,7 +35,7 @@ export const PitchCard = ({
                               orgId,
                               isFavorite,
                               onClick
-                          }: PitchCardProps) => {
+                          }: PitchCardProps) {
     const { userId } = useAuth();
     const authorLabel = userId === authorId ? "You" : authorName;
     const createdAtLabel = formatDistanceToNow(createdAt, {
@@ -66,64 +66,70 @@ export const PitchCard = ({
             layout
             className="group h-[250px]"
         >
-            <Card className="flex flex-col h-full hover:shadow-lg transition-shadow duration-200 dark:bg-neutral-800/50">
-                <CardHeader className="flex-none">
+            <Card
+                onClick={onClick}
+                className="flex flex-col h-full cursor-pointer hover:shadow-lg transition-all duration-200 dark:bg-neutral-950/50 dark:shadow-[0_0_1px_1px_rgba(255,255,255,0.1)] dark:hover:shadow-[0_0_1px_1px_rgba(255,255,255,0.2)]"
+            >
+                <CardHeader className="flex-none space-y-2">
                     <div className="flex items-center justify-between">
-                        <CardTitle className="text-xl font-semibold truncate">
+                        <CardTitle className="line-clamp-1 text-lg font-semibold">
                             {title}
                         </CardTitle>
-                        <div className="flex items-center gap-2">
-                            <Actions
-                                id={id}
-                                title={title}
-                                side="right"
+                        <Actions
+                            id={id}
+                            title={title}
+                            side="right"
+                        >
+                            <Button
+                                size="icon"
+                                variant="ghost"
+                                className="h-8 w-8"
                             >
-                                <Button
-                                    aria-haspopup="true"
-                                    size="icon"
-                                    variant="ghost"
-                                >
-                                    <MoreHorizontal className="h-4 w-4"/>
-                                    <span className="sr-only">Toggle menu</span>
-                                </Button>
-                            </Actions>
-                        </div>
+                                <MoreHorizontal className="h-4 w-4"/>
+                                <span className="sr-only">Open menu</span>
+                            </Button>
+                        </Actions>
                     </div>
-                    <CardDescription>
+                    <CardDescription className="flex items-center text-xs">
                         {authorLabel} • {createdAtLabel}
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="flex-1">
-                    <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">
+                    <p className="text-sm text-muted-foreground line-clamp-3">
                         {text}
                     </p>
                 </CardContent>
                 <CardFooter className="flex-none justify-between">
                     <Button
                         variant="outline"
-                        onClick={onClick}
                         size="sm"
-                        className="px-4 py-2 rounded-full bg-gradient-to-b from-blue-500 to-blue-600 text-white focus:ring-2 focus:ring-blue-400 hover:shadow-xl transition duration-200"
+                        className="h-8 px-3 text-xs font-medium"
                     >
-                        View
+                        View Details
                     </Button>
-                    <button
+                    <Button
                         onClick={toggleFavorite}
                         disabled={pendingFavorite || pendingUnfavorite}
+                        variant="ghost"
+                        size="icon"
                         className={cn(
-                            "focus:outline-none",
-                            (pendingFavorite || pendingUnfavorite) && "cursor-not-allowed opacity-75"
+                            "h-8 w-8",
+                            (pendingFavorite || pendingUnfavorite) && "opacity-50 cursor-not-allowed"
                         )}
                     >
                         <Star
                             className={cn(
-                                "h-4 w-4 hover:text-blue-600 transition",
-                                isFavorite && "fill-blue-600 text-blue-600"
+                                "h-4 w-4 transition-colors",
+                                isFavorite && "fill-primary text-primary"
                             )}
                         />
-                    </button>
+                        <span className="sr-only">
+                            {isFavorite ? "Remove from favorites" : "Add to favorites"}
+                        </span>
+                    </Button>
                 </CardFooter>
             </Card>
         </motion.div>
     );
-};
+}
+
