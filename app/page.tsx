@@ -24,30 +24,48 @@ export default function LandingPage() {
         <div className="flex min-h-screen flex-col">
             {/* Navigation */}
             <motion.header
-                initial={{ y: -20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.5 }}
-                className="border-b bg-background"
+                initial={{y: -20, opacity: 0}}
+                animate={{y: 0, opacity: 1}}
+                transition={{duration: 0.5}}
+                className="fixed top-0 left-0 right-0 border-b bg-background/80 backdrop-blur-md z-50"
             >
                 <nav className="container mx-auto flex h-16 items-center justify-between px-4">
                     <motion.div
-                        className="flex items-center gap-2"
-                        whileHover={{ scale: 1.05 }}
+                        className="flex items-center gap-2 cursor-pointer"
+                        whileHover={{scale: 1.02}}
+                        whileTap={{scale: 0.98}}
                     >
-                        <LogoIcon  />
-                        <span className="text-xl font-bold">Pitch Perfect</span>
+                        <LogoIcon/>
+                        <motion.span
+                            className="text-xl font-bold"
+                            initial={{opacity: 0, x: -10}}
+                            animate={{opacity: 1, x: 0}}
+                            transition={{delay: 0.2}}
+                        >
+                            Pitch Perfect
+                        </motion.span>
                     </motion.div>
-                    <div className="flex items-center gap-4">
+                    <motion.div
+                        className="flex items-center gap-4"
+                        initial={{opacity: 0, x: 20}}
+                        animate={{opacity: 1, x: 0}}
+                        transition={{delay: 0.3}}
+                    >
                         <SignInButton mode="modal">
-                            <Button variant="ghost">Sign In</Button>
+                            <motion.div whileHover={{scale: 1.05}} whileTap={{scale: 0.95}}>
+                                <Button variant="ghost">Sign In</Button>
+                            </motion.div>
                         </SignInButton>
                         <SignUpButton mode="modal">
-                            <Button>Get Started</Button>
+                            <motion.div whileHover={{scale: 1.05}} whileTap={{scale: 0.95}}>
+                                <Button>Get Started</Button>
+                            </motion.div>
                         </SignUpButton>
-                    </div>
+                    </motion.div>
                 </nav>
             </motion.header>
 
+            <div className="h-16"/>
             <main className="flex-1">
                 {/* Hero Section */}
                 <section className="bg-background py-20">
@@ -63,7 +81,8 @@ export default function LandingPage() {
                                 className="mb-6 text-4xl font-bold tracking-tight sm:text-6xl"
                             >
                                 Perfect Your Startup Pitch with{" "}
-                                <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+                                <span
+                                    className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
                                     AI-Powered
                                 </span>{" "}
                                 Evaluation
@@ -81,12 +100,9 @@ export default function LandingPage() {
                             >
                                 <SignUpButton mode="modal">
                                     <Button size="lg" className="gap-2">
-                                        Start Now <ArrowRight className="h-4 w-4" />
+                                        Start Now <ArrowRight className="h-4 w-4"/>
                                     </Button>
                                 </SignUpButton>
-                                <Button size="lg" variant="outline">
-                                    View Demo
-                                </Button>
                             </motion.div>
                         </motion.div>
                     </div>
@@ -98,7 +114,7 @@ export default function LandingPage() {
                         <motion.div
                             initial="hidden"
                             whileInView="visible"
-                            viewport={{ once: true }}
+                            viewport={{once: true}}
                             variants={staggerChildren}
                             className="grid gap-6 md:grid-cols-2"
                         >
@@ -106,10 +122,10 @@ export default function LandingPage() {
                                 <motion.div
                                     key={feature.title}
                                     variants={fadeIn}
-                                    whileHover={{ scale: 1.02 }}
+                                    whileHover={{scale: 1.02}}
                                     className="rounded-lg border bg-background p-6"
                                 >
-                                    <feature.icon className="mb-4 h-12 w-12 text-primary" />
+                                    <feature.icon className="mb-4 h-12 w-12 text-primary"/>
                                     <h3 className="mb-2 text-xl font-semibold">{feature.title}</h3>
                                     <p className="text-muted-foreground">{feature.description}</p>
                                 </motion.div>
@@ -124,7 +140,7 @@ export default function LandingPage() {
                         <motion.div
                             initial="hidden"
                             whileInView="visible"
-                            viewport={{ once: true }}
+                            viewport={{once: true}}
                             variants={staggerChildren}
                             className="grid gap-8 md:grid-cols-3"
                         >
@@ -135,7 +151,7 @@ export default function LandingPage() {
                                     className="text-center"
                                 >
                                     <motion.div
-                                        whileHover={{ scale: 1.1 }}
+                                        whileHover={{scale: 1.1}}
                                         className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-xl font-bold text-primary-foreground mx-auto"
                                     >
                                         {index + 1}
@@ -151,9 +167,9 @@ export default function LandingPage() {
                 {/* CTA Section */}
                 <section className="border-t bg-muted/50 py-20">
                     <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
+                        initial={{opacity: 0, y: 20}}
+                        whileInView={{opacity: 1, y: 0}}
+                        viewport={{once: true}}
                         className="container px-4"
                     >
                         <div className="mx-auto max-w-3xl text-center">
@@ -165,9 +181,9 @@ export default function LandingPage() {
                                 AI-powered platform.
                             </p>
                             <SignUpButton mode="modal">
-                                <motion.div whileHover={{ scale: 1.05 }}>
+                                <motion.div whileHover={{scale: 1.05}}>
                                     <Button size="lg" className="gap-2">
-                                        Get Started Now <ArrowRight className="h-4 w-4" />
+                                        Get Started Now <ArrowRight className="h-4 w-4"/>
                                     </Button>
                                 </motion.div>
                             </SignUpButton>
@@ -177,18 +193,18 @@ export default function LandingPage() {
             </main>
 
             <motion.footer
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.5 }}
+                initial={{opacity: 0}}
+                animate={{opacity: 1}}
+                transition={{delay: 0.5}}
                 className="border-t bg-background py-12"
             >
                 <div className="container px-4">
                     <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
                         <motion.div
-                            whileHover={{ scale: 1.05 }}
+                            whileHover={{scale: 1.05}}
                             className="flex items-center gap-2"
                         >
-                            <LogoIcon  />
+                            <LogoIcon/>
                             <span className="text-xl font-bold"> Pitch Perfect</span>
                         </motion.div>
                     </div>
@@ -226,9 +242,9 @@ const steps = [
         description:
             "Our AI analyzes your pitch across multiple dimensions and benchmarks against industry standards.",
     },
-  {
-    title: "Get Detailed Feedback",
-    description:
-      "Receive comprehensive feedback and actionable suggestions to improve your pitch.",
-  },
+    {
+        title: "Get Detailed Feedback",
+        description:
+            "Receive comprehensive feedback and actionable suggestions to improve your pitch.",
+    },
 ]

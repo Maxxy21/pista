@@ -60,16 +60,14 @@ export function TeamSwitcher({isDark}: TeamSwitcherProps) {
                         >
                             {organization && (
                                 <>
+                                    <Image
+                                        src={organization.imageUrl}
+                                        alt={organization.name}
+                                        width={32}
+                                        height={32}
+                                        className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground"
+                                    />
 
-                                    <div
-                                        className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                                        <Image
-                                            src={organization.imageUrl}
-                                            alt={organization.name}
-                                            width={32}
-                                            height={32}
-                                        />
-                                    </div>
                                     <div className="grid flex-1 text-left text-sm leading-tight">
                     <span className="truncate font-semibold">
                       {organization.name}
@@ -95,15 +93,13 @@ export function TeamSwitcher({isDark}: TeamSwitcherProps) {
                                 onClick={() => setActive?.({organization: org.id})}
                                 className="gap-2 p-2"
                             >
-                                <div
-                                    className="flex size-6 items-center justify-center rounded-sm border overflow-hidden">
-                                    <Image
-                                        src={org.imageUrl}
-                                        alt={org.name}
-                                        width={24}
-                                        height={24}
-                                    />
-                                </div>
+                                <Image
+                                    src={org.imageUrl}
+                                    alt={org.name}
+                                    width={24}
+                                    height={24}
+                                    className="flex size-6 items-center justify-center rounded-sm border overflow-hidden"
+                                />
                                 <span className="flex-1">{org.name}</span>
                                 <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
                             </DropdownMenuItem>

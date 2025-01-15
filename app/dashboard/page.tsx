@@ -5,6 +5,7 @@ import {DashboardStats} from "./_components/stats";
 import {PitchList} from "./_components/pitch-list";
 import {SidebarInset, SidebarTrigger, useSidebar} from "@/components/ui/sidebar";
 import {useOrganization} from "@clerk/nextjs";
+import {ExpandTrigger} from "@/components/expand-trigger";
 
 interface DashboardProps {
     searchParams: {
@@ -23,7 +24,7 @@ const Dashboard = ({searchParams}: DashboardProps) => {
             <div className="flex-1 space-y-4 p-4 pb-8">
 
                 <div className="flex items-center gap-2">
-                    {isMobile && <SidebarTrigger />}
+                    {isMobile && <ExpandTrigger />}
                     <h1 className="text-2xl font-bold">Dashboard</h1>
                 </div>
 

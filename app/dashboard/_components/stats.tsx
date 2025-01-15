@@ -1,8 +1,9 @@
 "use client"
-import {useQuery} from "convex/react";
-import {api} from "@/convex/_generated/api";
-import {cn} from "@/lib/utils";
-import {LucideIcon, LineChart, ChevronUp, CalendarDays} from 'lucide-react'
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { cn } from "@/lib/utils";
+import { LucideIcon, LineChart, ChevronUp, CalendarDays } from 'lucide-react'
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 export function DashboardStats() {
     const stats = useQuery(api.pitches.getPitchStats);
@@ -38,7 +39,6 @@ export function DashboardStats() {
     );
 }
 
-
 interface StatCardProps {
     title: string
     value: string | number
@@ -55,23 +55,23 @@ function StatCard({
                       className
                   }: StatCardProps) {
     return (
-        <div className={cn(
-            "rounded-xl bg-card p-6 shadow-sm dark:bg-neutral-950/50 dark:shadow-[0_0_1px_1px_rgba(255,255,255,0.1)]",
-            className
-        )}>
-            <div className="flex items-center justify-between">
+        <Card className={cn(className)}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <h3 className="text-sm font-medium text-muted-foreground">
                     {title}
                 </h3>
                 <Icon className="h-4 w-4 text-muted-foreground"/>
-            </div>
-            <div className="mt-3 space-y-1">
-                <div className="text-2xl font-bold">{value}</div>
-                <p className="text-xs text-muted-foreground">
-                    {description}
-                </p>
-            </div>
-        </div>
+            </CardHeader>
+            <CardContent>
+                <div className="space-y-1">
+                    <div className="text-2xl font-bold">{value}</div>
+                    {description && (
+                        <p className="text-xs text-muted-foreground">
+                            {description}
+                        </p>
+                    )}
+                </div>
+            </CardContent>
+        </Card>
     )
 }
-

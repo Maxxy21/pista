@@ -26,6 +26,8 @@ import { SearchForm } from "@/components/search-form";
 import { InviteButton } from "@/components/invite-button";
 import LogoIcon from "@/components/ui/logo-icon";
 import {Button} from "@/components/ui/button";
+import {CollapseTrigger} from "@/components/collapse-trigger";
+import {ExpandTrigger} from "@/components/expand-trigger";
 
 const navigationItems = [
     {
@@ -84,7 +86,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                             <LogoIcon/>
                             <h1 className="text-lg font-semibold">Pitch Perfect</h1>
                         </div>
-                        <SidebarTrigger/>
+                        <CollapseTrigger/>
                     </div>
                 )}
                 <TeamSwitcher isDark={isDark}/>
@@ -98,7 +100,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </SidebarContent>
             <SidebarFooter>
                 {state === "collapsed" && (
-                    <SidebarTrigger/>
+                    <ExpandTrigger/>
 
                 )}
                 {organization && (

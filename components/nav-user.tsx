@@ -98,7 +98,7 @@ export function NavUser({ isDark }: NavUserProps) {
                         <DropdownMenuItem
                             onClick={() => openUserProfile({appearance: {baseTheme: isDark ? dark : undefined}})}>
                             <Settings className="mr-2 h-4 w-4" />
-                            Settings
+                            Account Settings
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuGroup>
