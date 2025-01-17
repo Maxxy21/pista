@@ -11,7 +11,7 @@ import { SidebarInset, useSidebar } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Copy, Share2, ChevronDown, ChevronUp, Check } from 'lucide-react'
+import { Copy, ChevronDown, ChevronUp, Check } from 'lucide-react'
 import { Progress } from "@/components/ui/progress"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { ExpandTrigger } from "@/components/expand-trigger"
