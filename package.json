@@ -13,6 +13,7 @@
     "@clerk/nextjs": "^5.2.1",
     "@clerk/themes": "^2.1.41",
     "@hookform/resolvers": "^3.9.0",
+    "@mermaid-js/mermaid-cli": "^11.4.2",
     "@radix-ui/react-alert-dialog": "^1.1.2",
     "@radix-ui/react-avatar": "^1.1.1",
     "@radix-ui/react-collapsible": "^1.1.2",

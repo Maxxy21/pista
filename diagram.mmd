@@ -1,0 +1,129 @@
+
+flowchart TB
+    subgraph subGraph0["Landing Page Components"]
+        Hero["Hero Section"]
+        LandingPage["Landing Page"]
+        HowItWorks["How It Works"]
+        CTAs["Get Started"]
+    end
+    subgraph subGraph1["Landing Flow"]
+        Entry("User Visits Site")
+        subGraph0
+        SignUpFlow["Sign Up"]
+        LoginFlow["Login"]
+    end
+    subgraph Authentication["Authentication"]
+        ClerkAuth["Clerk Authentication"]
+        NewUser["Create User"]
+        ExistingUser["Existing User"]
+        StoreUser["Store User in Convex and Clerk"]
+        Dashboard["Dashboard"]
+    end
+    subgraph subGraph3["Main Flow"]
+        PitchForm["Pitch Creation Form"]
+        PitchList["List of Pitches"]
+        SavePitch["Save to Convex DB"]
+        ConvexFunction["Convex Server Function"]
+    end
+    subgraph subGraph4["OpenAI Processing"]
+        BusinessPotential["Business Potential Analysis"]
+        OpenAI["OpenAI API"]
+        PresentationQuality["Presentation Quality Analysis"]
+        ProblemSolutionFit["Problem-Solution Fit Analysis"]
+        DetailedFeedback["Detailed Feedback"]
+        FinalScore["Final Score"]
+    end
+    subgraph subGraph5["AI Evaluation Process"]
+        subGraph4
+        ProcessResponse["Process AI Response"]
+        PrepareData["Prepare Data for Storage"]
+    end
+    subgraph subGraph6["Database Operations"]
+        UpdatePitch["Update Pitch in Convex"]
+        Convex[("Convex Database")]
+        Notify["Notify User"]
+    end
+    subgraph subGraph7["Results Display"]
+        Score["Overall Score"]
+        AIFeedback["AI Analysis Results"]
+        Breakdown["Criteria Breakdown"]
+        Suggestions["Improvement Suggestions"]
+    end
+    subgraph subGraph8["Pitch Details"]
+        PitchDetails["Pitch Details View"]
+        subGraph7
+    end
+    Entry --> LandingPage
+    LandingPage --> Hero & HowItWorks & CTAs
+    CTAs -- Sign Up --> SignUpFlow
+    CTAs -- Login --> LoginFlow
+    SignUpFlow --> ClerkAuth
+    LoginFlow --> ClerkAuth
+    ClerkAuth -- Sign Up --> NewUser
+    ClerkAuth -- Login --> ExistingUser
+    NewUser --> StoreUser
+    ExistingUser --> Dashboard
+    StoreUser --> Dashboard
+    Dashboard -- Create New --> PitchForm
+    Dashboard -- View --> PitchList
+    PitchForm -- Submit --> SavePitch
+    SavePitch -- Trigger --> ConvexFunction
+    ConvexFunction -- Send Pitch Data --> OpenAI
+    OpenAI -- Analyze --> BusinessPotential & PresentationQuality & ProblemSolutionFit
+    BusinessPotential -- Generate --> DetailedFeedback
+    ProblemSolutionFit -- Generate --> DetailedFeedback
+    PresentationQuality -- Generate --> DetailedFeedback
+    DetailedFeedback -- Calculate --> FinalScore
+    OpenAI -- Return --> ProcessResponse
+    ProcessResponse -- Format --> PrepareData
+    PrepareData -- Store Results --> UpdatePitch
+    SavePitch -. Write .-> Convex
+    UpdatePitch -. Write .-> Convex
+    PitchList -. Read .-> Convex
+    UpdatePitch --> Notify
+    Notify --> PitchList
+    PitchList -- Select --> PitchDetails
+    PitchDetails -- View --> AIFeedback
+    AIFeedback -- Show --> Score & Breakdown & Suggestions
+    PitchDetails -- Edit --> PitchForm
+    Hero:::landingNode
+    LandingPage:::landingNode
+    HowItWorks:::landingNode
+    CTAs:::landingNode
+    Entry:::landingNode
+    SignUpFlow:::authNode
+    LoginFlow:::authNode
+    ClerkAuth:::authNode
+    NewUser:::authNode
+    ExistingUser:::authNode
+    StoreUser:::authNode
+    Dashboard:::mainNode
+    PitchForm:::mainNode
+    PitchList:::mainNode
+    SavePitch:::dbNode
+    ConvexFunction:::mainNode
+    BusinessPotential:::aiNode
+    OpenAI:::openaiNode
+    PresentationQuality:::aiNode
+    ProblemSolutionFit:::aiNode
+    DetailedFeedback:::aiNode
+    FinalScore:::aiNode
+    ProcessResponse:::openaiNode
+    PrepareData:::dbNode
+    UpdatePitch:::dbNode
+    Convex:::dbNode
+    Notify:::dbNode
+    Score:::displayNode
+    AIFeedback:::displayNode
+    Breakdown:::displayNode
+    Suggestions:::displayNode
+    PitchDetails:::displayNode
+    classDef landingNode fill:#f3e5f5,stroke:#9c27b0
+    classDef authNode fill:#e1f5fe,stroke:#0288d1
+    classDef mainNode fill:#f3e5f5,stroke:#7b1fa2
+    classDef aiNode fill:#fff3e0,stroke:#ff9800
+    classDef openaiNode fill:#fce4ec,stroke:#e91e63
+    classDef dbNode fill:#e8f5e9,stroke:#388e3c
+    classDef displayNode fill:#f1f8e9,stroke:#689f38
+    style Convex fill:#FFD600
+    style subGraph6 fill:none
