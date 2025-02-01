@@ -1,18 +1,18 @@
 "use client";
 
-import { useQuery } from "convex/react";
-import { api } from "@/convex/_generated/api";
-import { NewPitchButton } from "./new-pitch-button";
-import { EmptySearch } from "./empty-search";
-import { EmptyFavorites } from "./empty-favorites";
-import { EmptyPitches } from "./empty-pitches";
-import { motion, AnimatePresence } from "framer-motion";
-import { useRouter, useSearchParams } from "next/navigation";
+import {useQuery} from "convex/react";
+import {api} from "@/convex/_generated/api";
+import {NewPitchButton} from "./new-pitch-button";
+import {EmptySearch} from "./empty-search";
+import {EmptyFavorites} from "./empty-favorites";
+import {EmptyPitches} from "./empty-pitches";
+import {motion, AnimatePresence} from "framer-motion";
+import {useRouter, useSearchParams} from "next/navigation";
 import React from "react";
-import { FilterPanel } from "@/components/filter-panel";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { PitchCard } from "./pitch-card/pitch-card";
-import { PitchCardSkeleton } from "./pitch-card/pitch-card-skeleton";
+import {FilterPanel} from "@/components/filter-panel";
+import {ScrollArea} from "@/components/ui/scroll-area";
+import {PitchCard} from "./pitch-card/pitch-card";
+import {PitchCardSkeleton} from "./pitch-card/pitch-card-skeleton";
 import qs from "query-string";
 import {useOrganization} from "@clerk/nextjs";
 
@@ -33,12 +33,12 @@ interface PitchListProps {
     }
 }
 
-export const PitchList = ({ orgId, query }: PitchListProps) => {
+export const PitchList = ({orgId, query}: PitchListProps) => {
     const router = useRouter();
     const searchParams = useSearchParams();
     const currentView = searchParams.get("view");
     const searchQuery = searchParams.get("search") || "";
-    const { organization } = useOrganization();
+    const {organization} = useOrganization();
 
     const [filters, setFilters] = React.useState<FilterState>({
         categories: [],
@@ -59,7 +59,7 @@ export const PitchList = ({ orgId, query }: PitchListProps) => {
             query: {
                 view: query.view
             }
-        }, { skipEmptyString: true, skipNull: true });
+        }, {skipEmptyString: true, skipNull: true});
 
         router.push(url);
     };
@@ -84,99 +84,107 @@ export const PitchList = ({ orgId, query }: PitchListProps) => {
         }
     };
 
-    if (data === undefined) {
+
+    if (!data) {
         return (
             <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="w-full max-w-[100vw] p-4"
+                initial={{opacity: 0}}
+                animate={{opacity: 1}}
+                className="flex flex-col h-full w-full"
             >
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
-                    <h2 className="text-2xl font-semibold truncate">
-                        {getTitle()}
-                    </h2>
-                    <NewPitchButton orgId={orgId} disabled/>
+                <div className="flex-none p-4">
+                    <div className="flex flex-col gap-4">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:justify-between">
+                            <h2 className="text-2xl font-semibold truncate">
+                                {getTitle()}
+                            </h2>
+                            <NewPitchButton orgId={orgId} disabled/>
+                        </div>
+                        <FilterPanel
+                            filters={filters}
+                            onChange={handleFiltersChange}
+                        />
+                    </div>
                 </div>
-                <FilterPanel
-                    filters={filters}
-                    onChange={handleFiltersChange}
-                    className="mb-6"
-                />
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                    {[...Array(6)].map((_, index) => (
-                        <PitchCardSkeleton key={index}/>
-                    ))}
-                </div>
+                <ScrollArea className="flex-1 w-full">
+                    <div className="px-4 pb-4 min-h-[400px]">
+                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                            {[...Array(6)].map((_, index) => (
+                                <PitchCardSkeleton key={index}/>
+                            ))}
+                        </div>
+                    </div>
+                </ScrollArea>
             </motion.div>
         );
     }
 
-    if (!data?.length && query.search) {
-        return <EmptySearch/>;
-    }
-
-    if (!data?.length && query.view === "favorites") {
-        return <EmptyFavorites />;
-    }
-
-    if (!data?.length) {
-        return <EmptyPitches orgId={orgId} />;
-    }
-
     return (
         <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="flex flex-col h-full w-full max-w-[100vw]"
+            initial={{opacity: 0}}
+            animate={{opacity: 1}}
+            className="flex flex-col h-full w-full"
         >
             <div className="flex-none p-4">
-                <div className="flex flex-col gap-4 max-w-full">
+                <div className="flex flex-col gap-4">
                     <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:justify-between">
                         <h2 className="text-2xl font-semibold truncate">
                             {getTitle()}
                         </h2>
-                        <NewPitchButton orgId={orgId}/>
+                        <NewPitchButton orgId={orgId} disabled={!data}/>
                     </div>
-                    <FilterPanel
-                        filters={filters}
-                        onChange={handleFiltersChange}
-                    />
+                    <FilterPanel filters={filters} onChange={setFilters}/>
                 </div>
             </div>
-            <ScrollArea className="flex-1 w-full">
-                <div className="px-4 pb-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                        <AnimatePresence mode="popLayout">
-                            {data?.map((pitch, index) => (
-                                <motion.div
-                                    key={pitch._id}
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{
-                                        opacity: 1,
-                                        y: 0,
-                                        transition: { delay: index * 0.1 }
-                                    }}
-                                    exit={{ opacity: 0, y: -20 }}
-                                    layout
-                                >
-                                    <PitchCard
-                                        id={pitch._id}
-                                        title={pitch.title}
-                                        text={pitch.text}
-                                        authorId={pitch.userId}
-                                        authorName={pitch.authorName}
-                                        createdAt={pitch._creationTime}
-                                        orgId={pitch.orgId}
-                                        isFavorite={pitch.isFavorite}
-                                        onClick={() => handlePitchClick(pitch._id)}
-                                    />
-                                </motion.div>
-                            ))}
-                        </AnimatePresence>
+
+            <div className="flex-1 min-h-0 w-full">
+                <ScrollArea className="h-full w-full">
+                    <div className="h-full p-4">
+                        {data && data.length > 0 ? (
+                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                                <AnimatePresence mode="popLayout">
+                                    {data?.map((pitch, index) => (
+                                        <motion.div
+                                            key={pitch._id}
+                                            initial={{opacity: 0, y: 20}}
+                                            animate={{
+                                                opacity: 1,
+                                                y: 0,
+                                                transition: {delay: index * 0.1},
+                                            }}
+                                            exit={{opacity: 0, y: -20}}
+                                            layout
+                                        >
+                                            <PitchCard
+                                                id={pitch._id}
+                                                title={pitch.title}
+                                                text={pitch.text}
+                                                authorId={pitch.userId}
+                                                authorName={pitch.authorName}
+                                                createdAt={pitch._creationTime}
+                                                orgId={pitch.orgId}
+                                                isFavorite={pitch.isFavorite}
+                                                onClick={() => handlePitchClick(pitch._id)}
+                                            />
+                                        </motion.div>
+                                    ))}
+                                </AnimatePresence>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-7 gap-4">
+                                <div className="col-start-4 ">
+                                    <div className="col-span-4">
+                                        {query.search && <EmptySearch/>}
+                                        {!query.search && query.view === "favorites" && <EmptyFavorites/>}
+                                        {!query.search && query.view !== "favorites" && <EmptyPitches orgId={orgId}/>}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
                     </div>
-                </div>
-            </ScrollArea>
+                </ScrollArea>
+            </div>
         </motion.div>
     );
 };
-

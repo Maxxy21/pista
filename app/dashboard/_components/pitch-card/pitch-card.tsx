@@ -68,7 +68,7 @@ export function PitchCard({
         >
             <Card
                 onClick={onClick}
-                className="flex flex-col h-full cursor-pointer hover:shadow-lg transition-all duration-200 bg-background border-border hover:shadow-md"
+                className="flex flex-col h-full cursor-pointer hover:shadow-lg transition-all duration-200 bg-background border-border"
             >
                 <CardHeader className="flex-none space-y-2">
                     <div className="flex items-center justify-between">

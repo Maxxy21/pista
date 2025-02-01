@@ -24,6 +24,20 @@ interface FilterPanelProps {
 export const FilterPanel = React.memo(({ filters, onChange, className }: FilterPanelProps) => {
     const [isExpanded, setIsExpanded] = React.useState(false);
 
+    const handleScoreRangeChange = (value: string) => {
+        const ranges = {
+            "all": { min: 0, max: 10 },
+            "high-score": { min: 8, max: 10 },
+            "medium-score": { min: 5, max: 7.9 },
+            "low-score": { min: 0, max: 4.9 }
+        };
+
+        onChange({
+            ...filters,
+            scoreRange: ranges[value as keyof typeof ranges]
+        });
+    };
+
     return (
         <div className={cn("space-y-4 w-full", className)}>
             <div className="flex flex-wrap items-center gap-2 md:hidden">
@@ -54,43 +68,24 @@ export const FilterPanel = React.memo(({ filters, onChange, className }: FilterP
                 >
                     <div className="flex flex-col md:flex-row items-start md:items-center gap-2 overflow-hidden">
                         <div className="flex items-center gap-2 w-full md:w-auto">
-                            <span className="text-sm text-muted-foreground whitespace-nowrap">Filter by</span>
+                            <span className="text-sm text-muted-foreground whitespace-nowrap">Score range</span>
                             <Select
-                                value="all"
-                                onValueChange={(value) => {
-                                    // Handle filter change
-                                }}
+                                value={
+                                    filters.scoreRange.min === 8 ? "high-score" :
+                                    filters.scoreRange.min === 5 ? "medium-score" :
+                                    filters.scoreRange.min === 0 && filters.scoreRange.max === 4.9 ? "low-score" : "all"
+                                }
+                                onValueChange={handleScoreRangeChange}
                             >
                                 <SelectTrigger className="w-full md:w-[140px] lg:w-[180px]">
-                                    <SelectValue placeholder="All boards" />
+                                    <SelectValue placeholder="All scores" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectGroup>
-                                        <SelectItem value="all">All pitches</SelectItem>
+                                        <SelectItem value="all">All scores</SelectItem>
                                         <SelectItem value="high-score">High Score (8+)</SelectItem>
                                         <SelectItem value="medium-score">Medium Score (5-8)</SelectItem>
-                                        <SelectItem value="low-score">Low Score (5)</SelectItem>
-                                    </SelectGroup>
-                                </SelectContent>
-                            </Select>
-                        </div>
-
-                        <div className="flex items-center gap-2 w-full md:w-auto">
-                            <span className="text-sm text-muted-foreground whitespace-nowrap">Owned by</span>
-                            <Select
-                                value="anyone"
-                                onValueChange={(value) => {
-                                    // Handle ownership filter
-                                }}
-                            >
-                                <SelectTrigger className="w-full md:w-[140px] lg:w-[180px]">
-                                    <SelectValue placeholder="Anyone" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectGroup>
-                                        <SelectItem value="anyone">Anyone</SelectItem>
-                                        <SelectItem value="me">Me</SelectItem>
-                                        <SelectItem value="team">Team members</SelectItem>
+                                        <SelectItem value="low-score">Low Score (≤5)</SelectItem>
                                     </SelectGroup>
                                 </SelectContent>
                             </Select>

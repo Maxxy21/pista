@@ -1,26 +1,35 @@
 "use client";
+
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export const PitchCardSkeleton = () => {
     return (
-        <Card className="h-[200px] w-full bg-neutral-900/50">
-            <div className="p-4 space-y-3">
-                <div className="flex items-center justify-between">
-                    <div className="space-y-1.5">
-                        <Skeleton className="h-4 w-[180px]" />
-                        <Skeleton className="h-3 w-[100px]" />
+        <div className="group h-[250px]">
+            <Card className="flex flex-col h-full cursor-pointer hover:shadow-lg transition-all duration-200 bg-background border-border">
+                <CardHeader className="flex-none space-y-2">
+                    <div className="flex items-center justify-between">
+                        <div className="space-y-2">
+                            <Skeleton className="h-6 w-[180px]" />
+                            <div className="flex items-center gap-2">
+                                <Skeleton className="h-4 w-24" />
+                            </div>
+                        </div>
+                        <Skeleton className="h-8 w-8" />
                     </div>
-                    <Skeleton className="h-8 w-8 rounded-md" />
-                </div>
-                <div className="space-y-1.5">
-                    <Skeleton className="h-3 w-full" />
-                    <Skeleton className="h-3 w-3/4" />
-                </div>
-                <div className="pt-1">
-                    <Skeleton className="h-8 w-[60px] rounded-md" />
-                </div>
-            </div>
-        </Card>
+                </CardHeader>
+                <CardContent className="flex-1">
+                    <div className="space-y-2">
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-3/4" />
+                        <Skeleton className="h-4 w-1/2" />
+                    </div>
+                </CardContent>
+                <CardFooter className="flex-none justify-between">
+                    <Skeleton className="h-8 w-24" />
+                    <Skeleton className="h-8 w-8" />
+                </CardFooter>
+            </Card>
+        </div>
     );
 };

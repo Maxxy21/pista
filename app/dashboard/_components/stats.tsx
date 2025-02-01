@@ -1,31 +1,64 @@
-"use client"
+"use client";
+
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { Card, CardContent } from "@/components/ui/card";
+import { LineChart, ChevronUp, CalendarDays } from 'lucide-react';
 import { cn } from "@/lib/utils";
-import { LucideIcon, LineChart, ChevronUp, CalendarDays } from 'lucide-react';
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { useRouter } from "next/navigation";
-import { useConvexAuth } from "convex/react";
+
+interface StatCardProps {
+    title: string;
+    value: string | number;
+    description?: string;
+    icon: any;
+    className?: string;
+}
+
+function StatCard({
+    title,
+    value,
+    description,
+    icon: Icon,
+    className
+}: StatCardProps) {
+    return (
+        <Card className={cn("bg-background", className)}>
+            <CardContent className="p-6">
+                <div className="flex items-center justify-between space-y-0 pb-2">
+                    <h3 className="text-sm font-medium text-muted-foreground">
+                        {title}
+                    </h3>
+                    <Icon className="h-4 w-4 text-muted-foreground"/>
+                </div>
+                <div className="space-y-1">
+                    <div className="text-2xl font-bold">{value}</div>
+                    {description && (
+                        <p className="text-xs text-muted-foreground">
+                            {description}
+                        </p>
+                    )}
+                </div>
+            </CardContent>
+        </Card>
+    );
+}
 
 export function DashboardStats() {
-    const { isAuthenticated, isLoading } = useConvexAuth();
-    const router = useRouter();
     const stats = useQuery(api.pitches.getPitchStats);
 
-    // Redirect if not authenticated
-    if (!isAuthenticated && !isLoading) {
-        router.push("/");
-        return null;
-    }
-
-    // Show nothing while loading
-    if (isLoading) {
-        return null;
-    }
-
-    // Handle the case where stats might be undefined
     if (!stats) {
-        return null;
+        // Loading state with shimmer effect
+        return (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                {[...Array(4)].map((_, i) => (
+                    <Card key={i} className="bg-background animate-pulse">
+                        <CardContent className="p-6">
+                            <div className="h-20"/>
+                        </CardContent>
+                    </Card>
+                ))}
+            </div>
+        );
     }
 
     return (
@@ -55,41 +88,4 @@ export function DashboardStats() {
             />
         </div>
     );
-}
-
-interface StatCardProps {
-    title: string
-    value: string | number
-    description?: string
-    icon: LucideIcon
-    className?: string
-}
-
-function StatCard({
-                      title,
-                      value,
-                      description,
-                      icon: Icon,
-                      className
-                  }: StatCardProps) {
-    return (
-        <Card className={cn(className)}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <h3 className="text-sm font-medium text-muted-foreground">
-                    {title}
-                </h3>
-                <Icon className="h-4 w-4 text-muted-foreground"/>
-            </CardHeader>
-            <CardContent>
-                <div className="space-y-1">
-                    <div className="text-2xl font-bold">{value}</div>
-                    {description && (
-                        <p className="text-xs text-muted-foreground">
-                            {description}
-                        </p>
-                    )}
-                </div>
-            </CardContent>
-        </Card>
-    )
 }
