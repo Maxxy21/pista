@@ -64,17 +64,14 @@ export const PitchList = ({orgId, query}: PitchListProps) => {
         router.push(url);
     };
 
-    const data = useQuery(
-        api.pitches.getFilteredPitches,
-        organization ? {
-            orgId,
-            search: searchQuery,
-            favorites: currentView === "favorites",
-            sortBy: currentView === "recent" ? "date" : filters.sortBy,
-            categories: filters.categories,
-            scoreRange: filters.scoreRange,
-        } : "skip"
-    );
+    const data = useQuery(api.pitches.getFilteredPitches, {
+        orgId,
+        search: searchQuery,
+        favorites: currentView === "favorites",
+        sortBy: currentView === "recent" ? "date" : filters.sortBy,
+        categories: filters.categories,
+        scoreRange: filters.scoreRange,
+    });
 
     const getTitle = () => {
         switch (query.view) {
