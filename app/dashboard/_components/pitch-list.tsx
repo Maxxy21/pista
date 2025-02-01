@@ -66,7 +66,7 @@ export const PitchList = ({orgId, query}: PitchListProps) => {
 
     const data = useQuery(
         api.pitches.getFilteredPitches,
-        orgId ? {
+        organization ? {
             orgId,
             search: searchQuery,
             favorites: currentView === "favorites",

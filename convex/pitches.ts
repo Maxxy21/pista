@@ -509,6 +509,10 @@ export const getFilteredPitches = query({
         const identity = await validateUser(ctx);
         const userId = identity.subject;
 
+        if (!args.orgId) {
+            throw new Error("Organization ID is required");
+        }
+
         // Get user's favorited pitches for this org
         const userFavorites = await ctx.db
             .query("userFavorites")
