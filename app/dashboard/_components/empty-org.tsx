@@ -16,7 +16,7 @@ export const EmptyOrg = () => {
     const isDark = resolvedTheme === 'dark';
 
     return (
-        <div className="grid grid-cols-7 gap-4 mt-12">
+        <div className="grid grid-cols-7 gap-4 mt-20">
             <div className="col-start-4 ">
                 <div className="col-span-4">
                     <div className="flex flex-col items-center justify-center">

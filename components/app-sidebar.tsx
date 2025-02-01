@@ -48,7 +48,7 @@ const navigationItems = [
 ];
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-    const { organization } = useOrganization();
+    const { organization, isLoaded } = useOrganization();
     const { resolvedTheme } = useTheme();
     const isDark = resolvedTheme === 'dark';
     const router = useRouter();
@@ -89,7 +89,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         <CollapseTrigger/>
                     </div>
                 )}
-                <TeamSwitcher isDark={isDark}/>
+                {isLoaded && organization && (
+                    <TeamSwitcher isDark={isDark}/>
+                )}
                 <SearchForm
                     value={search}
                     onChange={handleSearchChange}
