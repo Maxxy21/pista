@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import {dark} from "@clerk/themes";
 import {useTheme} from "next-themes";
+import * as React from "react";
 
 export const EmptyOrg = () => {
     const { resolvedTheme } = useTheme();
@@ -39,7 +40,8 @@ export const EmptyOrg = () => {
                                     </Button>
                                 </DialogTrigger>
                                 <DialogContent className="p-0 bg-transparent border-none max-w-[480px]">
-                                    <CreateOrganization routing="hash"/>
+                                    <CreateOrganization appearance={{baseTheme: isDark ? dark : undefined}}
+                                                        routing={"hash"}/>
                                 </DialogContent>
                             </Dialog>
                         </div>
