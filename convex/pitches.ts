@@ -2,6 +2,7 @@ import {mutation, query, QueryCtx} from "./_generated/server";
 import {ConvexError, v} from "convex/values";
 import {Doc} from "@/convex/_generated/dataModel";
 import {getAllOrThrow} from "convex-helpers/server/relationships";
+import { OpenAI } from "openai";
 
 // Types
 export const evaluationObject = v.object({
