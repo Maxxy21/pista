@@ -1,6 +1,8 @@
 //evaluations/index.ts
 
-import {getOpenAI} from "@/utils";
+
+import {getOpenAI} from "@/lib/utils";
+
 type EvaluationResult = {
     criteria: string;
     comment: string;

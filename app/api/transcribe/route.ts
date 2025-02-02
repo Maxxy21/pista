@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getOpenAI } from "@/utils";
+import {getOpenAI} from "@/lib/utils";
 
 export const runtime = 'edge';
 
