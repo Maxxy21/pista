@@ -22,6 +22,9 @@ export const evaluationData = v.object({
     overallFeedback: v.string(),
 });
 
+export const questionAnswerArray = v.array(questionAnswer);
+export const evaluationArray = v.array(evaluation);
+
 export default defineSchema({
     pitches: defineTable({
         title: v.string(),

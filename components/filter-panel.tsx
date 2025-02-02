@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface FilterState {
-    categories: string[];
     scoreRange: {
         min: number;
         max: number;

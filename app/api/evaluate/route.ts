@@ -1,5 +1,5 @@
 // app/api/evaluate/route.ts
-import { NextResponse } from "next/server";
+import {NextResponse} from "next/server";
 import {getOpenAI} from "@/lib/utils";
 
 
@@ -51,12 +51,12 @@ const evaluationCriteria = {
 
 export async function POST(req: Request) {
     try {
-        const { text, questions } = await req.json();
+        const {text, questions} = await req.json();
 
         if (!text) {
             return NextResponse.json(
-                { error: "No text provided" },
-                { status: 400 }
+                {error: "No text provided"},
+                {status: 400}
             );
         }
 
@@ -191,6 +191,12 @@ export async function POST(req: Request) {
             }, 0)
         );
 
+        console.log('API Response:', {
+            evaluations,
+            overallScore,
+            overallFeedback: summaryCompletion.choices[0].message.content || "",
+        });
+
         return NextResponse.json({
             evaluations,
             overallScore,
@@ -199,8 +205,8 @@ export async function POST(req: Request) {
     } catch (error) {
         console.error("Evaluation error:", error);
         return NextResponse.json(
-            { error: "Evaluation failed" },
-            { status: 500 }
+            {error: "Evaluation failed"},
+            {status: 500}
         );
     }
 }

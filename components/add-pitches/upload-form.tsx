@@ -24,14 +24,29 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Loader2, ChevronRight, ChevronLeft } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { AudioPreview } from "./audio-preview";
+import {ScrollArea} from "@/components/ui/scroll-area";
 
 type Step = "upload" | "questions" | "review";
 
 interface UploadFormProps {
     orgId: string;
+    onStepChange: (step: "upload" | "questions" | "review") => void;
 }
 
-export const UploadForm = ({ orgId }: UploadFormProps) => {
+interface EvaluationResponse {
+    evaluations: Array<{
+        criteria: string;
+        comment: string;
+        score: number;
+        strengths: string[];
+        improvements: string[];
+        aspects: string[];
+    }>;
+    overallScore: number;
+    overallFeedback: string;
+}
+
+export const UploadForm = ({ orgId,onStepChange }: UploadFormProps) => {
     const router = useRouter();
     const [currentStep, setCurrentStep] = useState<Step>("upload");
     const [files, setFiles] = useState<File[]>([]);
@@ -52,6 +67,11 @@ export const UploadForm = ({ orgId }: UploadFormProps) => {
             file: null,
         }
     });
+
+    const setStep = (newStep: "upload" | "questions" | "review") => {
+        setCurrentStep(newStep);
+        onStepChange(newStep);
+    };
 
     const handleFileChange = (newFiles: File[]) => {
         setFiles(newFiles);
@@ -117,7 +137,7 @@ export const UploadForm = ({ orgId }: UploadFormProps) => {
                 answer: ""
             })));
 
-            setCurrentStep("questions");
+            setStep("questions");
         } catch (error) {
             toast.error("Failed to process pitch");
         } finally {
@@ -141,14 +161,14 @@ export const UploadForm = ({ orgId }: UploadFormProps) => {
             if (!evaluationResponse.ok) throw new Error("Evaluation failed");
             const evaluationData = await evaluationResponse.json();
 
+            // Remove the questions field and only send the fields that match the validator
             const id = await mutate({
                 orgId,
                 title: form.getValues("pitchTitle"),
                 text: pitchText,
                 type: form.getValues("contentType"),
                 status: "evaluated",
-                evaluation: evaluationData,
-                questions,
+                evaluation: evaluationData
             });
 
             toast.success("Pitch created successfully");
@@ -158,6 +178,7 @@ export const UploadForm = ({ orgId }: UploadFormProps) => {
             setQuestions([]);
             setPitchText("");
         } catch (error) {
+            console.error('Error:', error);
             toast.error("Failed to create pitch");
         } finally {
             setIsProcessing(false);
@@ -333,7 +354,7 @@ export const UploadForm = ({ orgId }: UploadFormProps) => {
                                             animate={{ opacity: 1, y: 0 }}
                                             exit={{ opacity: 0, y: -20 }}
                                         >
-                                            <p className="text-lg font-medium mb-4">
+                                            <p className="text-sm font-medium mb-4">
                                                 {questions[currentQuestionIndex].text}
                                             </p>
                                             <Textarea
@@ -344,7 +365,7 @@ export const UploadForm = ({ orgId }: UploadFormProps) => {
                                                     newQuestions[currentQuestionIndex].answer = e.target.value;
                                                     setQuestions(newQuestions);
                                                 }}
-                                                className="min-h-[150px]"
+                                                className="min-h-[100px] text-sm"
                                             />
                                         </motion.div>
                                     </CardContent>
@@ -357,7 +378,7 @@ export const UploadForm = ({ orgId }: UploadFormProps) => {
                                             if (currentQuestionIndex > 0) {
                                                 setCurrentQuestionIndex(i => i - 1);
                                             } else {
-                                                setCurrentStep("upload");
+                                                setStep("upload");
                                                 setCurrentQuestionIndex(0);
                                             }
                                         }}
@@ -370,7 +391,7 @@ export const UploadForm = ({ orgId }: UploadFormProps) => {
                                             if (currentQuestionIndex < questions.length - 1) {
                                                 setCurrentQuestionIndex(i => i + 1);
                                             } else {
-                                                setCurrentStep("review");
+                                                setStep("review");
                                                 setCurrentQuestionIndex(0);
                                             }
                                         }}
@@ -393,21 +414,29 @@ export const UploadForm = ({ orgId }: UploadFormProps) => {
                         >
                             <Card>
                                 <CardContent className="pt-6">
-                                    <h3 className="font-semibold mb-2">Pitch</h3>
-                                    <p className="text-muted-foreground mb-4">
-                                        {form.watch("contentType") === "text"
-                                            ? form.watch("content")
-                                            : files[0]?.name
-                                        }
-                                    </p>
+                                    <ScrollArea className="h-[400px] pr-4"> {/* Set fixed height and add padding for scrollbar */}
+                                        <div className="space-y-6"> {/* Add container with spacing */}
+                                            <div>
+                                                <h3 className="text-sm font-semibold mb-2">Pitch</h3>
+                                                <p className="text-sm text-muted-foreground mb-4">
+                                                    {form.watch("contentType") === "text"
+                                                        ? form.watch("content")
+                                                        : files[0]?.name
+                                                    }
+                                                </p>
+                                            </div>
 
-                                    <h3 className="font-semibold mb-2">Q&A</h3>
-                                    {questions.map((q, index) => (
-                                        <div key={index} className="mb-4">
-                                            <p className="font-medium">Q: {q.text}</p>
-                                            <p className="text-muted-foreground">A: {q.answer}</p>
+                                            <div>
+                                                <h3 className="text-sm font-semibold mb-2">Q&A</h3>
+                                                {questions.map((q, index) => (
+                                                    <div key={index} className="mb-4">
+                                                        <p className="text-sm font-medium">Q: {q.text}</p>
+                                                        <p className="text-sm text-muted-foreground">A: {q.answer}</p>
+                                                    </div>
+                                                ))}
+                                            </div>
                                         </div>
-                                    ))}
+                                    </ScrollArea>
                                 </CardContent>
                             </Card>
 
@@ -415,7 +444,7 @@ export const UploadForm = ({ orgId }: UploadFormProps) => {
                                 <div className="flex w-full justify-between">
                                     <Button
                                         variant="outline"
-                                        onClick={() => setCurrentStep("questions")}
+                                        onClick={() => setStep("questions")}
                                     >
                                         <ChevronLeft className="mr-2 h-4 w-4"/>
                                         Back

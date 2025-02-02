@@ -8,7 +8,7 @@ import {EmptyFavorites} from "./empty-favorites";
 import {EmptyPitches} from "./empty-pitches";
 import {motion, AnimatePresence} from "framer-motion";
 import {useRouter, useSearchParams} from "next/navigation";
-import React from "react";
+import React, {useState} from "react";
 import {FilterPanel} from "@/components/filter-panel";
 import {ScrollArea} from "@/components/ui/scroll-area";
 import {PitchCard} from "./pitch-card/pitch-card";
@@ -17,7 +17,6 @@ import qs from "query-string";
 import {useOrganization} from "@clerk/nextjs";
 
 interface FilterState {
-    categories: string[];
     scoreRange: {
         min: number;
         max: number;
@@ -40,8 +39,7 @@ export const PitchList = ({orgId, query}: PitchListProps) => {
     const searchQuery = searchParams.get("search") || "";
     const {organization} = useOrganization();
 
-    const [filters, setFilters] = React.useState<FilterState>({
-        categories: [],
+    const [filters, setFilters] = useState<FilterState>({
         scoreRange: {
             min: 0,
             max: 10
@@ -69,7 +67,6 @@ export const PitchList = ({orgId, query}: PitchListProps) => {
         search: searchQuery,
         favorites: currentView === "favorites",
         sortBy: currentView === "recent" ? "date" : filters.sortBy,
-        categories: filters.categories,
         scoreRange: filters.scoreRange,
     });
 

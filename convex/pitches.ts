@@ -2,28 +2,11 @@ import {mutation, query} from "./_generated/server";
 import {ConvexError, v} from "convex/values";
 import {Doc} from "@/convex/_generated/dataModel";
 import {getAllOrThrow} from "convex-helpers/server/relationships";
-import {evaluationData, questionAnswer} from "./schema";
-
-// Types
-export const questionAnswerObject = v.object({
-    text: v.string(),
-    answer: v.string(),
-});
-
-export const evaluationObject = v.object({
-    criteria: v.string(),
-    comment: v.string(),
-    score: v.number(),
-    strengths: v.array(v.string()),
-    improvements: v.array(v.string()),
-    aspects: v.array(v.string()),
-});
-
-export const evaluationArgs = v.object({
-    evaluations: v.array(evaluationObject),
-    overallScore: v.number(),
-    overallFeedback: v.string(),
-});
+import {
+    evaluationData,
+    questionAnswer,
+    questionAnswerArray,
+} from "./schema";
 
 
 
@@ -36,7 +19,6 @@ interface PitchStats {
 }
 
 
-
 const validateUser = async (ctx: { auth: any }) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
@@ -45,8 +27,6 @@ const validateUser = async (ctx: { auth: any }) => {
     return identity;
 };
 
-// Create a new pitch
-// pitches.ts
 export const create = mutation({
     args: {
         orgId: v.string(),
@@ -55,7 +35,7 @@ export const create = mutation({
         type: v.string(),
         status: v.string(),
         evaluation: evaluationData,
-        questions: v.array(questionAnswer)
+        questions: questionAnswerArray
     },
     handler: async (ctx, args) => {
         const identity = await validateUser(ctx);
@@ -168,8 +148,8 @@ export const update = mutation({
         title: v.optional(v.string()),
         text: v.optional(v.string()),
         status: v.optional(v.string()),
-        evaluation: v.optional(evaluationArgs),
-        questions: v.optional(v.array(questionAnswerObject)),
+        evaluation: v.optional(evaluationData), // Use imported type
+        questions: v.optional(v.array(questionAnswer)),
     },
     handler: async (ctx, args) => {
         const identity = await validateUser(ctx);
