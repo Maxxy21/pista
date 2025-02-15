@@ -6,15 +6,15 @@ import {
     Clock,
     Star, ChevronRight
 } from "lucide-react";
-import { useOrganization } from "@clerk/nextjs";
-import { useTheme } from "next-themes";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useDebounceValue } from "usehooks-ts";
+import {useOrganization} from "@clerk/nextjs";
+import {useTheme} from "next-themes";
+import {useRouter, useSearchParams} from "next/navigation";
+import {useDebounceValue} from "usehooks-ts";
 import qs from "query-string";
 
-import { NavMain } from "@/components/nav-main";
-import { NavUser } from "@/components/nav-user";
-import { TeamSwitcher } from "@/components/team-switcher";
+import {NavMain} from "@/components/nav-main";
+import {NavUser} from "@/components/nav-user";
+import {TeamSwitcher} from "@/components/team-switcher";
 import {
     Sidebar,
     SidebarContent,
@@ -22,10 +22,12 @@ import {
     SidebarHeader,
     SidebarRail, SidebarTrigger, useSidebar,
 } from "@/components/ui/sidebar";
-import { SearchForm } from "@/components/search-form";
-import { InviteButton } from "@/components/invite-button";
+import {SearchForm} from "@/components/search-form";
+import {InviteButton} from "@/components/invite-button";
 import LogoIcon from "@/components/ui/logo-icon";
 import {Button} from "@/components/ui/button";
+import {CollapseTrigger} from "@/components/collapse-trigger";
+import {ExpandTrigger} from "@/components/expand-trigger";
 
 const navigationItems = [
     {
@@ -45,15 +47,15 @@ const navigationItems = [
     },
 ];
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-    const { organization } = useOrganization();
-    const { resolvedTheme } = useTheme();
+export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
+    const {organization, isLoaded} = useOrganization();
+    const {resolvedTheme} = useTheme();
     const isDark = resolvedTheme === 'dark';
     const router = useRouter();
     const searchParams = useSearchParams();
     const [search, setSearch] = React.useState("");
     const [debouncedSearch] = useDebounceValue(search, 500);
-    const { state } = useSidebar()
+    const {state} = useSidebar()
 
     React.useEffect(() => {
         const url = qs.stringifyUrl({
@@ -62,7 +64,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 ...Object.fromEntries(searchParams.entries()),
                 search: debouncedSearch,
             },
-        }, { skipEmptyString: true, skipNull: true });
+        }, {skipEmptyString: true, skipNull: true});
 
         router.push(url);
     }, [debouncedSearch, router, searchParams]);
@@ -76,7 +78,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarHeader>
                 {state === "collapsed" ? (
                     <div className="py-2">
-                        <LogoIcon />
+                        <LogoIcon/>
                     </div>
                 ) : (
                     <div className="flex items-center justify-between gap-2 mb-2">
@@ -84,29 +86,35 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                             <LogoIcon/>
                             <h1 className="text-lg font-semibold">Pitch Perfect</h1>
                         </div>
-                        <SidebarTrigger/>
+                        <CollapseTrigger/>
                     </div>
                 )}
-                <TeamSwitcher isDark={isDark}/>
-                <SearchForm
-                    value={search}
-                    onChange={handleSearchChange}
-                />
+                {isLoaded && organization && (
+                    <>
+                        <TeamSwitcher isDark={isDark}/>
+                        <SearchForm
+                            value={search}
+                            onChange={handleSearchChange}
+                        />
+                    </>
+
+                )}
+
             </SidebarHeader>
             <SidebarContent>
                 <NavMain items={navigationItems}/>
             </SidebarContent>
             <SidebarFooter>
                 {state === "collapsed" && (
-                    <SidebarTrigger/>
+                    <ExpandTrigger/>
 
                 )}
                 {organization && (
-                    <InviteButton isDark={isDark} />
+                    <InviteButton isDark={isDark}/>
                 )}
-                <NavUser isDark={isDark} />
+                <NavUser isDark={isDark}/>
             </SidebarFooter>
-            <SidebarRail />
+            <SidebarRail/>
         </Sidebar>
     );
 }

@@ -1,13 +1,11 @@
 "use client";
 import React from 'react';
 import {DashboardStats} from "./_components/stats";
-
 import {PitchList} from "./_components/pitch-list";
-import {SidebarInset, SidebarTrigger} from "@/components/ui/sidebar";
-import {Separator} from "@/components/ui/separator";
-import ModeToggle from "@/components/mode-toggle";
-import DashboardHeader from "@/app/dashboard/_components/dashboard-header";
+import {SidebarInset, SidebarTrigger, useSidebar} from "@/components/ui/sidebar";
 import {useOrganization} from "@clerk/nextjs";
+import {ExpandTrigger} from "@/components/expand-trigger";
+import {EmptyOrg} from "@/app/dashboard/_components/empty-org";
 
 interface DashboardProps {
     searchParams: {
@@ -16,21 +14,34 @@ interface DashboardProps {
     };
 }
 
-
 const Dashboard = ({searchParams}: DashboardProps) => {
-    const { organization } = useOrganization();
+    const {organization} = useOrganization();
+    const {isMobile} = useSidebar();
+
     return (
         <SidebarInset>
-            {/*<DashboardHeader/>*/}
-            <div className="flex flex-1 flex-col gap-4 p-4 pt-3">
-                <DashboardStats/>
-                <PitchList
-                    orgId={organization?.id as string}
-                    query={searchParams}
-                />
+            <div className="flex flex-col h-full">
+                <div className="flex items-center gap-2 p-4">
+                    {isMobile && <ExpandTrigger/>}
+                    <h1 className="text-2xl font-bold">Dashboard</h1>
+                </div>
+
+                <div className="flex-none px-4">
+                    <DashboardStats/>
+                </div>
+
+                <div className="flex-1 min-h-0">
+                    {!organization ? (
+                        <EmptyOrg/>
+                    ) : (
+                        <PitchList
+                            orgId={organization?.id as string}
+                            query={searchParams}
+                        />
+                    )}
+                </div>
             </div>
         </SidebarInset>
-
     );
 };
 

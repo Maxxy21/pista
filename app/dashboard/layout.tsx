@@ -6,8 +6,12 @@ import {
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
     return (
         <SidebarProvider>
-            <AppSidebar />
-            {children}
+            <div className="relative flex min-h-screen">
+                <AppSidebar/>
+                <div className="flex-1 overflow-auto">
+                    {children}
+                </div>
+            </div>
         </SidebarProvider>
     )
 }

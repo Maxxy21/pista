@@ -1,6 +1,29 @@
+// convex/schema.ts
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
-import { evaluationArgs } from "./pitches";
+
+export const questionAnswer = v.object({
+    text: v.string(),
+    answer: v.string()
+});
+
+export const evaluation = v.object({
+    criteria: v.string(),
+    comment: v.string(),
+    score: v.number(),
+    strengths: v.array(v.string()),
+    improvements: v.array(v.string()),
+    aspects: v.array(v.string()),
+});
+
+export const evaluationData = v.object({
+    evaluations: v.array(evaluation),
+    overallScore: v.number(),
+    overallFeedback: v.string(),
+});
+
+export const questionAnswerArray = v.array(questionAnswer);
+export const evaluationArray = v.array(evaluation);
 
 export default defineSchema({
     pitches: defineTable({
@@ -8,25 +31,11 @@ export default defineSchema({
         text: v.string(),
         type: v.string(),
         status: v.string(),
-        evaluation: evaluationArgs,
+        evaluation: evaluationData,
+        questions: v.array(questionAnswer),
         orgId: v.string(),
         userId: v.string(),
         authorName: v.string(),
-        categories: v.optional(v.array(v.string())),
-        notes: v.optional(v.array(v.object({
-            content: v.string(),
-            authorId: v.string(),
-            authorName: v.string(),
-            createdAt: v.number(),
-            updatedAt: v.number(),
-        }))),
-        versions: v.optional(v.array(v.object({
-            text: v.string(),
-            evaluation: evaluationArgs,
-            authorId: v.string(),
-            authorName: v.string(),
-            createdAt: v.number(),
-        }))),
         createdAt: v.number(),
         updatedAt: v.number(),
     })
@@ -35,19 +44,7 @@ export default defineSchema({
         .searchIndex("search_title", {
             searchField: "title",
             filterFields: ["orgId"]
-        })
-        .index("by_status", ["status"])
-        .index("by_categories", ["categories"]),
-
-    categories: defineTable({
-        orgId: v.string(),
-        name: v.string(),
-        color: v.optional(v.string()),
-        createdAt: v.number(),
-        createdBy: v.string(),
-    })
-        .index("by_org", ["orgId"])
-        .index("by_org_name", ["orgId", "name"]),
+        }),
 
     userFavorites: defineTable({
         userId: v.string(),
