@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.2.7",
+    "@clerk/nextjs": "^6.11.3",
     "@clerk/themes": "^2.1.41",
     "@hookform/resolvers": "^3.9.0",
     "@livekit/components-react": "^2.8.1",
@@ -33,7 +34,7 @@
     "@tanstack/react-table": "^8.19.3",
     "@vercel/analytics": "^1.4.1",
     "@vercel/speed-insights": "^1.1.0",
-    "axios": "1.7.4",
+    "axios": "1.7.8",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "convex": "^1.13.0",
