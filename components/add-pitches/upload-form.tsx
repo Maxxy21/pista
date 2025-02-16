@@ -109,6 +109,7 @@ export const UploadForm = ({ orgId,onStepChange }: UploadFormProps) => {
 
                 const transcriptionData = await transcriptionResponse.json();
                 text = transcriptionData.text;
+                console.log(text);
             } else if (contentType === 'textFile') {
                 text = await files[0].text();
             }
