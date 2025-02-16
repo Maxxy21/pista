@@ -21,9 +21,14 @@ interface PitchStats {
 
 const validateUser = async (ctx: { auth: any }) => {
     const identity = await ctx.auth.getUserIdentity();
+
     if (!identity) {
-        throw new ConvexError("Unauthorized");
+        throw new ConvexError({
+            message: "Not authenticated",
+            code: "UNAUTHORIZED"
+        });
     }
+
     return identity;
 };
 

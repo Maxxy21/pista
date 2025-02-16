@@ -35,8 +35,7 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-
-        <html lang="en">
+        <html lang="en" suppressHydrationWarning>
         <body className={defaultFont.className}>
         <Suspense fallback={<Loading/>}>
             <ThemeProvider
@@ -56,6 +55,5 @@ export default function RootLayout({
         </Suspense>
         </body>
         </html>
-
     );
 }

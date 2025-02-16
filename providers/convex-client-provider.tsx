@@ -1,24 +1,29 @@
 "use client";
 
-
 import {Loading} from "@/components/auth/loading";
 import {ClerkProvider, useAuth} from "@clerk/nextjs";
 import {AuthLoading, Authenticated, ConvexReactClient, Unauthenticated} from "convex/react";
 import {ConvexProviderWithClerk} from "convex/react-clerk";
+import {useMemo} from "react";
+import {usePathname} from "next/navigation";
 
 interface ConvexClientProviderProps {
     children: React.ReactNode;
-};
+}
 
 const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL!;
-
-const convex = new ConvexReactClient(convexUrl);
 
 export const ConvexClientProvider = ({
                                          children
                                      }: ConvexClientProviderProps) => {
+    const convex = useMemo(() => new ConvexReactClient(convexUrl), []);
+    const pathname = usePathname();
+
+    // Check if we're on an auth page
+    const isAuthPage = pathname === '/sign-in' || pathname === '/sign-up';
+
     return (
-        <ClerkProvider dynamic>
+        <ClerkProvider>
             <ConvexProviderWithClerk useAuth={useAuth} client={convex}>
                 <AuthLoading>
                     <Loading/>
@@ -27,9 +32,9 @@ export const ConvexClientProvider = ({
                     {children}
                 </Authenticated>
                 <Unauthenticated>
-                    {children}
+                    {isAuthPage ? children : children}
                 </Unauthenticated>
             </ConvexProviderWithClerk>
         </ClerkProvider>
-    )
-}
+    );
+};
