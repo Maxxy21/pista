@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
 import { Loader2, Upload, ChevronRight, ChevronLeft } from "lucide-react";
@@ -47,7 +47,7 @@ interface FollowUpDialogProps {
 }
 
 export function FollowUpDialog({ orgId }: FollowUpDialogProps) {
-    const [isOpen, setIsOpen] = useState(false);
+    const [isOpen, setIsOpen] = useState<boolean>(false);
     const [currentStep, setCurrentStep] = useState<Step>("pitch");
     const [pitchData, setPitchData] = useState({
         title: "",
@@ -58,8 +58,6 @@ export function FollowUpDialog({ orgId }: FollowUpDialogProps) {
     const [files, setFiles] = useState<File[]>([]);
     const [isProcessing, setIsProcessing] = useState(false);
 
-    const { mutate: createPitch } = useApiMutation(api.pitches.create);
-
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         multiple: false,
         accept: pitchData.type === "audio"
@@ -69,6 +67,13 @@ export function FollowUpDialog({ orgId }: FollowUpDialogProps) {
             setFiles(acceptedFiles);
         },
     });
+
+    const { mutate: createPitch } = useApiMutation(api.pitches.create);
+
+    // Initialize dialog state after mount
+    useEffect(() => {
+        setIsOpen(false);
+    }, []);
 
     const generateQuestions = async () => {
         try {
@@ -150,7 +155,7 @@ export function FollowUpDialog({ orgId }: FollowUpDialogProps) {
 
             if (!evaluationResponse.ok) throw new Error("Evaluation failed");
             const evaluationData = await evaluationResponse.json();
-
+      
             // Create pitch in database
             await createPitch({
                 orgId,

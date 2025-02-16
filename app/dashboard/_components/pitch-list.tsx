@@ -8,7 +8,7 @@ import {EmptyFavorites} from "./empty-favorites";
 import {EmptyPitches} from "./empty-pitches";
 import {motion, AnimatePresence} from "framer-motion";
 import {useRouter, useSearchParams} from "next/navigation";
-import React, {useState} from "react";
+import React, {useState, useMemo} from "react";
 import {FilterPanel} from "@/components/filter-panel";
 import {ScrollArea} from "@/components/ui/scroll-area";
 import {PitchCard} from "./pitch-card/pitch-card";
@@ -35,9 +35,10 @@ interface PitchListProps {
 export const PitchList = ({orgId, query}: PitchListProps) => {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const currentView = searchParams.get("view");
-    const searchQuery = searchParams.get("search") || "";
     const {organization} = useOrganization();
+
+    const currentView = useMemo(() => searchParams.get("view"), [searchParams]);
+    const searchQuery = useMemo(() => searchParams.get("search") || "", [searchParams]);
 
     const [filters, setFilters] = useState<FilterState>({
         scoreRange: {
@@ -62,16 +63,8 @@ export const PitchList = ({orgId, query}: PitchListProps) => {
         router.push(url);
     };
 
-    const data = useQuery(api.pitches.getFilteredPitches, {
-        orgId,
-        search: searchQuery,
-        favorites: currentView === "favorites",
-        sortBy: currentView === "recent" ? "date" : filters.sortBy,
-        scoreRange: filters.scoreRange,
-    });
-
-    const getTitle = () => {
-        switch (query.view) {
+    const getTitle = useMemo(() => {
+        switch (currentView) {
             case "recent":
                 return "Recent Pitches";
             case "favorites":
@@ -79,8 +72,15 @@ export const PitchList = ({orgId, query}: PitchListProps) => {
             default:
                 return `${organization?.name ?? "Organization"} Pitches`;
         }
-    };
+    }, [currentView, organization?.name]);
 
+    const data = useQuery(api.pitches.getFilteredPitches, {
+        orgId,
+        search: searchQuery,
+        favorites: currentView === "favorites",
+        sortBy: currentView === "recent" ? "date" : filters.sortBy,
+        scoreRange: filters.scoreRange,
+    });
 
     if (!data) {
         return (
@@ -93,7 +93,7 @@ export const PitchList = ({orgId, query}: PitchListProps) => {
                     <div className="flex flex-col gap-4">
                         <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:justify-between">
                             <h2 className="text-2xl font-semibold truncate">
-                                {getTitle()}
+                                {getTitle}
                             </h2>
                             <NewPitchButton orgId={orgId} disabled/>
                         </div>
@@ -126,7 +126,7 @@ export const PitchList = ({orgId, query}: PitchListProps) => {
                 <div className="flex flex-col gap-4">
                     <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:justify-between">
                         <h2 className="text-2xl font-semibold truncate">
-                            {getTitle()}
+                            {getTitle}
                         </h2>
                         <NewPitchButton orgId={orgId} disabled={!data}/>
                     </div>
@@ -169,11 +169,11 @@ export const PitchList = ({orgId, query}: PitchListProps) => {
                             </div>
                         ) : (
                             <div className="grid grid-cols-7 gap-4">
-                                <div className="col-start-4 ">
+                                <div className="col-start-4">
                                     <div className="col-span-4">
-                                        {query.search && <EmptySearch/>}
-                                        {!query.search && query.view === "favorites" && <EmptyFavorites/>}
-                                        {!query.search && query.view !== "favorites" && <EmptyPitches orgId={orgId}/>}
+                                        {searchQuery && <EmptySearch/>}
+                                        {!searchQuery && currentView === "favorites" && <EmptyFavorites/>}
+                                        {!searchQuery && currentView !== "favorites" && <EmptyPitches orgId={orgId}/>}
                                     </div>
                                 </div>
                             </div>
