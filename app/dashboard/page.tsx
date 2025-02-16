@@ -11,7 +11,7 @@ interface DashboardProps {
     searchParams: {
         search?: string;
         favorites?: string;
-    } & { [key: string]: string | string[] | undefined };
+    };
 }
 
 const Dashboard = ({searchParams}: DashboardProps) => {
