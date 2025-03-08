@@ -8,13 +8,13 @@ import { Button } from "@/components/ui/button";
 interface NewPitchButtonProps {
     orgId: string;
     disabled?: boolean;
+    className?: string;
 }
 
-export const NewPitchButton = ({ orgId, disabled }: NewPitchButtonProps) => {
+export const NewPitchButton = ({ orgId, disabled, className }: NewPitchButtonProps) => {
     return (
         <FileDialog
             orgId={orgId}
-            disabled={disabled}
         >
             <motion.div
                 whileHover={{ scale: 1.02 }}
@@ -23,8 +23,9 @@ export const NewPitchButton = ({ orgId, disabled }: NewPitchButtonProps) => {
                 <Button
                     disabled={disabled}
                     className={cn(
-                        "flex items-center gap-2 bg-primary hover:bg-primary/90",
-                        disabled && "opacity-50 cursor-not-allowed"
+                        "flex items-center gap-2 font-medium",
+                        disabled && "opacity-50 cursor-not-allowed",
+                        className
                     )}
                 >
                     <Plus className="h-4 w-4" />
@@ -34,4 +35,3 @@ export const NewPitchButton = ({ orgId, disabled }: NewPitchButtonProps) => {
         </FileDialog>
     );
 };
-
