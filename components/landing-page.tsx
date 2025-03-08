@@ -232,7 +232,6 @@ export default function LandingPage() {
     );
 }
 
-// ... rest of the code remains the same
 
 const features = [
     {
