@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, Suspense, lazy } from 'react';
 import { useOrganization, useUser } from "@clerk/nextjs";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
@@ -9,63 +9,56 @@ import { Loading } from "@/components/auth/loading";
 import { EmptyOrg } from "@/app/dashboard/components/empty-org";
 import { DashboardHeader } from "@/app/dashboard/components/dashboard-header";
 import { DashboardTabs } from "@/app/dashboard/components/dashboard-tabs";
-import { DashboardStats } from "@/app/dashboard/components/stats";
-import { PitchesGrid } from "@/app/dashboard/components/pitches-grid";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import { useDashboardState } from "./hooks/use-dashboard-state";
+import { usePrefetchPitches } from "@/hooks/use-prefetch-pitches";
+import { SkeletonCard } from "@/components/ui/skeleton-card";
 
-const Dashboard = () => {
-    const {  isLoaded } = useUser();
+// Lazy load heavy components
+const DashboardStats = lazy(() => import("@/app/dashboard/components/stats").then(mod => ({ default: mod.DashboardStats })));
+const PitchesGrid = lazy(() => import("@/app/dashboard/components/pitches-grid").then(mod => ({ default: mod.PitchesGrid })));
+
+// Skeleton loaders for lazy-loaded components
+const StatsSkeleton = () => (
+  <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+    {Array.from({ length: 4 }).map((_, i) => (
+      <SkeletonCard key={i} variant="stat" />
+    ))}
+  </div>
+);
+
+const PitchesGridSkeleton = () => (
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    {Array.from({ length: 8 }).map((_, i) => (
+      <SkeletonCard key={i} variant="pitch" />
+    ))}
+  </div>
+);
+
+export default function Dashboard() {
+    const { isLoaded } = useUser();
     const { organization } = useOrganization();
     const router = useRouter();
     const pathname = usePathname();
     const searchParamsObj = useSearchParams();
-
+    const { 
+      searchValue, setSearchValue, 
+      viewMode, setViewMode, 
+      scoreFilter, setScoreFilter, 
+      sortBy, setSortBy, 
+      handleSearch, handleTabChange, 
+      getScoreRange 
+    } = useDashboardState(searchParamsObj);
+    
+    // Prefetch frequently accessed data
+    usePrefetchPitches();
     
     // Get search parameters
     const searchParam = searchParamsObj.get('search') || "";
     const viewParam = searchParamsObj.get('view') || "all";
     
-    // State for filters and search
-    const [searchValue, setSearchValue] = useState("");
-    const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-    const [scoreFilter, setScoreFilter] = useState("all");
-    const [sortBy, setSortBy] = useState<"newest" | "score" | "updated">("newest");
-
-    useEffect(() => {
-        setSearchValue(searchParam);
-    }, [searchParam]);
-    
-    // Handle tab changes
-    const handleTabChange = useCallback((value: string) => {
-        const current = new URLSearchParams(Array.from(searchParamsObj.entries()));
-        
-        if (value === "all") {
-            current.delete("view");
-        } else {
-            current.set("view", value);
-        }
-        
-        const search = current.toString();
-        const query = search ? `?${search}` : "";
-        
-        router.replace(`${pathname}${query}`);
-    }, [router, pathname, searchParamsObj]);
-    
-    // Get score range based on filter
-    const getScoreRange = (filter: string) => {
-        switch (filter) {
-            case "high":
-                return { min: 8, max: 10 };
-            case "medium":
-                return { min: 5, max: 7.9 };
-            case "low":
-                return { min: 0, max: 4.9 };
-            default:
-                return { min: 0, max: 10 };
-        }
-    }
-
-    // Fetch pitches data
+    // Fetch pitches data with loading state tracking
+    const [isLoading, setIsLoading] = useState(true);
     const data = useQuery(
         api.pitches.getFilteredPitches,
         organization
@@ -78,6 +71,13 @@ const Dashboard = () => {
             }
             : "skip"
     );
+    
+    // Update loading state when data changes
+    useEffect(() => {
+        if (data !== undefined) {
+            setIsLoading(false);
+        }
+    }, [data]);
 
     if (!isLoaded) {
         return <Loading />;
@@ -86,50 +86,51 @@ const Dashboard = () => {
     return (
         <SidebarInset className="w-full">
             <div className="flex flex-col h-full w-full">
-                        {/* Dashboard Header */}
-                        <DashboardHeader
-                            searchValue={searchValue}
-                            setSearchValue={setSearchValue}
-                            viewMode={viewMode}
-                            setViewMode={setViewMode}
-                            scoreFilter={scoreFilter}
-                            setScoreFilter={setScoreFilter}
-                            sortBy={sortBy}
-                            setSortBy={setSortBy}
-                            handleSearch={() => {}}
-                            organization={organization}
-                        />
+                {/* Dashboard Header */}
+                <DashboardHeader
+                    searchValue={searchValue}
+                    setSearchValue={setSearchValue}
+                    viewMode={viewMode}
+                    setViewMode={setViewMode}
+                    scoreFilter={scoreFilter}
+                    setScoreFilter={setScoreFilter}
+                    sortBy={sortBy}
+                    setSortBy={setSortBy}
+                    handleSearch={handleSearch}
+                    organization={organization}
+                />
 
-                        {/* Tab Navigation */}
-                        <DashboardTabs 
-                            currentView={viewParam}
-                            handleTabChange={handleTabChange}
-                        />
+                {/* Tab Navigation */}
+                <DashboardTabs 
+                    currentView={viewParam}
+                    handleTabChange={handleTabChange}
+                />
 
-                        {/* Stats Section */}
-                        <div className="w-full px-4 md:px-6 lg:px-8 py-6">
-                            <DashboardStats />
-                        </div>
+                {/* Stats Section */}
+                <div className="w-full px-4 md:px-6 lg:px-8 py-6">
+                    <Suspense fallback={<StatsSkeleton />}>
+                        <DashboardStats />
+                    </Suspense>
+                </div>
 
-                        {/* Main Content */}
-                        <div className="flex-1 min-h-0 w-full px-4 md:px-6 lg:px-8 py-6">
-                            {!organization ? (
-                                <EmptyOrg />
-                            ) : (
-                                <div className="w-full">
-                                    <PitchesGrid 
-                                        data={data}
-                                        viewMode={viewMode}
-                                        searchQuery={searchParam}
-                                        currentView={viewParam}
-                                        organization={organization}
-                                    />
-                                </div>
-                            )}
-                        </div>
+                {/* Main Content */}
+                <div className="w-full px-4 md:px-6 lg:px-8 pb-6">
+                    {!organization ? (
+                        <EmptyOrg />
+                    ) : (
+                        <Suspense fallback={<PitchesGridSkeleton />}>
+                            <PitchesGrid 
+                                data={data}
+                                viewMode={viewMode}
+                                searchQuery={searchParam}
+                                currentView={viewParam}
+                                organization={organization}
+                                isLoading={isLoading}
+                            />
+                        </Suspense>
+                    )}
+                </div>
             </div>
         </SidebarInset>
     );
-};
-
-export default Dashboard;
+}

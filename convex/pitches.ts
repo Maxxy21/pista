@@ -392,3 +392,42 @@ export const getPitchStats = query({
         };
     },
 });
+
+// Add a prefetch mutation to warm up the cache
+export const prefetch = mutation({
+    args: {
+        orgId: v.string(),
+    },
+    handler: async (ctx, args) => {
+        const identity = await validateUser(ctx);
+        
+        // Prefetch recent pitches
+        await ctx.db
+            .query("pitches")
+            .withIndex("by_org", (q) => q.eq("orgId", args.orgId))
+            .order("desc")
+            .take(10);
+        
+        // Prefetch user's favorites
+        const favorites = await ctx.db
+            .query("userFavorites")
+            .withIndex("by_user_org_pitch", (q) =>
+                q.eq("userId", identity.subject).eq("orgId", args.orgId)
+            )
+            .collect();
+        
+        const favoritedIds = favorites.map((f) => f.pitchId);
+        
+        // Prefetch the actual favorite pitches if there are any
+        if (favoritedIds.length > 0) {
+            // Use get() instead of getAllOrThrow to handle missing documents
+            await Promise.all(
+                favoritedIds.slice(0, 10).map(id => 
+                    ctx.db.get(id)
+                )
+            );
+        }
+        
+        return { success: true };
+    },
+});
