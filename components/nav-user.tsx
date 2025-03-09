@@ -33,12 +33,12 @@ import {dark} from "@clerk/themes"
 import {useRouter} from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 
-interface ModernNavUserProps {
+interface NavUserProps {
     isDark?: boolean
     className?: string
 }
 
-export function NavUser({isDark, className}: ModernNavUserProps) {
+export function NavUser({isDark, className}: NavUserProps) {
     const {isMobile} = useSidebar()
     const {user} = useUser()
     const {signOut} = useClerk()

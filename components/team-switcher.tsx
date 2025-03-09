@@ -33,12 +33,12 @@ import {dark} from "@clerk/themes";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 
-interface ModernTeamSwitcherProps {
+interface TeamSwitcherProps {
     isDark?: boolean;
     className?: string;
 }
 
-export function TeamSwitcher({isDark, className}: ModernTeamSwitcherProps) {
+export function TeamSwitcher({isDark, className}: TeamSwitcherProps) {
     const {isMobile} = useSidebar();
     const {organization} = useOrganization();
     const {userMemberships, setActive} = useOrganizationList({

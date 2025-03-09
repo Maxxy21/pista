@@ -1,37 +1,48 @@
 "use client";
-import { Plus } from 'lucide-react';
-import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
-import { FileDialog } from "@/components/add-pitches/file-dialog";
+
+import { PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+
+import { cn } from "@/lib/utils";
+import {FileDialog} from "@/components/add-pitches/file-dialog";
 
 interface NewPitchButtonProps {
     orgId: string;
     disabled?: boolean;
     className?: string;
+    variant?: "default" | "gradient" | "outline";
+    size?: "default" | "sm" | "lg" | "icon";
 }
 
-export const NewPitchButton = ({ orgId, disabled, className }: NewPitchButtonProps) => {
+export function NewPitchButton({
+                                   orgId,
+                                   disabled = false,
+                                   className,
+                                   variant = "default",
+                                   size = "default"
+                               }: NewPitchButtonProps) {
+    // Generate button styles based on variant
+    const buttonStyles = {
+        default: "",
+        gradient: "bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70",
+        outline: "border-primary/50 text-primary hover:bg-primary/10"
+    };
+
     return (
-        <FileDialog
-            orgId={orgId}
-        >
-            <motion.div
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+        <FileDialog orgId={orgId}>
+            <Button
+                disabled={disabled}
+                variant={variant === "outline" ? "outline" : "default"}
+                size={size}
+                className={cn(
+                    "gap-2",
+                    buttonStyles[variant],
+                    className
+                )}
             >
-                <Button
-                    disabled={disabled}
-                    className={cn(
-                        "flex items-center gap-2 font-medium",
-                        disabled && "opacity-50 cursor-not-allowed",
-                        className
-                    )}
-                >
-                    <Plus className="h-4 w-4" />
-                    New Pitch
-                </Button>
-            </motion.div>
+                <PlusCircle className="h-4 w-4" />
+                {size !== "icon" && "New Pitch"}
+            </Button>
         </FileDialog>
     );
-};
+}

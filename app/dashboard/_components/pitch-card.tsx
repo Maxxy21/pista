@@ -1,18 +1,16 @@
-"use client";
-
-import { motion } from "framer-motion";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { formatDistanceToNow } from "date-fns";
-import { Button } from "@/components/ui/button";
-import { MoreHorizontal, Star, ChevronRight } from 'lucide-react';
+import {motion} from "framer-motion";
+import {Card, CardContent, CardFooter} from "@/components/ui/card";
+import {formatDistanceToNow} from "date-fns";
+import {Button} from "@/components/ui/button";
+import {MoreHorizontal, Star, ChevronRight} from 'lucide-react';
 import React from "react";
-import { useApiMutation } from "@/hooks/use-api-mutation";
-import { api } from "@/convex/_generated/api";
-import { cn } from "@/lib/utils";
-import { useAuth } from "@clerk/nextjs";
-import { Badge } from "@/components/ui/badge";
-import { Actions } from "@/components/actions";
-import {toast} from "sonner";
+import {useApiMutation} from "@/hooks/use-api-mutation";
+import {api} from "@/convex/_generated/api";
+import {cn} from "@/lib/utils";
+import {useAuth} from "@clerk/nextjs";
+import {Badge} from "@/components/ui/badge";
+import {Actions} from "@/components/actions";
+import {useToast} from "@/components/ui/use-toast"
 
 interface PitchCardProps {
     id: string;
@@ -27,37 +25,46 @@ interface PitchCardProps {
     onClick: () => void;
 }
 
-export function ModernPitchCard({
-                                    id,
-                                    title,
-                                    text,
-                                    authorId,
-                                    authorName,
-                                    createdAt,
-                                    orgId,
-                                    isFavorite,
-                                    score,
-                                    onClick
-                                }: PitchCardProps) {
-    const { userId } = useAuth();
+export function PitchCard({
+                              id,
+                              title,
+                              text,
+                              authorId,
+                              authorName,
+                              createdAt,
+                              orgId,
+                              isFavorite,
+                              score,
+                              onClick
+                          }: PitchCardProps) {
+    const {userId} = useAuth();
+    const {toast} = useToast()
     const authorLabel = userId === authorId ? "You" : authorName;
     const createdAtLabel = formatDistanceToNow(createdAt, {
         addSuffix: true,
     });
 
-    const { mutate: onFavorite, pending: pendingFavorite } = useApiMutation(api.pitches.favorite);
-    const { mutate: onUnfavorite, pending: pendingUnfavorite } = useApiMutation(api.pitches.unfavorite);
+    const {mutate: onFavorite, pending: pendingFavorite} = useApiMutation(api.pitches.favorite);
+    const {mutate: onUnfavorite, pending: pendingUnfavorite} = useApiMutation(api.pitches.unfavorite);
 
     const toggleFavorite = (e: React.MouseEvent) => {
         e.stopPropagation();
         e.preventDefault();
 
         if (isFavorite) {
-            onUnfavorite({ id, orgId})
-                .catch(() => toast.error("Failed to unfavorite"));
+            onUnfavorite({id, orgId})
+                .catch(() => toast({
+                    title: "Error",
+                    description: "Failed to unfavorite",
+                    variant: "destructive"
+                }));
         } else {
-            onFavorite({ id, orgId })
-                .catch(() => toast.error("Failed to favorite"));
+            onFavorite({id, orgId})
+                .catch(() => toast({
+                    title: "Error",
+                    description: "Failed to favorite",
+                    variant: "destructive"
+                }));
         }
     };
 
@@ -72,10 +79,10 @@ export function ModernPitchCard({
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            whileHover={{ y: -5, transition: { duration: 0.2 } }}
+            initial={{opacity: 0, y: 10}}
+            animate={{opacity: 1, y: 0}}
+            exit={{opacity: 0, y: -10}}
+            whileHover={{y: -5, transition: {duration: 0.2}}}
             className="h-full"
         >
             <Card
@@ -137,9 +144,10 @@ export function ModernPitchCard({
                     </p>
                 </CardContent>
 
-                <CardFooter className="flex-none pt-0 pb-4 px-6 text-xs text-muted-foreground flex justify-between items-center">
+                <CardFooter
+                    className="flex-none pt-0 pb-4 px-6 text-xs text-muted-foreground flex justify-between items-center">
                     <span>{authorLabel} • {createdAtLabel}</span>
-                    <ChevronRight className="h-4 w-4 opacity-60" />
+                    <ChevronRight className="h-4 w-4 opacity-60"/>
                 </CardFooter>
             </Card>
         </motion.div>

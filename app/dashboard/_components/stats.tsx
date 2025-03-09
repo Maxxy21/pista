@@ -18,7 +18,7 @@ interface StatCardProps {
     trend?: "up" | "down" | "neutral";
 }
 
-function ModernStatCard({
+function StatCard({
                             title,
                             value,
                             description,
@@ -71,7 +71,7 @@ function ModernStatCard({
     );
 }
 
-export function ModernDashboardStats() {
+export function DashboardStats() {
     const { userId, isLoaded, isSignedIn } = useAuth();
     const defaultStats = useMemo(() => ({
         totalPitches: 0,
@@ -107,28 +107,28 @@ export function ModernDashboardStats() {
 
     return (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            <ModernStatCard
+            <StatCard
                 title="Total Pitches"
                 value={mergedStats.totalPitches}
                 description={pitchGrowth}
                 trend="up"
                 icon={BarChart3}
             />
-            <ModernStatCard
+            <StatCard
                 title="Average Score"
                 value={mergedStats.averageScore?.toFixed(1) ?? "0.0"}
                 description={`${mergedStats.totalPitches} pitches analyzed`}
                 icon={LineChart}
                 trend="neutral"
             />
-            <ModernStatCard
+            <StatCard
                 title="Best Pitch"
                 value={mergedStats.bestPitch?.title ?? "None"}
                 description={mergedStats.bestPitch?.evaluation.overallScore.toFixed(1) ?? "0.0"}
                 icon={ChevronUp}
                 trend="up"
             />
-            <ModernStatCard
+            <StatCard
                 title="Recent Pitches"
                 value={mergedStats.recentPitches.length}
                 description="Last 7 days"

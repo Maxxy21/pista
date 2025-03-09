@@ -17,15 +17,17 @@ export function AudioPreview({ file, onRemove }: AudioPreviewProps) {
     const [duration, setDuration] = useState(0);
     const [currentTime, setCurrentTime] = useState(0);
     const audioRef = useRef<HTMLAudioElement | null>(null);
-    const [audioUrl, setAudioUrl] = useState<string>("");
+    const [audioUrl, setAudioUrl] = useState<string | null>(null);
 
     useEffect(() => {
-        const url = URL.createObjectURL(file);
-        setAudioUrl(url);
+        if (file) {
+            const url = URL.createObjectURL(file);
+            setAudioUrl(url);
 
-        return () => {
-            URL.revokeObjectURL(url);
-        };
+            return () => {
+                URL.revokeObjectURL(url);
+            };
+        }
     }, [file]);
 
     useEffect(() => {
@@ -74,14 +76,14 @@ export function AudioPreview({ file, onRemove }: AudioPreviewProps) {
 
     return (
         <Card className="p-4">
-            <audio ref={audioRef} src={audioUrl} />
+            {audioUrl && <audio ref={audioRef} src={audioUrl} />}
 
             <div className="space-y-4">
                 <div className="flex items-center justify-between">
                     <span className="text-sm font-medium">{file.name}</span>
                     <span className="text-xs text-muted-foreground">
-            {formatDuration(currentTime)} / {formatDuration(duration)}
-          </span>
+                        {formatDuration(currentTime)} / {formatDuration(duration)}
+                    </span>
                 </div>
 
                 <div className="space-y-2">

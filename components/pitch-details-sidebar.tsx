@@ -172,14 +172,11 @@ export function PitchDetailsSidebar({ ...props }: React.ComponentProps<typeof Si
                         </div>
 
                         <div className="relative">
-                            <SearchIcon
-                                className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground"
-                            />
-                            <SidebarInput
+                            <SearchForm
                                 value={search}
-                                onChange={(e) => setSearch(e.target.value)}
+                                onChange={(value) => setSearch(value)}
                                 placeholder="Search pitches..."
-                                className="pl-10 w-full"
+                                variant="sidebar"
                             />
                         </div>
                     </div>

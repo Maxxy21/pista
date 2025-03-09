@@ -141,17 +141,12 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
                         {isLoaded && organization && (
                             <>
                                 <TeamSwitcher isDark={isDark}/>
-                                <div className="relative">
-                                    <SearchIcon
-                                        className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground"
-                                    />
-                                    <SidebarInput
-                                        value={search}
-                                        onChange={(e) => handleSearchChange(e.target.value)}
-                                        placeholder="Search pitches..."
-                                        className="pl-10 w-full"
-                                    />
-                                </div>
+                                <SearchForm
+                                    value={search}
+                                    onChange={handleSearchChange}
+                                    placeholder="Search pitches..."
+                                    variant="sidebar"
+                                />
                             </>
                         )}
                     </div>
@@ -194,41 +189,41 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
                             })}
                         </SidebarMenu>
 
-                        <Separator className="my-4 mx-2" />
+                        {/*<Separator className="my-4 mx-2" />*/}
 
-                        <SidebarGroupLabel className="px-4">
-                            Tools
-                        </SidebarGroupLabel>
-                        <SidebarMenu>
-                            <SidebarMenuItem>
-                                <SidebarMenuButton
-                                    className="group"
-                                    tooltip={state === "collapsed" ? "AI Assistant" : undefined}
-                                >
-                                    <Sparkles className="h-4 w-4 text-amber-500" />
-                                    <span>AI Assistant</span>
-                                    <Badge className="ml-auto px-1.5 py-0.5 text-[10px] bg-amber-500/10 text-amber-500 border-amber-500/30">
-                                        Pro
-                                    </Badge>
-                                </SidebarMenuButton>
-                            </SidebarMenuItem>
-                            <SidebarMenuItem>
-                                <SidebarMenuButton
-                                    tooltip={state === "collapsed" ? "Team Access" : undefined}
-                                >
-                                    <Users className="h-4 w-4" />
-                                    <span>Team Access</span>
-                                </SidebarMenuButton>
-                            </SidebarMenuItem>
-                            <SidebarMenuItem>
-                                <SidebarMenuButton
-                                    tooltip={state === "collapsed" ? "Settings" : undefined}
-                                >
-                                    <Settings className="h-4 w-4" />
-                                    <span>Settings</span>
-                                </SidebarMenuButton>
-                            </SidebarMenuItem>
-                        </SidebarMenu>
+                        {/*<SidebarGroupLabel className="px-4">*/}
+                        {/*    Tools*/}
+                        {/*</SidebarGroupLabel>*/}
+                        {/*<SidebarMenu>*/}
+                        {/*    <SidebarMenuItem>*/}
+                        {/*        <SidebarMenuButton*/}
+                        {/*            className="group"*/}
+                        {/*            tooltip={state === "collapsed" ? "AI Assistant" : undefined}*/}
+                        {/*        >*/}
+                        {/*            <Sparkles className="h-4 w-4 text-amber-500" />*/}
+                        {/*            <span>AI Assistant</span>*/}
+                        {/*            <Badge className="ml-auto px-1.5 py-0.5 text-[10px] bg-amber-500/10 text-amber-500 border-amber-500/30">*/}
+                        {/*                Pro*/}
+                        {/*            </Badge>*/}
+                        {/*        </SidebarMenuButton>*/}
+                        {/*    </SidebarMenuItem>*/}
+                        {/*    <SidebarMenuItem>*/}
+                        {/*        <SidebarMenuButton*/}
+                        {/*            tooltip={state === "collapsed" ? "Team Access" : undefined}*/}
+                        {/*        >*/}
+                        {/*            <Users className="h-4 w-4" />*/}
+                        {/*            <span>Team Access</span>*/}
+                        {/*        </SidebarMenuButton>*/}
+                        {/*    </SidebarMenuItem>*/}
+                        {/*    <SidebarMenuItem>*/}
+                        {/*        <SidebarMenuButton*/}
+                        {/*            tooltip={state === "collapsed" ? "Settings" : undefined}*/}
+                        {/*        >*/}
+                        {/*            <Settings className="h-4 w-4" />*/}
+                        {/*            <span>Settings</span>*/}
+                        {/*        </SidebarMenuButton>*/}
+                        {/*    </SidebarMenuItem>*/}
+                        {/*</SidebarMenu>*/}
                     </>
                 )}
             </SidebarContent>

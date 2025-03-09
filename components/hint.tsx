@@ -12,7 +12,7 @@ export interface HintProps {
   align?: "start" | "center" | "end";
   sideOffset?: number;
   alignOffset?: number;
-};
+}
 
 export const Hint = ({
   label,
