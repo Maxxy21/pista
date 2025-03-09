@@ -40,7 +40,7 @@ export const create = mutation({
         type: v.string(),
         status: v.string(),
         evaluation: evaluationData,
-        questions: questionAnswerArray
+        questions: v.array(questionAnswer),
     },
     handler: async (ctx, args) => {
         const identity = await validateUser(ctx);

@@ -87,7 +87,7 @@ export function PitchCard({
         >
             <Card
                 onClick={onClick}
-                className="flex flex-col h-full cursor-pointer hover:shadow-md transition-all duration-300 overflow-hidden border-opacity-40 dark:border-opacity-30"
+                className="flex flex-col h-full cursor-pointer hover:shadow-md transition-all duration-300 overflow-hidden border-opacity-40 dark:border-opacity-30 relative"
             >
                 {score !== undefined && (
                     <div className="absolute top-3 right-3 z-10">

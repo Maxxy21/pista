@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-import {NewPitchButton} from "@/app/dashboard/_components/new-pitch-button";
+import {NewPitchButton} from "@/app/dashboard/components/new-pitch-button";
 
 
 export const EmptyPitches = ({orgId}: { orgId: string }) => {

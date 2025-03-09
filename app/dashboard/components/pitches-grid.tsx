@@ -7,7 +7,7 @@ import { NewPitchButton } from "./new-pitch-button";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { OrganizationResource } from "@clerk/types";
-import {PitchCard} from "@/app/dashboard/_components/pitch-card";
+import {PitchCard} from "@/app/dashboard/components/pitch-card";
 
 
 interface PitchesGridProps {

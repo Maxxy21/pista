@@ -1,7 +1,7 @@
-// app/(auth)/sign-up/page.tsx
-import { SignUp } from "@clerk/nextjs"
+// app/(auth)/routes)/sign-up/page.tsx
+
 import LogoIcon from "@/components/ui/logo-icon"
-import { SignUpForm } from "./_components/sign-up-form"
+import { SignUpForm } from "@/app/(auth)/(routes)/sign-up/[[...sign-up]]/components/sign-up-form"
 
 const SignUpPage = () => {
     return (

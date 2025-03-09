@@ -1,25 +1,25 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useOrganization, useUser } from "@clerk/nextjs";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { SidebarInset } from "@/components/ui/sidebar";
 import { Loading } from "@/components/auth/loading";
-import { EmptyOrg } from "./_components/empty-org";
-import { DashboardHeader } from "./_components/dashboard-header";
-import { DashboardTabs } from "./_components/dashboard-tabs";
-import { DashboardStats } from "./_components/stats";
-import { PitchesGrid } from "./_components/pitches-grid";
+import { EmptyOrg } from "@/app/dashboard/components/empty-org";
+import { DashboardHeader } from "@/app/dashboard/components/dashboard-header";
+import { DashboardTabs } from "@/app/dashboard/components/dashboard-tabs";
+import { DashboardStats } from "@/app/dashboard/components/stats";
+import { PitchesGrid } from "@/app/dashboard/components/pitches-grid";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 
 const Dashboard = () => {
-    const { user, isLoaded } = useUser();
+    const {  isLoaded } = useUser();
     const { organization } = useOrganization();
     const router = useRouter();
     const pathname = usePathname();
     const searchParamsObj = useSearchParams();
-    const [isClient, setIsClient] = useState(false);
+
     
     // Get search parameters
     const searchParam = searchParamsObj.get('search') || "";
@@ -30,20 +30,13 @@ const Dashboard = () => {
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
     const [scoreFilter, setScoreFilter] = useState("all");
     const [sortBy, setSortBy] = useState<"newest" | "score" | "updated">("newest");
-    
-    // Set isClient to true once component mounts on client
-    useEffect(() => {
-        setIsClient(true);
-        setSearchValue(searchParam);
-    }, [searchParam]);
-    
-    // Update search value when URL parameter changes
+
     useEffect(() => {
         setSearchValue(searchParam);
     }, [searchParam]);
     
     // Handle tab changes
-    const handleTabChange = (value: string) => {
+    const handleTabChange = useCallback((value: string) => {
         const current = new URLSearchParams(Array.from(searchParamsObj.entries()));
         
         if (value === "all") {
@@ -55,8 +48,8 @@ const Dashboard = () => {
         const search = current.toString();
         const query = search ? `?${search}` : "";
         
-        router.push(`${pathname}${query}`);
-    };
+        router.replace(`${pathname}${query}`);
+    }, [router, pathname, searchParamsObj]);
     
     // Get score range based on filter
     const getScoreRange = (filter: string) => {
@@ -70,10 +63,7 @@ const Dashboard = () => {
             default:
                 return { min: 0, max: 10 };
         }
-    };
-
-    // Get score range based on filter
-    const { min, max } = getScoreRange(scoreFilter);
+    }
 
     // Fetch pitches data
     const data = useQuery(
@@ -96,8 +86,6 @@ const Dashboard = () => {
     return (
         <SidebarInset className="w-full">
             <div className="flex flex-col h-full w-full">
-                {isClient ? (
-                    <>
                         {/* Dashboard Header */}
                         <DashboardHeader
                             searchValue={searchValue}
@@ -139,12 +127,6 @@ const Dashboard = () => {
                                 </div>
                             )}
                         </div>
-                    </>
-                ) : (
-                    <div className="flex items-center justify-center h-full">
-                        <Loading />
-                    </div>
-                )}
             </div>
         </SidebarInset>
     );

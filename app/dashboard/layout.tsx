@@ -2,10 +2,14 @@ import { AppSidebar } from "@/components/app-sidebar"
 import {
     SidebarProvider,
 } from "@/components/ui/sidebar"
+import {cookies} from "next/headers";
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default async function DashboardLayout({children}: { children: React.ReactNode }) {
+    const cookieStore = await cookies()
+    const defaultOpen = cookieStore.get("sidebar_state")?.value === "true"
+
     return (
-        <SidebarProvider>
+        <SidebarProvider defaultOpen={defaultOpen}>
             <div className="relative flex min-h-screen w-full">
                 <AppSidebar/>
                 <div className="flex-1 overflow-auto w-full">

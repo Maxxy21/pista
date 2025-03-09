@@ -15,6 +15,7 @@ import { TranscriptSection } from "./components/transcript-section"
 import { ScoreOverview } from "./components/score-overview"
 import { EvaluationSummary } from "./components/evaluation-summary"
 import { DetailedAnalysis } from "./components/detailed-analysis"
+import { QuestionsSection } from "./components/questions-section"
 
 const PitchDetails = () => {
     const { id } = useParams<{ id: string }>()
@@ -30,7 +31,10 @@ const PitchDetails = () => {
             
             <ScrollArea className="h-[calc(100vh-4rem)]">
                 <div className="container mx-auto py-6 space-y-10">
-                    <TranscriptSection data={data} />
+                    <div className="space-y-6">
+                        <TranscriptSection data={data} />
+                        <QuestionsSection data={data} />
+                    </div>
                     <ScoreOverview data={data} />
                     <EvaluationSummary data={data} />
                     <DetailedAnalysis data={data} />
@@ -40,6 +44,5 @@ const PitchDetails = () => {
     )
 }
 
-const cn = (...classes: string[]) => classes.filter(Boolean).join(' ');
 
 export default PitchDetails

@@ -39,9 +39,9 @@ export const TranscriptSection = ({ data }: TranscriptSectionProps) => {
                             <p className="text-muted-foreground whitespace-pre-wrap leading-relaxed">
                                 {data.text}
                             </p>
-                            <div className="absolute top-3 right-3">
-                                <CopyButton text={data.text} />
-                            </div>
+                            {/*<div className="absolute top-3 right-3">*/}
+                            {/*    <CopyButton text={data.text} />*/}
+                            {/*</div>*/}
                         </CardContent>
                     </Card>
                 </motion.div>

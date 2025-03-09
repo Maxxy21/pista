@@ -1,6 +1,6 @@
 
 import LogoIcon from "@/components/ui/logo-icon"
-import { SignInForm } from "./_components/sign-in-form"
+import { SignInForm } from "@/app/(auth)/(routes)/sign-in/[[...sign-in]]/components/sign-in-form"
 
 
 const SignInPage = () => {
