@@ -13,16 +13,7 @@ import { DashboardStats } from "./_components/stats";
 import { PitchesGrid } from "./_components/pitches-grid";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 
-interface PageProps {
-    params: {
-        [key: string]: string;
-    };
-    searchParams: {
-        [key: string]: string | string[] | undefined;
-    };
-}
-
-const Dashboard = ({ params, searchParams }: PageProps) => {
+const Dashboard = () => {
     const { user, isLoaded } = useUser();
     const { organization } = useOrganization();
     const router = useRouter();
