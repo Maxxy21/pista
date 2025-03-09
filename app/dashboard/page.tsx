@@ -14,10 +14,15 @@ import { PitchesGrid } from "./_components/pitches-grid";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 
 interface PageProps {
-    params: Record<string, string>;
+    params: {
+        [key: string]: string;
+    };
+    searchParams: {
+        [key: string]: string | string[] | undefined;
+    };
 }
 
-const ModernDashboard = ({ params }: PageProps) => {
+const Dashboard = ({ params, searchParams }: PageProps) => {
     const { user, isLoaded } = useUser();
     const { organization } = useOrganization();
     const router = useRouter();
@@ -39,7 +44,7 @@ const ModernDashboard = ({ params }: PageProps) => {
     useEffect(() => {
         setIsClient(true);
         setSearchValue(searchParam);
-    }, []);
+    }, [searchParam]);
     
     // Update search value when URL parameter changes
     useEffect(() => {
@@ -154,4 +159,4 @@ const ModernDashboard = ({ params }: PageProps) => {
     );
 };
 
-export default ModernDashboard;
+export default Dashboard;
