@@ -1,25 +1,24 @@
-import Image from "next/image";
+import { EmptyState } from "@/components/ui/empty-state";
+import { NewPitchButton } from "@/app/dashboard/components/new-pitch-button";
 
-import {NewPitchButton} from "@/app/dashboard/components/new-pitch-button";
+interface EmptyPitchesProps {
+    orgId: string;
+}
 
-
-export const EmptyPitches = ({orgId}: { orgId: string }) => {
+export const EmptyPitches = ({ orgId }: EmptyPitchesProps) => {
     return (
-        <div className="flex flex-col items-center justify-center">
-            <Image
-                src="/empty-favorites.svg"
-                height={110}
-                width={110}
-                alt="Empty"
-                className="mb-6"
-            />
-            <h2 className="text-2xl font-semibold text-center">
-                Create your first pitch!
-            </h2>
-            <p className="text-muted-foreground text-sm mt-2 mb-6 text-center">
-                Start by uploading or writing your pitch
-            </p>
-            <NewPitchButton orgId={orgId}/>
-        </div>
+        <EmptyState
+            title="Create your first pitch!"
+            description="Start by uploading or writing your pitch"
+            imageSrc="/empty-favorites.svg"
+            imageAlt="No pitches"
+            imageSize={110}
+            action={
+                <NewPitchButton 
+                    orgId={orgId}
+                    className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
+                />
+            }
+        />
     );
-};
+}; 

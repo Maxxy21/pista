@@ -1,22 +1,29 @@
 'use client';
 
-import React, { useEffect, useState, useCallback, Suspense, lazy } from 'react';
+import React, { useEffect, useState, Suspense, lazy } from 'react';
 import { useOrganization, useUser } from "@clerk/nextjs";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { SidebarInset } from "@/components/ui/sidebar";
 import { Loading } from "@/components/auth/loading";
-import { EmptyOrg } from "@/app/dashboard/components/empty-org";
 import { DashboardHeader } from "@/app/dashboard/components/dashboard-header";
 import { DashboardTabs } from "@/app/dashboard/components/dashboard-tabs";
-import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useDashboardState } from "./hooks/use-dashboard-state";
 import { usePrefetchPitches } from "@/hooks/use-prefetch-pitches";
 import { SkeletonCard } from "@/components/ui/skeleton-card";
 
+
+// Import simplified empty state components
+import { EmptyOrg } from "@/app/dashboard/components/empty-org";
+import { EmptySearch } from "@/app/dashboard/components/empty-search";
+import { EmptyPitches } from "@/app/dashboard/components/empty-pitches";
+import { EmptyFavorites } from "@/app/dashboard/components/empty-favorites";
+
 // Lazy load heavy components
 const DashboardStats = lazy(() => import("@/app/dashboard/components/stats").then(mod => ({ default: mod.DashboardStats })));
 const PitchesGrid = lazy(() => import("@/app/dashboard/components/pitches-grid").then(mod => ({ default: mod.PitchesGrid })));
+const VirtualizedPitchesGrid = lazy(() => import("@/app/dashboard/components/virtualized-pitches-grid").then(mod => ({ default: mod.VirtualizedPitchesGrid })));
 
 // Skeleton loaders for lazy-loaded components
 const StatsSkeleton = () => (
@@ -38,8 +45,6 @@ const PitchesGridSkeleton = () => (
 export default function Dashboard() {
     const { isLoaded } = useUser();
     const { organization } = useOrganization();
-    const router = useRouter();
-    const pathname = usePathname();
     const searchParamsObj = useSearchParams();
     const { 
       searchValue, setSearchValue, 
@@ -79,9 +84,43 @@ export default function Dashboard() {
         }
     }, [data]);
 
+    // Performance monitoring
+    useEffect(() => {
+        // Mark when dashboard content is loaded
+        if (!isLoading && data !== undefined) {
+            if (typeof window !== 'undefined' && 'performance' in window) {
+                performance.mark('dashboard-content-loaded');
+            }
+        }
+    }, [isLoading, data]);
+
     if (!isLoaded) {
         return <Loading />;
     }
+
+    // Determine which empty state to show
+    const renderEmptyState = () => {
+        if (!organization) {
+            return <EmptyOrg />;
+        }
+        
+        if (searchParam && (!data || data.length === 0)) {
+            return <EmptySearch />;
+        }
+        
+        if (viewParam === "favorites" && (!data || data.length === 0)) {
+            return <EmptyFavorites />;
+        }
+        
+        if (!data || data.length === 0) {
+            return <EmptyPitches orgId={organization.id} />;
+        }
+        
+        return null;
+    };
+
+    // Determine whether to use virtualized grid for large datasets
+    const useVirtualizedGrid = data && data.length > 20;
 
     return (
         <SidebarInset className="w-full">
@@ -114,19 +153,28 @@ export default function Dashboard() {
                 </div>
 
                 {/* Main Content */}
-                <div className="w-full px-4 md:px-6 lg:px-8 pb-6">
-                    {!organization ? (
-                        <EmptyOrg />
-                    ) : (
+                <div className="w-full px-4 md:px-6 lg:px-8 pb-6 flex-1">
+                    {renderEmptyState() || (
                         <Suspense fallback={<PitchesGridSkeleton />}>
-                            <PitchesGrid 
-                                data={data}
-                                viewMode={viewMode}
-                                searchQuery={searchParam}
-                                currentView={viewParam}
-                                organization={organization}
-                                isLoading={isLoading}
-                            />
+                            {useVirtualizedGrid ? (
+                                <VirtualizedPitchesGrid 
+                                    data={data}
+                                    viewMode={viewMode}
+                                    searchQuery={searchParam}
+                                    currentView={viewParam}
+                                    organization={organization}
+                                    isLoading={isLoading}
+                                />
+                            ) : (
+                                <PitchesGrid 
+                                    data={data}
+                                    viewMode={viewMode}
+                                    searchQuery={searchParam}
+                                    currentView={viewParam}
+                                    organization={organization}
+                                    isLoading={isLoading}
+                                />
+                            )}
                         </Suspense>
                     )}
                 </div>
