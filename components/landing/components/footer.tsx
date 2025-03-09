@@ -1,5 +1,6 @@
 import React from 'react';
 import {motion} from "framer-motion";
+import Link from "next/link";
 import LogoIcon from "@/components/ui/logo-icon";
 
 const Footer = () => {
@@ -18,12 +19,18 @@ const Footer = () => {
                     >
                         <LogoIcon/>
                         <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70">
-                                Pitch Perfect
-                            </span>
+                            Pitch Perfect
+                        </span>
                     </motion.div>
-                    <p className="text-sm text-muted-foreground">
-                        © {new Date().getFullYear()} Pitch Perfect. All rights reserved.
-                    </p>
+                    <div className="flex flex-col md:flex-row items-center gap-4">
+                        <p className="text-sm text-muted-foreground">
+                            © {new Date().getFullYear()} Pitch Perfect. All rights reserved.
+                        </p>
+                        <span className="hidden md:inline text-muted-foreground">•</span>
+                        <p className="text-sm text-muted-foreground">
+                            Made by <Link href="https://maxwellaboagye.xyz" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">Maxwell Aboagye</Link>
+                        </p>
+                    </div>
                 </div>
             </div>
         </motion.footer>
