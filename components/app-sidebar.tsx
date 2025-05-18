@@ -132,7 +132,7 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
                                     <LogoIcon className="h-5 w-5 text-primary"/>
                                 </motion.div>
                                 <h1 className="text-lg font-semibold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70">
-                                    Pitch Perfect
+                                    Pista
                                 </h1>
                             </div>
                             <CollapseTrigger/>

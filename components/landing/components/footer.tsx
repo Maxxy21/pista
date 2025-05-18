@@ -19,12 +19,12 @@ const Footer = () => {
                     >
                         <LogoIcon/>
                         <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70">
-                            Pitch Perfect
+                            Pista
                         </span>
                     </motion.div>
                     <div className="flex flex-col md:flex-row items-center gap-4">
                         <p className="text-sm text-muted-foreground">
-                            © {new Date().getFullYear()} Pitch Perfect. All rights reserved.
+                            © {new Date().getFullYear()} Pista. All rights reserved.
                         </p>
                         <span className="hidden md:inline text-muted-foreground">•</span>
                         <p className="text-sm text-muted-foreground">

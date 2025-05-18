@@ -9,6 +9,10 @@ import { cn } from "@/lib/utils";
 import { OrganizationResource } from "@clerk/types";
 import {PitchCard} from "@/app/dashboard/components/pitch-card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { EmptySearch } from "@/app/dashboard/components/empty-search";
+import { EmptyFavorites } from "@/app/dashboard/components/empty-favorites";
+import { EmptyPitches } from "@/app/dashboard/components/empty-pitches";
+
 
 
 interface PitchesGridProps {
@@ -56,10 +60,10 @@ export const PitchesGrid = ({
         </div>
     );
 
-    return (
-        <ScrollArea className="h-full w-full">
-            {isLoading || data === undefined ? (
-                // Loading state with more realistic skeleton cards
+    // Show loading state
+    if (isLoading || data === undefined) {
+        return (
+            <ScrollArea className="h-full w-full">
                 <div className={cn(
                     "grid gap-6",
                     viewMode === "grid"
@@ -70,54 +74,58 @@ export const PitchesGrid = ({
                         <SkeletonPitchCard key={i} />
                     ))}
                 </div>
-            ) : data.length === 0 ? (
-                // Empty state
-                <div className="flex flex-col items-center justify-center h-[400px] text-center">
-                    <p className="text-muted-foreground mb-4">
-                        {searchQuery
-                            ? "No pitches found matching your search."
-                            : currentView === "favorites"
-                            ? "You haven't favorited any pitches yet."
-                            : "No pitches found. Create your first pitch!"}
-                    </p>
-                    {!searchQuery && currentView !== "favorites" && organization && (
-                        <NewPitchButton
-                            orgId={organization.id as string}
-                            className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
-                        />
+            </ScrollArea>
+        );
+    }
+
+    // Show empty states based on context
+    if (data.length === 0) {
+        if (searchQuery) {
+            return <EmptySearch />;
+        }
+        
+        if (currentView === "favorites") {
+            return <EmptyFavorites />;
+        }
+        
+        if (organization) {
+            return <EmptyPitches orgId={organization.id as string} />;
+        }
+        
+        return null;
+    }
+
+    // Show pitch grid/list
+    return (
+        <ScrollArea className="h-full w-full">
+            <AnimatePresence>
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className={cn(
+                        "grid gap-6",
+                        viewMode === "grid"
+                            ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+                            : "grid-cols-1"
                     )}
-                </div>
-            ) : (
-                // Pitch grid/list
-                <AnimatePresence>
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className={cn(
-                            "grid gap-6",
-                            viewMode === "grid"
-                                ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-                                : "grid-cols-1"
-                        )}
-                    >
-                        {data.map((pitch) => (
-                            <PitchCard
-                                key={pitch._id}
-                                id={pitch._id}
-                                title={pitch.title}
-                                text={pitch.text}
-                                authorId={pitch.userId}
-                                authorName={pitch.authorName}
-                                createdAt={pitch._creationTime}
-                                orgId={pitch.orgId}
-                                isFavorite={pitch.isFavorite}
-                                score={pitch.evaluation.overallScore}
-                                onClick={() => handlePitchClick(pitch._id)}
-                            />
-                        ))}
-                    </motion.div>
-                </AnimatePresence>
-            )}
+                >
+                    {data.map((pitch) => (
+                        <PitchCard
+                            key={pitch._id}
+                            id={pitch._id}
+                            title={pitch.title}
+                            text={pitch.text}
+                            authorId={pitch.userId}
+                            authorName={pitch.authorName}
+                            createdAt={pitch._creationTime}
+                            orgId={pitch.orgId}
+                            isFavorite={pitch.isFavorite}
+                            score={pitch.evaluation.overallScore}
+                            onClick={() => handlePitchClick(pitch._id)}
+                        />
+                    ))}
+                </motion.div>
+            </AnimatePresence>
         </ScrollArea>
     );
 }; 

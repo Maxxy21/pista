@@ -25,7 +25,7 @@ const Header = () => {
                         animate={{opacity: 1, x: 0}}
                         transition={{delay: 0.2}}
                     >
-                        Pitch Perfect
+                        Pista
                     </motion.span>
                 </motion.div>
                 <motion.div

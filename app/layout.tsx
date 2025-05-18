@@ -21,7 +21,7 @@ const ORIGIN_URL =
 
 
 export const metadata: Metadata = {
-    title: "Pitch Perfect",
+    title: "Pista",
     description: "Evaluate your startup pitches using AI:",
     metadataBase: new URL(ORIGIN_URL),
     alternates: {
