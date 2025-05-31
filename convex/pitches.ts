@@ -1,14 +1,8 @@
-import {mutation, query} from "./_generated/server";
-import {ConvexError, v} from "convex/values";
-import {Doc} from "@/convex/_generated/dataModel";
-import {getAllOrThrow} from "convex-helpers/server/relationships";
-import {
-    evaluationData,
-    questionAnswer,
-    questionAnswerArray,
-} from "./schema";
-
-
+import { mutation, query } from "./_generated/server";
+import { ConvexError, v } from "convex/values";
+import { Doc } from "@/convex/_generated/dataModel";
+import { getAllOrThrow } from "convex-helpers/server/relationships";
+import { evaluationData, questionAnswer } from "./schema";
 
 interface PitchStats {
     totalPitches: number;
@@ -18,17 +12,17 @@ interface PitchStats {
     scoreDistribution: Record<number, number>;
 }
 
+const RECENT_PITCH_COUNT = 5;
+const PREFETCH_COUNT = 10;
 
 const validateUser = async (ctx: { auth: any }) => {
     const identity = await ctx.auth.getUserIdentity();
-
     if (!identity) {
         throw new ConvexError({
             message: "Not authenticated",
-            code: "UNAUTHORIZED"
+            code: "UNAUTHORIZED",
         });
     }
-
     return identity;
 };
 
@@ -44,15 +38,8 @@ export const create = mutation({
     },
     handler: async (ctx, args) => {
         const identity = await validateUser(ctx);
-
-        return await ctx.db.insert("pitches", {
-            title: args.title,
-            text: args.text,
-            type: args.type,
-            status: args.status,
-            evaluation: args.evaluation,
-            questions: args.questions,
-            orgId: args.orgId,
+        return ctx.db.insert("pitches", {
+            ...args,
             userId: identity.subject,
             authorName: identity.name!,
             createdAt: Date.now(),
@@ -91,7 +78,7 @@ export const get = query({
         }
 
         // Handle search
-        let pitches = [];
+        let pitches: Doc<"pitches">[];
         const searchTerm = args.search?.trim();
         if (searchTerm) {
             pitches = await ctx.db
@@ -130,18 +117,16 @@ export const getPitch = query({
     args: {
         id: v.id("pitches"),
     },
-    handler: async (ctx, {id}) => {
+    handler: async (ctx, { id }) => {
         const identity = await validateUser(ctx);
 
         const pitch = await ctx.db.get(id);
         if (!pitch) {
-            throw new Error("Pitch not found");
+            throw new ConvexError("Pitch not found");
         }
-
         if (pitch.userId !== identity.subject) {
-            throw new Error("Unauthorized");
+            throw new ConvexError("Unauthorized");
         }
-
         return pitch;
     },
 });
@@ -153,48 +138,38 @@ export const update = mutation({
         title: v.optional(v.string()),
         text: v.optional(v.string()),
         status: v.optional(v.string()),
-        evaluation: v.optional(evaluationData), // Use imported type
+        evaluation: v.optional(evaluationData),
         questions: v.optional(v.array(questionAnswer)),
     },
     handler: async (ctx, args) => {
         const identity = await validateUser(ctx);
 
         const pitch = await ctx.db.get(args.id);
-        if (!pitch) {
-            throw new Error("Pitch not found");
-        }
-
-        if (pitch.userId !== identity.subject) {
-            throw new Error("Unauthorized");
-        }
+        if (!pitch) throw new ConvexError("Pitch not found");
+        if (pitch.userId !== identity.subject) throw new ConvexError("Unauthorized");
 
         const updates = {
-            ...(args.title && {title: args.title}),
-            ...(args.text && {text: args.text}),
-            ...(args.status && {status: args.status}),
-            ...(args.evaluation && {evaluation: args.evaluation}),
-            ...(args.questions && {questions: args.questions}),
+            ...(args.title && { title: args.title }),
+            ...(args.text && { text: args.text }),
+            ...(args.status && { status: args.status }),
+            ...(args.evaluation && { evaluation: args.evaluation }),
+            ...(args.questions && { questions: args.questions }),
             updatedAt: Date.now(),
         };
 
-        return await ctx.db.patch(args.id, updates);
+        return ctx.db.patch(args.id, updates);
     },
 });
 
 // Delete a pitch
 export const remove = mutation({
-    args: {id: v.id("pitches")},
+    args: { id: v.id("pitches") },
     handler: async (ctx, args) => {
         const identity = await validateUser(ctx);
 
         const pitch = await ctx.db.get(args.id);
-        if (!pitch) {
-            throw new Error("Pitch not found");
-        }
-
-        if (pitch.userId !== identity.subject) {
-            throw new Error("Unauthorized");
-        }
+        if (!pitch) throw new ConvexError("Pitch not found");
+        if (pitch.userId !== identity.subject) throw new ConvexError("Unauthorized");
 
         // Delete associated favorites
         const favorites = await ctx.db
@@ -204,10 +179,7 @@ export const remove = mutation({
             )
             .collect();
 
-        for (const favorite of favorites) {
-            await ctx.db.delete(favorite._id);
-        }
-
+        await Promise.all(favorites.map((favorite) => ctx.db.delete(favorite._id)));
         await ctx.db.delete(args.id);
     },
 });
@@ -222,9 +194,7 @@ export const favorite = mutation({
         const identity = await validateUser(ctx);
 
         const pitch = await ctx.db.get(args.id);
-        if (!pitch) {
-            throw new Error("Pitch not found");
-        }
+        if (!pitch) throw new ConvexError("Pitch not found");
 
         const existing = await ctx.db
             .query("userFavorites")
@@ -236,9 +206,7 @@ export const favorite = mutation({
             )
             .unique();
 
-        if (existing) {
-            throw new Error("Already favorited");
-        }
+        if (existing) throw new ConvexError("Already favorited");
 
         await ctx.db.insert("userFavorites", {
             userId: identity.subject,
@@ -266,9 +234,7 @@ export const unfavorite = mutation({
             )
             .unique();
 
-        if (!favorite) {
-            throw new Error("Not favorited");
-        }
+        if (!favorite) throw new ConvexError("Not favorited");
 
         await ctx.db.delete(favorite._id);
     },
@@ -281,10 +247,12 @@ export const getFilteredPitches = query({
         search: v.optional(v.string()),
         favorites: v.optional(v.boolean()),
         sortBy: v.optional(v.union(v.literal("date"), v.literal("score"))),
-        scoreRange: v.optional(v.object({
-            min: v.number(),
-            max: v.number()
-        })),
+        scoreRange: v.optional(
+            v.object({
+                min: v.number(),
+                max: v.number(),
+            })
+        ),
     },
     handler: async (ctx, args) => {
         const identity = await validateUser(ctx);
@@ -299,13 +267,12 @@ export const getFilteredPitches = query({
 
         // Apply filters
         if (args.search) {
-            const searchTerm = args.search?.trim().toLowerCase();
-            if (searchTerm) {
-                pitches = pitches.filter((pitch) =>
+            const searchTerm = args.search.trim().toLowerCase();
+            pitches = pitches.filter(
+                (pitch) =>
                     pitch.title.toLowerCase().includes(searchTerm) ||
                     pitch.text.toLowerCase().includes(searchTerm)
-                );
-            }
+            );
         }
 
         if (args.scoreRange) {
@@ -383,7 +350,7 @@ export const getPitchStats = query({
             totalPitches: pitches.length,
             averageScore: totalScores / pitches.length,
             bestPitch,
-            recentPitches: pitches.slice(-5),
+            recentPitches: pitches.slice(-RECENT_PITCH_COUNT),
             scoreDistribution: pitches.reduce((acc, pitch) => {
                 const score = Math.floor(pitch.evaluation.overallScore);
                 acc[score] = (acc[score] || 0) + 1;
@@ -400,14 +367,14 @@ export const prefetch = mutation({
     },
     handler: async (ctx, args) => {
         const identity = await validateUser(ctx);
-        
+
         // Prefetch recent pitches
         await ctx.db
             .query("pitches")
             .withIndex("by_org", (q) => q.eq("orgId", args.orgId))
             .order("desc")
-            .take(10);
-        
+            .take(PREFETCH_COUNT);
+
         // Prefetch user's favorites
         const favorites = await ctx.db
             .query("userFavorites")
@@ -415,19 +382,16 @@ export const prefetch = mutation({
                 q.eq("userId", identity.subject).eq("orgId", args.orgId)
             )
             .collect();
-        
+
         const favoritedIds = favorites.map((f) => f.pitchId);
-        
+
         // Prefetch the actual favorite pitches if there are any
         if (favoritedIds.length > 0) {
-            // Use get() instead of getAllOrThrow to handle missing documents
             await Promise.all(
-                favoritedIds.slice(0, 10).map(id => 
-                    ctx.db.get(id)
-                )
+                favoritedIds.slice(0, PREFETCH_COUNT).map((id) => ctx.db.get(id))
             );
         }
-        
+
         return { success: true };
     },
 });

@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from 'react';
-import { PolarAngleAxis, PolarGrid, Radar, RadarChart } from "recharts"
-import { motion } from 'framer-motion';
+import { useEffect, useState } from "react";
+import { PolarAngleAxis, PolarGrid, Radar, RadarChart } from "recharts";
+import { motion } from "framer-motion";
 
 import {
   Card,
@@ -10,13 +10,18 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart"
+} from "@/components/ui/chart";
+
+interface RadarChartData {
+  category: string;
+  score: number;
+}
 
 interface RadarChartProps {
   data: Array<{
@@ -26,34 +31,35 @@ interface RadarChartProps {
 }
 
 export const ScoreRadarChart = ({ data }: RadarChartProps) => {
-  const [chartData, setChartData] = useState<Array<{ category: string; score: number }>>([]);
+  const [chartData, setChartData] = useState<RadarChartData[]>([]);
 
   useEffect(() => {
-    // Format data for the radar chart
-    const formattedData = data.map(item => ({
+    // Prepare initial data for animation
+    const initialData = data.map((item) => ({
       category: item.criteria,
-      score: 0, // Start at 0 for animation
+      score: 0,
     }));
-    
-    setChartData(formattedData);
-    
-    // Trigger animation after a small delay
+    setChartData(initialData);
+
+    // Animate to actual scores
     const timer = setTimeout(() => {
-      setChartData(data.map(item => ({
-        category: item.criteria,
-        score: item.score,
-      })));
+      setChartData(
+        data.map((item) => ({
+          category: item.criteria,
+          score: item.score,
+        }))
+      );
     }, 500);
-    
+
     return () => clearTimeout(timer);
   }, [data]);
 
-  const chartConfig = {
+  const chartConfig: ChartConfig = {
     score: {
       label: "Score",
       color: "hsl(var(--chart-1))",
     },
-  } satisfies ChartConfig;
+  };
 
   return (
     <motion.div
@@ -83,7 +89,7 @@ export const ScoreRadarChart = ({ data }: RadarChartProps) => {
                 fillOpacity={0.6}
                 animationDuration={1000}
                 animationEasing="ease-out"
-                isAnimationActive={true}
+                isAnimationActive
               />
             </RadarChart>
           </ChartContainer>
@@ -91,4 +97,4 @@ export const ScoreRadarChart = ({ data }: RadarChartProps) => {
       </Card>
     </motion.div>
   );
-}; 
+};

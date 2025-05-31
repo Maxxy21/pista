@@ -1,43 +1,44 @@
 // app/api/evaluate-answers/route.ts
 import { NextResponse } from "next/server";
-import {getOpenAI} from "@/lib/utils";
+import { getOpenAI } from "@/lib/utils";
 
 export const runtime = "edge";
 
+interface QA {
+    question: string;
+    answer: string;
+}
+
+interface Evaluation {
+    criteria: string;
+    comment: string;
+    score: number;
+    strengths: string[];
+    improvements: string[];
+    aspects: string[];
+}
+
+interface EvaluationResponse {
+    evaluations: Evaluation[];
+    overallScore: number;
+    overallFeedback: string;
+}
+
 export async function POST(req: Request) {
     try {
-        const { pitchText, answers } = await req.json();
-        const openai = getOpenAI();
+        const body = await req.json();
+        const { pitchText, answers } = body;
 
-        if (!pitchText || !answers) {
+        if (typeof pitchText !== "string" || !Array.isArray(answers)) {
             return NextResponse.json(
-                { error: "Missing required data" },
+                { error: "Missing or invalid required data" },
                 { status: 400 }
             );
         }
 
-        const prompt = `
-      Analyze this startup pitch and the follow-up Q&A:
+        const prompt = buildPrompt(pitchText, answers);
 
-      Original Pitch:
-      "${pitchText}"
-
-      Follow-up Q&A:
-      ${answers.map((qa: any) => `Q: ${qa.question}\nA: ${qa.answer}`).join("\n\n")}
-
-      Evaluate the answers considering:
-      1. Depth and clarity of responses
-      2. Market understanding
-      3. Problem-solution validation
-      4. Business model viability
-      5. Team capability signals
-
-      Provide an updated evaluation with:
-      1. Specific strengths from the answers
-      2. Areas needing more clarification
-      3. Adjusted scores based on new insights
-    `;
-
+        const openai = getOpenAI();
         const completion = await openai.chat.completions.create({
             model: "gpt-4",
             messages: [
@@ -53,30 +54,30 @@ export async function POST(req: Request) {
             temperature: 0.7,
         });
 
-        // Parse the evaluation response and integrate with original evaluation format
-        const response = completion.choices[0].message.content || "";
+        const response = completion.choices[0]?.message?.content?.trim() ?? "";
 
-        // Structure matches your existing evaluation schema
-        return NextResponse.json({
-            evaluations: [
-                {
-                    criteria: "Follow-up Responses",
-                    comment: response,
-                    score: calculateScore(response),
-                    strengths: extractStrengths(response),
-                    improvements: extractImprovements(response),
-                    aspects: [
-                        "Response Clarity",
-                        "Market Understanding",
-                        "Problem Validation",
-                        "Business Viability",
-                        "Team Capability"
-                    ],
-                },
+        const evaluation: Evaluation = {
+            criteria: "Follow-up Responses",
+            comment: response,
+            score: calculateScore(response),
+            strengths: extractStrengths(response),
+            improvements: extractImprovements(response),
+            aspects: [
+                "Response Clarity",
+                "Market Understanding",
+                "Problem Validation",
+                "Business Viability",
+                "Team Capability",
             ],
-            overallScore: calculateScore(response),
-            overallFeedback: response,
-        });
+        };
+
+        const result: EvaluationResponse = {
+            evaluations: [evaluation],
+            overallScore: evaluation.score,
+            overallFeedback: evaluation.comment,
+        };
+
+        return NextResponse.json(result);
     } catch (error) {
         console.error("Answer evaluation error:", error);
         return NextResponse.json(
@@ -86,43 +87,69 @@ export async function POST(req: Request) {
     }
 }
 
+function buildPrompt(pitchText: string, answers: QA[]): string {
+    const qaSection = answers
+        .map(
+            (qa) =>
+                `Q: ${qa.question}\nA: ${qa.answer}`
+        )
+        .join("\n\n");
+
+    return `
+Analyze this startup pitch and the follow-up Q&A:
+
+Original Pitch:
+"${pitchText}"
+
+Follow-up Q&A:
+${qaSection}
+
+Evaluate the answers considering:
+1. Depth and clarity of responses
+2. Market understanding
+3. Problem-solution validation
+4. Business model viability
+5. Team capability signals
+
+Provide an updated evaluation with:
+1. Specific strengths from the answers
+2. Areas needing more clarification
+3. Adjusted scores based on new insights
+`.trim();
+}
+
 // Helper functions to parse the AI response
 function calculateScore(response: string): number {
-    // Implement scoring logic based on response content
-    // This is a simplified example
     const positiveSignals = [
         "excellent", "strong", "comprehensive", "impressive",
         "clear", "detailed", "well-thought", "insightful"
     ];
 
     let score = 7; // Base score
-    positiveSignals.forEach(signal => {
+    for (const signal of positiveSignals) {
         if (response.toLowerCase().includes(signal)) {
             score += 0.5;
         }
-    });
+    }
 
-    return Math.min(Math.max(score, 1), 10); // Ensure score is between 1-10
+    return Math.min(Math.max(score, 1), 10);
 }
 
 function extractStrengths(response: string): string[] {
-    // Extract strengths from the response
-    // This is a simplified implementation
+    // Looks for lines starting with "Strength" or containing "strength"
     return response
         .split("\n")
-        .filter(line => line.toLowerCase().includes("strength"))
+        .filter(line => /strength/i.test(line))
         .map(line => line.replace(/^[^:]+:/, "").trim())
         .filter(Boolean);
 }
 
 function extractImprovements(response: string): string[] {
-    // Extract improvements from the response
-    // This is a simplified implementation
+    // Looks for lines containing "improve" or "clarif"
     return response
         .split("\n")
         .filter(line =>
-            line.toLowerCase().includes("improve") ||
-            line.toLowerCase().includes("clarif")
+            /improve|clarif/i.test(line)
         )
         .map(line => line.replace(/^[^:]+:/, "").trim())
         .filter(Boolean);

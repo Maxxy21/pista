@@ -5,12 +5,7 @@ import {
     Home,
     Clock,
     Star,
-    Search as SearchIcon,
-    ChevronRight,
     PlusCircle,
-    Settings,
-    Users,
-    Sparkles
 } from "lucide-react";
 import { useOrganization } from "@clerk/nextjs";
 import { useTheme } from "next-themes";
@@ -28,10 +23,8 @@ import {
     SidebarMenu,
     SidebarMenuItem,
     SidebarMenuButton,
-    SidebarInput,
-    useSidebar,
-    SidebarTrigger,
     SidebarGroupLabel,
+    useSidebar,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { NavUser } from "@/components/nav-user";
@@ -41,70 +34,81 @@ import { InviteButton } from "@/components/invite-button";
 import LogoIcon from "@/components/ui/logo-icon";
 import { CollapseTrigger } from "@/components/collapse-trigger";
 import { ExpandTrigger } from "@/components/expand-trigger";
-import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
-const navigationItems = [
+const NAVIGATION_ITEMS = [
     {
         title: "Home",
         icon: Home,
-        value: "home"
+        value: "home",
     },
     {
         title: "Recent",
         icon: Clock,
-        value: "recent"
+        value: "recent",
     },
     {
         title: "Favorites",
         icon: Star,
-        value: "favorites"
+        value: "favorites",
+        badge: (
+            <Badge
+                variant="outline"
+                className="ml-auto text-xs bg-primary/5 border-primary/20"
+            >
+                New
+            </Badge>
+        ),
     },
 ];
 
-export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
-    const {organization, isLoaded} = useOrganization();
-    const {resolvedTheme} = useTheme();
-    const isDark = resolvedTheme === 'dark';
+export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
+    const { organization, isLoaded } = useOrganization();
+    const { resolvedTheme } = useTheme();
+    const isDark = resolvedTheme === "dark";
     const router = useRouter();
     const searchParams = useSearchParams();
     const [search, setSearch] = React.useState("");
     const [debouncedSearch] = useDebounceValue(search, 500);
-    const {state} = useSidebar();
+    const { state } = useSidebar();
 
     React.useEffect(() => {
-        const url = qs.stringifyUrl({
-            url: window.location.pathname,
-            query: {
-                ...Object.fromEntries(searchParams.entries()),
-                search: debouncedSearch,
+        const url = qs.stringifyUrl(
+            {
+                url: window.location.pathname,
+                query: {
+                    ...Object.fromEntries(searchParams.entries()),
+                    search: debouncedSearch,
+                },
             },
-        }, {skipEmptyString: true, skipNull: true});
-
+            { skipEmptyString: true, skipNull: true }
+        );
         router.push(url);
-    }, [debouncedSearch, router, searchParams]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [debouncedSearch]);
 
-    const handleSearchChange = (value: string) => {
+    const handleSearchChange = React.useCallback((value: string) => {
         setSearch(value);
-    };
+    }, []);
 
-    const handleNavigation = (value: string) => {
-        const current = new URLSearchParams(Array.from(searchParams.entries()));
+    const handleNavigation = React.useCallback(
+        (value: string) => {
+            const current = new URLSearchParams(Array.from(searchParams.entries()));
 
-        if (value === "home") {
-            current.delete("view");
-        } else {
-            current.set("view", value);
-        }
+            if (value === "home") {
+                current.delete("view");
+            } else {
+                current.set("view", value);
+            }
 
-        const search = current.toString();
-        const query = search ? `?${search}` : "";
+            const searchString = current.toString();
+            const query = searchString ? `?${searchString}` : "";
 
-        router.replace(`/dashboard${query}`);
-    };
+            router.replace(`/dashboard${query}`);
+        },
+        [router, searchParams]
+    );
 
-    // Determine active item
     const currentView = searchParams.get("view");
 
     return (
@@ -117,7 +121,7 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
                             whileTap={{ scale: 0.95 }}
                             className="flex items-center justify-center bg-primary/10 p-2 rounded-lg"
                         >
-                            <LogoIcon className="h-6 w-6 text-primary"/>
+                            <LogoIcon className="h-6 w-6 text-primary" />
                         </motion.div>
                     </div>
                 ) : (
@@ -129,18 +133,17 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
                                     whileTap={{ scale: 0.95 }}
                                     className="bg-primary/10 p-2 rounded-lg"
                                 >
-                                    <LogoIcon className="h-5 w-5 text-primary"/>
+                                    <LogoIcon className="h-5 w-5 text-primary" />
                                 </motion.div>
                                 <h1 className="text-lg font-semibold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70">
                                     Pista
                                 </h1>
                             </div>
-                            <CollapseTrigger/>
+                            <CollapseTrigger />
                         </div>
-
                         {isLoaded && organization && (
                             <>
-                                <TeamSwitcher isDark={isDark}/>
+                                <TeamSwitcher isDark={isDark} />
                                 <SearchForm
                                     value={search}
                                     onChange={handleSearchChange}
@@ -160,13 +163,13 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
                             Navigation
                         </SidebarGroupLabel>
                         <SidebarMenu>
-                            {navigationItems.map((item) => {
+                            {NAVIGATION_ITEMS.map((item) => {
                                 const isActive =
                                     (item.value === "home" && !currentView) ||
                                     currentView === item.value;
 
                                 return (
-                                    <SidebarMenuItem key={item.title}>
+                                    <SidebarMenuItem key={item.value}>
                                         <SidebarMenuButton
                                             isActive={isActive}
                                             onClick={() => handleNavigation(item.value)}
@@ -175,55 +178,12 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
                                         >
                                             <item.icon className={`h-4 w-4 ${isActive ? "text-primary" : ""}`} />
                                             <span>{item.title}</span>
-                                            {item.value === "favorites" && (
-                                                <Badge
-                                                    variant="outline"
-                                                    className="ml-auto text-xs bg-primary/5 border-primary/20"
-                                                >
-                                                    New
-                                                </Badge>
-                                            )}
+                                            {item.badge}
                                         </SidebarMenuButton>
                                     </SidebarMenuItem>
                                 );
                             })}
                         </SidebarMenu>
-
-                        {/*<Separator className="my-4 mx-2" />*/}
-
-                        {/*<SidebarGroupLabel className="px-4">*/}
-                        {/*    Tools*/}
-                        {/*</SidebarGroupLabel>*/}
-                        {/*<SidebarMenu>*/}
-                        {/*    <SidebarMenuItem>*/}
-                        {/*        <SidebarMenuButton*/}
-                        {/*            className="group"*/}
-                        {/*            tooltip={state === "collapsed" ? "AI Assistant" : undefined}*/}
-                        {/*        >*/}
-                        {/*            <Sparkles className="h-4 w-4 text-amber-500" />*/}
-                        {/*            <span>AI Assistant</span>*/}
-                        {/*            <Badge className="ml-auto px-1.5 py-0.5 text-[10px] bg-amber-500/10 text-amber-500 border-amber-500/30">*/}
-                        {/*                Pro*/}
-                        {/*            </Badge>*/}
-                        {/*        </SidebarMenuButton>*/}
-                        {/*    </SidebarMenuItem>*/}
-                        {/*    <SidebarMenuItem>*/}
-                        {/*        <SidebarMenuButton*/}
-                        {/*            tooltip={state === "collapsed" ? "Team Access" : undefined}*/}
-                        {/*        >*/}
-                        {/*            <Users className="h-4 w-4" />*/}
-                        {/*            <span>Team Access</span>*/}
-                        {/*        </SidebarMenuButton>*/}
-                        {/*    </SidebarMenuItem>*/}
-                        {/*    <SidebarMenuItem>*/}
-                        {/*        <SidebarMenuButton*/}
-                        {/*            tooltip={state === "collapsed" ? "Settings" : undefined}*/}
-                        {/*        >*/}
-                        {/*            <Settings className="h-4 w-4" />*/}
-                        {/*            <span>Settings</span>*/}
-                        {/*        </SidebarMenuButton>*/}
-                        {/*    </SidebarMenuItem>*/}
-                        {/*</SidebarMenu>*/}
                     </>
                 )}
             </SidebarContent>
@@ -247,13 +207,11 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
                     </div>
                 )}
 
-                {organization && (
-                    <InviteButton isDark={isDark}/>
-                )}
+                {organization && <InviteButton isDark={isDark} />}
 
-                <NavUser isDark={isDark}/>
+                <NavUser isDark={isDark} />
             </SidebarFooter>
-            <SidebarRail/>
+            <SidebarRail />
         </Sidebar>
     );
 }

@@ -1,18 +1,17 @@
-import React from 'react';
-import {Button} from "@/components/ui/button";
-
-import {useSidebar} from "@/components/ui/sidebar";
-import {Filter, ArrowDownUp, List, GridIcon} from "lucide-react";
-import {NewPitchButton} from "./new-pitch-button";
-import {SearchForm} from "@/components/search-form";
+import React, { useCallback, useMemo } from "react";
+import { Button } from "@/components/ui/button";
+import { useSidebar } from "@/components/ui/sidebar";
+import { Filter, ArrowDownUp, List, GridIcon } from "lucide-react";
+import { NewPitchButton } from "./new-pitch-button";
+import { SearchForm } from "@/components/search-form";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {OrganizationResource} from "@clerk/types";
-import {ExpandTrigger} from "@/components/expand-trigger";
+import { OrganizationResource } from "@clerk/types";
+import { ExpandTrigger } from "@/components/expand-trigger";
 
 interface DashboardHeaderProps {
     searchValue: string;
@@ -27,18 +26,45 @@ interface DashboardHeaderProps {
     organization: OrganizationResource | null | undefined;
 }
 
-export const DashboardHeader = ({
-                                    searchValue,
-                                    setSearchValue,
-                                    viewMode,
-                                    setViewMode,
-                                    scoreFilter,
-                                    setScoreFilter,
-                                    sortBy,
-                                    setSortBy,
-                                    organization
-                                }: DashboardHeaderProps) => {
+const SCORE_FILTER_LABELS: Record<string, string> = {
+    all: "All Scores",
+    high: "High Scores (8-10)",
+    medium: "Medium Scores (5-7.9)",
+    low: "Low Scores (0-4.9)",
+};
+
+const SORT_BY_LABELS: Record<DashboardHeaderProps["sortBy"], string> = {
+    newest: "Newest",
+    score: "Highest Score",
+    updated: "Recently Updated",
+};
+
+export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
+    searchValue,
+    setSearchValue,
+    viewMode,
+    setViewMode,
+    scoreFilter,
+    setScoreFilter,
+    sortBy,
+    setSortBy,
+    organization,
+}) => {
     const { isMobile } = useSidebar();
+
+    const handleViewModeToggle = useCallback(() => {
+        setViewMode(viewMode === "grid" ? "list" : "grid");
+    }, [viewMode, setViewMode]);
+
+    const scoreFilterLabel = useMemo(
+        () => SCORE_FILTER_LABELS[scoreFilter] || SCORE_FILTER_LABELS.all,
+        [scoreFilter]
+    );
+
+    const sortByLabel = useMemo(
+        () => SORT_BY_LABELS[sortBy],
+        [sortBy]
+    );
 
     return (
         <div className="border-b">
@@ -52,7 +78,7 @@ export const DashboardHeader = ({
 
                     {/* Middle section - Search */}
                     <div className="hidden md:flex flex-1 justify-center max-w-xl mx-auto">
-                        <SearchForm 
+                        <SearchForm
                             value={searchValue}
                             onChange={setSearchValue}
                             className="w-full max-w-md"
@@ -67,59 +93,42 @@ export const DashboardHeader = ({
                         {/* Score Filter */}
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="outline" className="h-10 gap-2">
+                                <Button variant="outline" className="h-10 gap-2" aria-label="Score Filter">
                                     <Filter className="h-4 w-4" />
-                                    <span className="hidden md:inline">
-                                        {scoreFilter === "all"
-                                            ? "All Scores"
-                                            : scoreFilter === "high"
-                                                ? "High Scores (8-10)"
-                                                : scoreFilter === "medium"
-                                                    ? "Medium Scores (5-7.9)"
-                                                    : "Low Scores (0-4.9)"}
-                                    </span>
+                                    <span className="hidden md:inline">{scoreFilterLabel}</span>
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                                <DropdownMenuItem onClick={() => setScoreFilter("all")}>
-                                    All Scores
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => setScoreFilter("high")}>
-                                    High Scores (8-10)
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => setScoreFilter("medium")}>
-                                    Medium Scores (5-7.9)
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => setScoreFilter("low")}>
-                                    Low Scores (0-4.9)
-                                </DropdownMenuItem>
+                                {Object.entries(SCORE_FILTER_LABELS).map(([key, label]) => (
+                                    <DropdownMenuItem
+                                        key={key}
+                                        onClick={() => setScoreFilter(key)}
+                                        aria-selected={scoreFilter === key}
+                                    >
+                                        {label}
+                                    </DropdownMenuItem>
+                                ))}
                             </DropdownMenuContent>
                         </DropdownMenu>
 
                         {/* Sort By */}
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="outline" className="h-10 gap-2">
+                                <Button variant="outline" className="h-10 gap-2" aria-label="Sort By">
                                     <ArrowDownUp className="h-4 w-4" />
-                                    <span className="hidden md:inline">
-                                        {sortBy === "newest"
-                                            ? "Newest"
-                                            : sortBy === "score"
-                                                ? "Highest Score"
-                                                : "Recently Updated"}
-                                    </span>
+                                    <span className="hidden md:inline">{sortByLabel}</span>
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                                <DropdownMenuItem onClick={() => setSortBy("newest")}>
-                                    Newest
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => setSortBy("score")}>
-                                    Highest Score
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => setSortBy("updated")}>
-                                    Recently Updated
-                                </DropdownMenuItem>
+                                {Object.entries(SORT_BY_LABELS).map(([key, label]) => (
+                                    <DropdownMenuItem
+                                        key={key}
+                                        onClick={() => setSortBy(key as DashboardHeaderProps["sortBy"])}
+                                        aria-selected={sortBy === key}
+                                    >
+                                        {label}
+                                    </DropdownMenuItem>
+                                ))}
                             </DropdownMenuContent>
                         </DropdownMenu>
 
@@ -128,7 +137,8 @@ export const DashboardHeader = ({
                             variant="outline"
                             size="icon"
                             className="h-10 w-10"
-                            onClick={() => setViewMode(viewMode === "grid" ? "list" : "grid")}
+                            onClick={handleViewModeToggle}
+                            aria-label={`Switch to ${viewMode === "grid" ? "list" : "grid"} view`}
                         >
                             {viewMode === "grid" ? (
                                 <List className="h-4 w-4" />
@@ -149,7 +159,7 @@ export const DashboardHeader = ({
 
                 {/* Mobile search - shown below header on small screens */}
                 <div className="md:hidden mt-4">
-                    <SearchForm 
+                    <SearchForm
                         value={searchValue}
                         onChange={setSearchValue}
                         className="w-full"
@@ -161,4 +171,4 @@ export const DashboardHeader = ({
             </div>
         </div>
     );
-}; 
+};

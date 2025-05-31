@@ -1,9 +1,18 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
-import { Loader2, Upload, ChevronRight, ChevronLeft, Mic, File, FileText, CheckCircle2 } from "lucide-react";
+import {
+    Loader2,
+    Upload,
+    ChevronRight,
+    ChevronLeft,
+    Mic,
+    File,
+    FileText,
+    CheckCircle2,
+} from "lucide-react";
 import {
     Dialog,
     DialogContent,
@@ -52,108 +61,113 @@ interface ModernEvaluationDialogProps {
     className?: string;
 }
 
-export function FileDialog({ orgId, children, className }: ModernEvaluationDialogProps) {
+const steps: StepsConfig = {
+    pitch: {
+        title: "Upload Your Pitch",
+        description: "Share your pitch as text, audio, or upload a file",
+        progress: 33,
+    },
+    questions: {
+        title: "Answer Questions",
+        description: "Respond to follow-up questions to improve your evaluation",
+        progress: 66,
+    },
+    review: {
+        title: "Review and Submit",
+        description: "Review your pitch and responses before getting your evaluation",
+        progress: 100,
+    },
+};
+
+const initialPitchData = {
+    title: "",
+    type: "text",
+    content: "",
+};
+
+export function FileDialog({
+    orgId,
+    children,
+    className,
+}: ModernEvaluationDialogProps) {
     const router = useRouter();
-    const [isOpen, setIsOpen] = useState<boolean>(false);
+    const [isOpen, setIsOpen] = useState(false);
     const [currentStep, setCurrentStep] = useState<Step>("pitch");
-    const [pitchData, setPitchData] = useState({
-        title: "",
-        type: "text",
-        content: "",
-    });
+    const [pitchData, setPitchData] = useState(initialPitchData);
     const [questions, setQuestions] = useState<Array<{ text: string; answer: string }>>([]);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [files, setFiles] = useState<File[]>([]);
     const [isProcessing, setIsProcessing] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
-    const [pitchText, setPitchText] = useState<string>("");
+    const [pitchText, setPitchText] = useState("");
 
     const { mutate: createPitch, pending } = useApiMutation(api.pitches.create);
 
+    // Memoize dropzone config for performance and to avoid unnecessary re-renders
+    const onDrop = useCallback(
+        (acceptedFiles: File[]) => setFiles(acceptedFiles),
+        []
+    );
+
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         multiple: false,
-        accept: pitchData.type === "audio"
-            ? { 'audio/*': ['.mp3', '.wav', '.m4a'] }
-            : { 'text/plain': ['.txt'] },
-        onDrop: (acceptedFiles) => {
-            setFiles(acceptedFiles);
-        },
+        accept:
+            pitchData.type === "audio"
+                ? { "audio/*": [".mp3", ".wav", ".m4a"] }
+                : { "text/plain": [".txt"] },
+        onDrop,
         disabled: isProcessing,
     });
 
-    // Define steps content
-    const steps: StepsConfig = {
-        pitch: {
-            title: "Upload Your Pitch",
-            description: "Share your pitch as text, audio, or upload a file",
-            progress: 33,
-        },
-        questions: {
-            title: "Answer Questions",
-            description: "Respond to follow-up questions to improve your evaluation",
-            progress: 66,
-        },
-        review: {
-            title: "Review and Submit",
-            description: "Review your pitch and responses before getting your evaluation",
-            progress: 100,
-        },
-    };
-
-    const processContent = async () => {
+    const processContent = useCallback(async () => {
         const { type, content } = pitchData;
         let text = "";
 
-        if (type === 'text') {
+        if (type === "text") {
             text = content || "";
         } else if (files.length > 0) {
-            if (type === 'audio') {
+            if (type === "audio") {
                 const formData = new FormData();
-                formData.append('audio', files[0]);
+                formData.append("audio", files[0]);
 
                 // Simulate upload progress
-                const simulateProgress = () => {
-                    let progress = 0;
-                    const interval = setInterval(() => {
-                        progress += 5;
-                        setUploadProgress(Math.min(progress, 90));
-                        if (progress >= 90) clearInterval(interval);
-                    }, 200);
-                    return interval;
-                };
-
-                const progressInterval = simulateProgress();
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += 5;
+                    setUploadProgress((prev) => Math.min(progress, 90));
+                    if (progress >= 90) clearInterval(interval);
+                }, 200);
 
                 try {
-                    const transcriptionResponse = await fetch('/api/transcribe', {
-                        method: 'POST',
+                    const transcriptionResponse = await fetch("/api/transcribe", {
+                        method: "POST",
                         body: formData,
                     });
 
-                    clearInterval(progressInterval);
+                    clearInterval(interval);
                     setUploadProgress(100);
 
                     if (!transcriptionResponse.ok) {
-                        throw new Error('Transcription failed');
+                        throw new Error("Transcription failed");
                     }
 
                     const transcriptionData = await transcriptionResponse.json();
                     text = transcriptionData.text;
                 } catch (error) {
-                    clearInterval(progressInterval);
+                    clearInterval(interval);
                     throw error;
                 }
-            } else if (type === 'textFile') {
+            } else if (type === "textFile") {
                 text = await files[0].text();
             }
         }
 
         return text;
-    };
+    }, [pitchData, files]);
 
-    const generateQuestions = async () => {
+    const generateQuestions = useCallback(async () => {
+        setIsProcessing(true);
         try {
-            setIsProcessing(true);
             const text = await processContent();
             setPitchText(text);
 
@@ -166,11 +180,12 @@ export function FileDialog({ orgId, children, className }: ModernEvaluationDialo
             if (!response.ok) throw new Error("Failed to generate questions");
             const data = await response.json();
 
-            setQuestions(data.questions.map((q: string) => ({
-                text: q,
-                answer: ""
-            })));
-
+            setQuestions(
+                data.questions.map((q: string) => ({
+                    text: q,
+                    answer: "",
+                }))
+            );
             setCurrentStep("questions");
         } catch (error) {
             toast.error("Failed to process pitch");
@@ -178,18 +193,17 @@ export function FileDialog({ orgId, children, className }: ModernEvaluationDialo
             setIsProcessing(false);
             setUploadProgress(0);
         }
-    };
+    }, [processContent]);
 
-    const handleSubmit = async () => {
+    const handleSubmit = useCallback(async () => {
+        setIsProcessing(true);
         try {
-            setIsProcessing(true);
-
             const evaluationResponse = await fetch("/api/evaluate", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     text: pitchText,
-                    questions
+                    questions,
                 }),
             });
 
@@ -204,44 +218,45 @@ export function FileDialog({ orgId, children, className }: ModernEvaluationDialo
                 type: pitchData.type,
                 status: "evaluated",
                 evaluation: evaluationData,
-                questions: questions
+                questions,
             });
 
             toast.success("Pitch created successfully");
             setIsOpen(false);
             router.push(`/pitch/${id}`);
         } catch (error) {
-            console.error('Error:', error);
+            console.error("Error:", error);
             toast.error("Failed to create pitch");
         } finally {
             setIsProcessing(false);
             setUploadProgress(0);
         }
-    };
+    }, [pitchData, pitchText, questions, createPitch, orgId, router]);
 
-    const resetForm = () => {
-        setPitchData({
-            title: "",
-            type: "text",
-            content: "",
-        });
+    const resetForm = useCallback(() => {
+        setPitchData(initialPitchData);
         setFiles([]);
         setQuestions([]);
         setCurrentQuestionIndex(0);
         setPitchText("");
         setCurrentStep("pitch");
-    };
+    }, []);
 
-    // Initialize dialog state after mount
-    React.useEffect(() => {
+    // Reset form after dialog closes with a delay to avoid visual jumping
+    useEffect(() => {
         if (!isOpen) {
-            // Reset form after dialog closes with a delay to avoid visual jumping
-            const timeout = setTimeout(() => {
-                resetForm();
-            }, 300);
+            const timeout = setTimeout(resetForm, 300);
             return () => clearTimeout(timeout);
         }
-    }, [isOpen]);
+    }, [isOpen, resetForm]);
+
+    // Helper for disabling continue button
+    const isContinueDisabled =
+        isProcessing ||
+        !pitchData.title ||
+        (pitchData.type === "text"
+            ? !pitchData.content
+            : files.length === 0);
 
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -268,7 +283,9 @@ export function FileDialog({ orgId, children, className }: ModernEvaluationDialo
                             </div>
                             <div>
                                 <DialogTitle>{steps[currentStep].title}</DialogTitle>
-                                <DialogDescription className="mt-1">{steps[currentStep].description}</DialogDescription>
+                                <DialogDescription className="mt-1">
+                                    {steps[currentStep].description}
+                                </DialogDescription>
                             </div>
                         </div>
                     </DialogHeader>
@@ -276,7 +293,15 @@ export function FileDialog({ orgId, children, className }: ModernEvaluationDialo
                     {/* Step Progress */}
                     <div className="px-6 pb-4">
                         <div className="flex justify-between text-xs text-muted-foreground mb-2">
-                            <span>Step {currentStep === "pitch" ? 1 : currentStep === "questions" ? 2 : 3} of 3</span>
+                            <span>
+                                Step{" "}
+                                {currentStep === "pitch"
+                                    ? 1
+                                    : currentStep === "questions"
+                                    ? 2
+                                    : 3}{" "}
+                                of 3
+                            </span>
                             <span>{steps[currentStep].progress}% Complete</span>
                         </div>
                         <Progress value={steps[currentStep].progress} className="h-1" />
@@ -301,11 +326,14 @@ export function FileDialog({ orgId, children, className }: ModernEvaluationDialo
                                             id="title"
                                             placeholder="Enter a descriptive title for your pitch"
                                             value={pitchData.title}
-                                            onChange={(e) => setPitchData(prev => ({
-                                                ...prev,
-                                                title: e.target.value
-                                            }))}
+                                            onChange={(e) =>
+                                                setPitchData((prev) => ({
+                                                    ...prev,
+                                                    title: e.target.value,
+                                                }))
+                                            }
                                             className="h-11"
+                                            autoFocus
                                         />
                                     </div>
 
@@ -313,10 +341,10 @@ export function FileDialog({ orgId, children, className }: ModernEvaluationDialo
                                         defaultValue="text"
                                         value={pitchData.type}
                                         onValueChange={(value) => {
-                                            setPitchData(prev => ({
+                                            setPitchData((prev) => ({
                                                 ...prev,
                                                 type: value,
-                                                content: ""
+                                                content: "",
                                             }));
                                             setFiles([]);
                                         }}
@@ -339,10 +367,12 @@ export function FileDialog({ orgId, children, className }: ModernEvaluationDialo
                                                 <Textarea
                                                     placeholder="Enter your pitch text here..."
                                                     value={pitchData.content}
-                                                    onChange={(e) => setPitchData(prev => ({
-                                                        ...prev,
-                                                        content: e.target.value
-                                                    }))}
+                                                    onChange={(e) =>
+                                                        setPitchData((prev) => ({
+                                                            ...prev,
+                                                            content: e.target.value,
+                                                        }))
+                                                    }
                                                     className="min-h-[200px] resize-none"
                                                 />
                                             </div>
@@ -353,8 +383,12 @@ export function FileDialog({ orgId, children, className }: ModernEvaluationDialo
                                                 {...getRootProps()}
                                                 className={cn(
                                                     "border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors",
-                                                    isDragActive && !isProcessing && "border-primary bg-primary/5",
-                                                    isProcessing ? "opacity-50 cursor-not-allowed bg-muted" : "hover:border-primary hover:bg-primary/5"
+                                                    isDragActive &&
+                                                        !isProcessing &&
+                                                        "border-primary bg-primary/5",
+                                                    isProcessing
+                                                        ? "opacity-50 cursor-not-allowed bg-muted"
+                                                        : "hover:border-primary hover:bg-primary/5"
                                                 )}
                                             >
                                                 <input {...getInputProps()} />
@@ -365,7 +399,11 @@ export function FileDialog({ orgId, children, className }: ModernEvaluationDialo
                                                         </div>
                                                         <p className="font-medium">{files[0].name}</p>
                                                         <p className="text-sm text-muted-foreground">
-                                                            {(files[0].size / (1024 * 1024)).toFixed(2)} MB
+                                                            {(
+                                                                files[0].size /
+                                                                (1024 * 1024)
+                                                            ).toFixed(2)}{" "}
+                                                            MB
                                                         </p>
                                                     </div>
                                                 ) : (
@@ -376,13 +414,16 @@ export function FileDialog({ orgId, children, className }: ModernEvaluationDialo
                                                         <p className="font-medium">
                                                             {isDragActive
                                                                 ? "Drop the audio file here"
-                                                                : "Drag & drop your audio file here"
-                                                            }
+                                                                : "Drag & drop your audio file here"}
                                                         </p>
                                                         <p className="text-sm text-muted-foreground">
                                                             Supports MP3, WAV, M4A (max 50MB)
                                                         </p>
-                                                        <Button size="sm" variant="outline" type="button">
+                                                        <Button
+                                                            size="sm"
+                                                            variant="outline"
+                                                            type="button"
+                                                        >
                                                             Browse files
                                                         </Button>
                                                     </div>
@@ -395,8 +436,12 @@ export function FileDialog({ orgId, children, className }: ModernEvaluationDialo
                                                 {...getRootProps()}
                                                 className={cn(
                                                     "border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors",
-                                                    isDragActive && !isProcessing && "border-primary bg-primary/5",
-                                                    isProcessing ? "opacity-50 cursor-not-allowed bg-muted" : "hover:border-primary hover:bg-primary/5"
+                                                    isDragActive &&
+                                                        !isProcessing &&
+                                                        "border-primary bg-primary/5",
+                                                    isProcessing
+                                                        ? "opacity-50 cursor-not-allowed bg-muted"
+                                                        : "hover:border-primary hover:bg-primary/5"
                                                 )}
                                             >
                                                 <input {...getInputProps()} />
@@ -407,7 +452,11 @@ export function FileDialog({ orgId, children, className }: ModernEvaluationDialo
                                                         </div>
                                                         <p className="font-medium">{files[0].name}</p>
                                                         <p className="text-sm text-muted-foreground">
-                                                            {(files[0].size / (1024 * 1024)).toFixed(2)} MB
+                                                            {(
+                                                                files[0].size /
+                                                                (1024 * 1024)
+                                                            ).toFixed(2)}{" "}
+                                                            MB
                                                         </p>
                                                     </div>
                                                 ) : (
@@ -418,13 +467,16 @@ export function FileDialog({ orgId, children, className }: ModernEvaluationDialo
                                                         <p className="font-medium">
                                                             {isDragActive
                                                                 ? "Drop the text file here"
-                                                                : "Drag & drop your text file here"
-                                                            }
+                                                                : "Drag & drop your text file here"}
                                                         </p>
                                                         <p className="text-sm text-muted-foreground">
                                                             Supports TXT files (max 5MB)
                                                         </p>
-                                                        <Button size="sm" variant="outline" type="button">
+                                                        <Button
+                                                            size="sm"
+                                                            variant="outline"
+                                                            type="button"
+                                                        >
                                                             Browse files
                                                         </Button>
                                                     </div>
@@ -449,13 +501,15 @@ export function FileDialog({ orgId, children, className }: ModernEvaluationDialo
                                     <CardContent className="p-6">
                                         <div className="flex justify-between items-center mb-4">
                                             <div className="space-y-1">
-                                                <h3 className="font-medium">Question {currentQuestionIndex + 1} of {questions.length}</h3>
+                                                <h3 className="font-medium">
+                                                    Question {currentQuestionIndex + 1} of {questions.length}
+                                                </h3>
                                                 <p className="text-xs text-muted-foreground">
                                                     These questions help improve your evaluation accuracy
                                                 </p>
                                             </div>
                                             <div className="flex items-center gap-1 text-xs">
-                                                {Array.from({ length: questions.length }).map((_, i) => (
+                                                {questions.map((_, i) => (
                                                     <span
                                                         key={i}
                                                         className={cn(
@@ -463,8 +517,8 @@ export function FileDialog({ orgId, children, className }: ModernEvaluationDialo
                                                             i === currentQuestionIndex
                                                                 ? "bg-primary"
                                                                 : i < currentQuestionIndex
-                                                                    ? "bg-primary/40"
-                                                                    : "bg-muted"
+                                                                ? "bg-primary/40"
+                                                                : "bg-muted"
                                                         )}
                                                     />
                                                 ))}
@@ -487,9 +541,11 @@ export function FileDialog({ orgId, children, className }: ModernEvaluationDialo
                                                     placeholder="Type your answer here..."
                                                     value={questions[currentQuestionIndex].answer}
                                                     onChange={(e) => {
-                                                        const newQuestions = [...questions];
-                                                        newQuestions[currentQuestionIndex].answer = e.target.value;
-                                                        setQuestions(newQuestions);
+                                                        setQuestions((prev) => {
+                                                            const updated = [...prev];
+                                                            updated[currentQuestionIndex].answer = e.target.value;
+                                                            return updated;
+                                                        });
                                                     }}
                                                     className="min-h-[150px] resize-none"
                                                 />
@@ -515,16 +571,19 @@ export function FileDialog({ orgId, children, className }: ModernEvaluationDialo
                                             <h3 className="text-lg font-semibold mb-2">Pitch Summary</h3>
                                             <div className="flex items-center gap-2 mb-4">
                                                 <CheckCircle2 className="h-5 w-5 text-green-500" />
-                                                <span className="text-sm text-muted-foreground">Your pitch is ready for evaluation</span>
+                                                <span className="text-sm text-muted-foreground">
+                                                    Your pitch is ready for evaluation
+                                                </span>
                                             </div>
 
                                             <div className="rounded-lg bg-muted p-4">
                                                 <p className="font-medium">{pitchData.title}</p>
                                                 <p className="text-sm text-muted-foreground mt-1">
                                                     {pitchData.type === "text"
-                                                        ? `${pitchData.content.slice(0, 100)}${pitchData.content.length > 100 ? '...' : ''}`
-                                                        : files[0]?.name
-                                                    }
+                                                        ? `${pitchData.content.slice(0, 100)}${
+                                                              pitchData.content.length > 100 ? "..." : ""
+                                                          }`
+                                                        : files[0]?.name}
                                                 </p>
                                             </div>
                                         </div>
@@ -532,12 +591,18 @@ export function FileDialog({ orgId, children, className }: ModernEvaluationDialo
                                         <Separator />
 
                                         <div>
-                                            <h3 className="text-lg font-semibold mb-2">Follow-up Questions</h3>
+                                            <h3 className="text-lg font-semibold mb-2">
+                                                Follow-up Questions
+                                            </h3>
                                             <div className="space-y-3">
                                                 {questions.map((q, index) => (
                                                     <div key={index} className="space-y-1">
-                                                        <p className="text-sm font-medium">{index + 1}. {q.text}</p>
-                                                        <p className="text-sm text-muted-foreground pl-5">{q.answer}</p>
+                                                        <p className="text-sm font-medium">
+                                                            {index + 1}. {q.text}
+                                                        </p>
+                                                        <p className="text-sm text-muted-foreground pl-5">
+                                                            {q.answer}
+                                                        </p>
                                                     </div>
                                                 ))}
                                             </div>
@@ -557,7 +622,7 @@ export function FileDialog({ orgId, children, className }: ModernEvaluationDialo
                                 onClick={() => {
                                     if (currentStep === "questions") {
                                         if (currentQuestionIndex > 0) {
-                                            setCurrentQuestionIndex(i => i - 1);
+                                            setCurrentQuestionIndex((i) => i - 1);
                                         } else {
                                             setCurrentStep("pitch");
                                         }
@@ -573,13 +638,13 @@ export function FileDialog({ orgId, children, className }: ModernEvaluationDialo
                                 Back
                             </Button>
                         ) : (
-                            <div></div>
+                            <div />
                         )}
 
                         {currentStep === "pitch" && (
                             <Button
                                 onClick={generateQuestions}
-                                disabled={isProcessing || !pitchData.title || (pitchData.type === "text" ? !pitchData.content : files.length === 0)}
+                                disabled={isContinueDisabled}
                                 className="gap-2 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
                             >
                                 {isProcessing ? (
@@ -600,7 +665,7 @@ export function FileDialog({ orgId, children, className }: ModernEvaluationDialo
                             <Button
                                 onClick={() => {
                                     if (currentQuestionIndex < questions.length - 1) {
-                                        setCurrentQuestionIndex(i => i + 1);
+                                        setCurrentQuestionIndex((i) => i + 1);
                                     } else {
                                         setCurrentStep("review");
                                     }
@@ -608,7 +673,9 @@ export function FileDialog({ orgId, children, className }: ModernEvaluationDialo
                                 disabled={!questions[currentQuestionIndex].answer}
                                 className="gap-2"
                             >
-                                {currentQuestionIndex === questions.length - 1 ? "Review" : "Next Question"}
+                                {currentQuestionIndex === questions.length - 1
+                                    ? "Review"
+                                    : "Next Question"}
                                 <ChevronRight className="h-4 w-4" />
                             </Button>
                         )}

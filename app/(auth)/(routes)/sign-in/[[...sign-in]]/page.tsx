@@ -10,7 +10,7 @@ const SignInPage = () => {
                 <div className="absolute inset-0 bg-primary/50" />
                 <div className="relative z-20 flex items-center gap-2 text-lg font-medium">
                     <LogoIcon />
-                    <span>Pitch Perfect</span>
+                    <span>Pista</span>
                 </div>
                 <div className="relative z-20 mt-auto">
                     <blockquote className="space-y-2">

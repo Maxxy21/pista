@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo, useRef } from 'react';
 import { useRouter } from "next/navigation";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { motion } from "framer-motion";
@@ -13,64 +13,75 @@ import { EmptyFavorites } from "@/app/dashboard/components/empty-favorites";
 import { EmptyPitches } from "@/app/dashboard/components/empty-pitches";
 
 interface VirtualizedPitchesGridProps {
-    data: any[] | undefined;
+    data?: any[];
     viewMode: "grid" | "list";
     searchQuery: string;
     currentView: string;
-    organization: OrganizationResource | null | undefined;
+    organization?: OrganizationResource | null;
     isLoading?: boolean;
 }
 
-export const VirtualizedPitchesGrid = ({ 
-    data, 
-    viewMode, 
-    searchQuery, 
+const getColumnCount = (viewMode: "grid" | "list", width: number) => {
+    if (viewMode === "list") return 1;
+    if (width < 768) return 1;
+    if (width < 1024) return 2;
+    if (width < 1280) return 3;
+    return 4;
+};
+
+export const VirtualizedPitchesGrid: React.FC<VirtualizedPitchesGridProps> = ({
+    data = [],
+    viewMode,
+    searchQuery,
     currentView,
     organization,
-    isLoading = false
-}: VirtualizedPitchesGridProps) => {
+    isLoading = false,
+}) => {
     const router = useRouter();
-    const parentRef = React.useRef<HTMLDivElement>(null);
+    const parentRef = useRef<HTMLDivElement>(null);
 
-    // Move function definition before usage
-    const getColumnCount = () => {
-        if (viewMode === "list") return 1;
-        const width = typeof window !== 'undefined' ? window.innerWidth : 1200;
-        if (width < 768) return 1;
-        if (width < 1024) return 2;
-        if (width < 1280) return 3;
-        return 4;
-    };
+    // Responsive column count
+    const [windowWidth, setWindowWidth] = React.useState(
+        typeof window !== "undefined" ? window.innerWidth : 1200
+    );
 
-    const pitches = data || [];
-    const columnCount = getColumnCount();
-    const rowCount = Math.ceil(pitches.length / columnCount);
+    React.useEffect(() => {
+        if (typeof window === "undefined") return;
+        const handleResize = () => setWindowWidth(window.innerWidth);
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
+
+    const columnCount = useMemo(
+        () => getColumnCount(viewMode, windowWidth),
+        [viewMode, windowWidth]
+    );
+
+    const pitches = data;
+    const rowCount = useMemo(
+        () => Math.ceil((isLoading ? 8 : pitches.length) / columnCount),
+        [pitches.length, columnCount, isLoading]
+    );
 
     const rowVirtualizer = useVirtualizer({
-        count: isLoading ? 8 : rowCount,
+        count: rowCount,
         getScrollElement: () => parentRef.current,
-        estimateSize: () => viewMode === "list" ? 120 : 250,
+        estimateSize: () => (viewMode === "list" ? 120 : 250),
         overscan: 5,
     });
 
-    const handlePitchClick = useCallback((pitchId: string) => {
-        router.push(`/pitch/${pitchId}`);
-    }, [router]);
+    const handlePitchClick = useCallback(
+        (pitchId: string) => {
+            router.push(`/pitch/${pitchId}`);
+        },
+        [router]
+    );
 
-    // Handle empty states after hook calls
-    if (!isLoading && data?.length === 0) {
-        if (searchQuery) {
-            return <EmptySearch />;
-        }
-        
-        if (currentView === "favorites") {
-            return <EmptyFavorites />;
-        }
-        
-        if (organization) {
-            return <EmptyPitches orgId={organization.id as string} />;
-        }
-        
+    // Empty states
+    if (!isLoading && pitches.length === 0) {
+        if (searchQuery) return <EmptySearch />;
+        if (currentView === "favorites") return <EmptyFavorites />;
+        if (organization) return <EmptyPitches orgId={organization.id as string} />;
         return null;
     }
 
@@ -84,7 +95,6 @@ export const VirtualizedPitchesGrid = ({
             >
                 {rowVirtualizer.getVirtualItems().map((virtualRow) => {
                     const rowIndex = virtualRow.index;
-                    
                     return (
                         <div
                             key={virtualRow.key}
@@ -102,17 +112,17 @@ export const VirtualizedPitchesGrid = ({
                             {Array.from({ length: columnCount }).map((_, colIndex) => {
                                 const pitchIndex = rowIndex * columnCount + colIndex;
                                 const pitch = pitches[pitchIndex];
-                                
+
                                 if (isLoading || !pitch) {
                                     return pitchIndex < (isLoading ? 8 : pitches.length) ? (
-                                        <SkeletonCard 
+                                        <SkeletonCard
                                             key={`skeleton-${pitchIndex}`}
                                             variant="pitch"
                                             height={viewMode === "list" ? "h-[120px]" : "h-[250px]"}
                                         />
                                     ) : null;
                                 }
-                                
+
                                 return (
                                     <motion.div
                                         key={pitch._id}
@@ -140,4 +150,4 @@ export const VirtualizedPitchesGrid = ({
             </div>
         </div>
     );
-}; 
+};

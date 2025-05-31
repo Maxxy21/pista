@@ -19,7 +19,7 @@ import {
 import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { useOrganization, useAuth, useUser } from "@clerk/nextjs";
 import { useDebounceValue } from "usehooks-ts";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import qs from "query-string";
 
 import {
@@ -39,6 +39,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useQuery } from "convex/react";
+import { Id } from "@/convex/_generated/dataModel";
 import { api } from "@/convex/_generated/api";
 import { cn } from "@/lib/utils";
 import { NavUser } from "@/components/nav-user";
@@ -54,7 +55,17 @@ import { format } from "date-fns";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
-export function PitchDetailsSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+// Extracted pitch type for clarity
+type Pitch = {
+    _id: string;
+    title: string;
+    _creationTime: string | number | Date;
+    evaluation: { overallScore: number };
+    type: string;
+    authorName?: string;
+};
+
+export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>) {
     const router = useRouter();
     const params = useParams();
     const searchParams = useSearchParams();
@@ -62,19 +73,20 @@ export function PitchDetailsSidebar({ ...props }: React.ComponentProps<typeof Si
     const { isLoaded: isAuthLoaded, isSignedIn } = useAuth();
     const { user } = useUser();
     const { resolvedTheme } = useTheme();
-    const isDark = resolvedTheme === 'dark';
+    const isDark = resolvedTheme === "dark";
     const [search, setSearch] = React.useState("");
     const [debouncedSearch] = useDebounceValue(search, 500);
     const { state } = useSidebar();
 
+    // Queries
     const pitches = useQuery(
         api.pitches.getFilteredPitches,
         isAuthLoaded && isSignedIn && organization
             ? {
-                orgId: organization.id,
-                search: debouncedSearch,
-                sortBy: "date",
-            }
+                  orgId: organization.id,
+                  search: debouncedSearch,
+                  sortBy: "date",
+              }
             : "skip"
     );
 
@@ -82,50 +94,52 @@ export function PitchDetailsSidebar({ ...props }: React.ComponentProps<typeof Si
         api.pitches.getPitch,
         isAuthLoaded && isSignedIn && params.id
             ? {
-                id: params.id as any,
-            }
+                  id: params.id as Id<"pitches">,
+              }
             : "skip"
     );
 
-    // Move useMemo before any conditional returns
-    // This ensures hook is always called in the same order
+    // Memoize recent pitches
     const recentPitches = React.useMemo(() => {
         if (!pitches) return [];
-
-        return pitches
-            .filter(pitch => pitch._id !== params.id)
-            .slice(0, 5);
+        return pitches.filter((pitch: Pitch) => pitch._id !== params.id).slice(0, 5);
     }, [pitches, params.id]);
 
+    // Redirect if not signed in
     React.useEffect(() => {
         if (isAuthLoaded && !isSignedIn) {
             router.push("/sign-in");
         }
     }, [isAuthLoaded, isSignedIn, router]);
 
-    const handleBack = () => {
+    // Handlers
+    const handleBack = React.useCallback(() => {
         const view = searchParams.get("view");
-        const url = qs.stringifyUrl({
-            url: "/dashboard",
-            query: {
-                view: view || undefined
-            }
-        }, { skipEmptyString: true, skipNull: true });
-
+        const url = qs.stringifyUrl(
+            {
+                url: "/dashboard",
+                query: { view: view || undefined },
+            },
+            { skipEmptyString: true, skipNull: true }
+        );
         router.push(url);
-    };
+    }, [router, searchParams]);
 
-    const navigateToPitch = (pitchId: string) => {
-        const url = qs.stringifyUrl({
-            url: `/pitch/${pitchId}`,
-            query: {
-                view: searchParams.get("view") || undefined
-            }
-        }, { skipEmptyString: true, skipNull: true });
+    const navigateToPitch = React.useCallback(
+        (pitchId: string) => {
+            const url = qs.stringifyUrl(
+                {
+                    url: `/pitch/${pitchId}`,
+                    query: { view: searchParams.get("view") || undefined },
+                },
+                { skipEmptyString: true, skipNull: true }
+            );
+            router.push(url);
+        },
+        [router, searchParams]
+    );
 
-        router.push(url);
-    };
-
+    // Loading state
     if (!isAuthLoaded || !organization) {
         return (
             <Sidebar collapsible="icon" className="border-r" {...props}>
@@ -140,6 +154,18 @@ export function PitchDetailsSidebar({ ...props }: React.ComponentProps<typeof Si
         );
     }
 
+    // Helper for pitch type badge
+    const renderTypeBadge = (type: string) => {
+        switch (type) {
+            case "audio":
+                return <Badge variant="outline">Audio</Badge>;
+            case "textFile":
+                return <Badge variant="outline">File</Badge>;
+            default:
+                return <Badge variant="outline">Text</Badge>;
+        }
+    };
+
     return (
         <Sidebar collapsible="icon" className="border-r" {...props}>
             <SidebarHeader className="py-4">
@@ -150,7 +176,7 @@ export function PitchDetailsSidebar({ ...props }: React.ComponentProps<typeof Si
                             whileTap={{ scale: 0.95 }}
                             className="flex items-center justify-center bg-primary/10 p-2 rounded-lg"
                         >
-                            <LogoIcon className="h-6 w-6 text-primary"/>
+                            <LogoIcon className="h-6 w-6 text-primary" />
                         </motion.div>
                     </div>
                 ) : (
@@ -162,19 +188,18 @@ export function PitchDetailsSidebar({ ...props }: React.ComponentProps<typeof Si
                                     whileTap={{ scale: 0.95 }}
                                     className="bg-primary/10 p-2 rounded-lg"
                                 >
-                                    <LogoIcon className="h-5 w-5 text-primary"/>
+                                    <LogoIcon className="h-5 w-5 text-primary" />
                                 </motion.div>
                                 <h1 className="text-lg font-semibold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70">
                                     Pista
                                 </h1>
                             </div>
-                            <SidebarTrigger/>
+                            <SidebarTrigger />
                         </div>
-
                         <div className="relative">
                             <SearchForm
                                 value={search}
-                                onChange={(value) => setSearch(value)}
+                                onChange={setSearch}
                                 placeholder="Search pitches..."
                                 variant="sidebar"
                             />
@@ -197,7 +222,6 @@ export function PitchDetailsSidebar({ ...props }: React.ComponentProps<typeof Si
                                     <ArrowLeft className="h-4 w-4" />
                                     <span>Back to Dashboard</span>
                                 </Button>
-
                                 {currentPitch && (
                                     <div className="space-y-2">
                                         <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
@@ -206,32 +230,25 @@ export function PitchDetailsSidebar({ ...props }: React.ComponentProps<typeof Si
                                             </h2>
                                             <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
                                                 <Calendar className="h-3.5 w-3.5" />
-                                                <span>{format(new Date(currentPitch._creationTime), 'MMM d, yyyy')}</span>
+                                                <span>
+                                                    {format(
+                                                        new Date(currentPitch._creationTime),
+                                                        "MMM d, yyyy"
+                                                    )}
+                                                </span>
                                             </div>
-
                                             <div className="flex items-center gap-2 mt-2">
-                                                <Badge
-                                                    className="bg-primary/10 hover:bg-primary/15 text-primary border-primary/20"
-                                                >
+                                                <Badge className="bg-primary/10 hover:bg-primary/15 text-primary border-primary/20">
                                                     Score: {currentPitch.evaluation.overallScore.toFixed(1)}
                                                 </Badge>
-
-                                                {currentPitch.type === 'audio' ? (
-                                                    <Badge variant="outline">Audio</Badge>
-                                                ) : currentPitch.type === 'textFile' ? (
-                                                    <Badge variant="outline">File</Badge>
-                                                ) : (
-                                                    <Badge variant="outline">Text</Badge>
-                                                )}
+                                                {renderTypeBadge(currentPitch.type)}
                                             </div>
-
                                             <Separator className="my-3" />
-
                                             <div className="flex items-center gap-2">
                                                 <Avatar className="h-6 w-6">
                                                     <AvatarImage src={user?.imageUrl} />
                                                     <AvatarFallback>
-                                                        {currentPitch.authorName?.charAt(0) || 'U'}
+                                                        {currentPitch.authorName?.charAt(0) || "U"}
                                                     </AvatarFallback>
                                                 </Avatar>
                                                 <span className="text-xs">{currentPitch.authorName}</span>
@@ -240,13 +257,13 @@ export function PitchDetailsSidebar({ ...props }: React.ComponentProps<typeof Si
                                     </div>
                                 )}
                             </div>
-
                             <div className="space-y-3">
-                                <h3 className="text-sm font-medium text-muted-foreground pl-1">Recent Pitches</h3>
-
+                                <h3 className="text-sm font-medium text-muted-foreground pl-1">
+                                    Recent Pitches
+                                </h3>
                                 {recentPitches.length > 0 ? (
                                     <div className="space-y-2">
-                                        {recentPitches.map(pitch => (
+                                        {recentPitches.map((pitch: Pitch) => (
                                             <motion.div
                                                 key={pitch._id}
                                                 whileHover={{ x: 3 }}
@@ -267,9 +284,16 @@ export function PitchDetailsSidebar({ ...props }: React.ComponentProps<typeof Si
                                                         </div>
                                                         <div className="flex items-center gap-1 text-xs text-muted-foreground">
                                                             <Clock8 className="h-3 w-3" />
-                                                            <span>{format(new Date(pitch._creationTime), 'MMM d')}</span>
+                                                            <span>
+                                                                {format(
+                                                                    new Date(pitch._creationTime),
+                                                                    "MMM d"
+                                                                )}
+                                                            </span>
                                                             <span className="inline-block w-1 h-1 rounded-full bg-muted-foreground mx-0.5"></span>
-                                                            <span>{pitch.evaluation.overallScore.toFixed(1)}</span>
+                                                            <span>
+                                                                {pitch.evaluation.overallScore.toFixed(1)}
+                                                            </span>
                                                         </div>
                                                     </div>
                                                 </Button>
@@ -281,7 +305,6 @@ export function PitchDetailsSidebar({ ...props }: React.ComponentProps<typeof Si
                                         No other pitches found
                                     </div>
                                 )}
-
                                 <Button
                                     variant="outline"
                                     size="sm"
@@ -311,7 +334,6 @@ export function PitchDetailsSidebar({ ...props }: React.ComponentProps<typeof Si
                                         </TooltipContent>
                                     </Tooltip>
                                 </SidebarMenuItem>
-
                                 <SidebarMenuItem>
                                     <Tooltip>
                                         <TooltipTrigger asChild>
@@ -324,7 +346,6 @@ export function PitchDetailsSidebar({ ...props }: React.ComponentProps<typeof Si
                                         </TooltipContent>
                                     </Tooltip>
                                 </SidebarMenuItem>
-
                                 <SidebarMenuItem>
                                     <Tooltip>
                                         <TooltipTrigger asChild>
@@ -349,7 +370,6 @@ export function PitchDetailsSidebar({ ...props }: React.ComponentProps<typeof Si
                         <SidebarTrigger />
                     </div>
                 )}
-
                 {organization && state === "expanded" && (
                     <div className="px-4 mb-2">
                         <Button
@@ -361,10 +381,9 @@ export function PitchDetailsSidebar({ ...props }: React.ComponentProps<typeof Si
                         </Button>
                     </div>
                 )}
-
                 <NavUser isDark={isDark} />
             </SidebarFooter>
-            <SidebarRail/>
+            <SidebarRail />
         </Sidebar>
     );
 }

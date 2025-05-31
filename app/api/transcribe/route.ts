@@ -1,41 +1,44 @@
 import { NextResponse } from 'next/server';
-import {getOpenAI} from "@/lib/utils";
+import { getOpenAI } from '@/lib/utils';
 
 export const runtime = 'edge';
 
 export async function POST(req: Request) {
+    let formData: FormData | null = null;
+    let audioFile: File | null = null;
+
     try {
-        const openai = getOpenAI();
-        const formData = await req.formData();
-        const audioFile = formData.get('audio') as File;
+        formData = await req.formData();
+        audioFile = formData.get('audio') as File | null;
 
         if (!audioFile) {
             return NextResponse.json({ error: 'No audio file provided' }, { status: 400 });
         }
 
-        const audioBuffer = Buffer.from(await audioFile.arrayBuffer());
+        const arrayBuffer = await audioFile.arrayBuffer();
+        const fileForOpenAI = new File([arrayBuffer], audioFile.name, { type: audioFile.type });
 
-        try {
-            const transcription = await openai.audio.transcriptions.create({
-                file: new File([audioBuffer], audioFile.name, { type: audioFile.type }),
-                model: "whisper-1",
-                language: "en",
-                response_format: "text",
-            });
+        const openai = getOpenAI();
 
-            return NextResponse.json({ text: transcription });
-        } catch (openaiError) {
-            console.error('OpenAI API Error:', openaiError);
-            return NextResponse.json(
-                { error: 'OpenAI transcription failed' },
-                { status: 503 }
-            );
-        }
-    } catch (error) {
+        const transcription = await openai.audio.transcriptions.create({
+            file: fileForOpenAI,
+            model: 'whisper-1',
+            language: 'en',
+            response_format: 'text',
+        });
+
+        return NextResponse.json({ text: transcription });
+    } catch (error: any) {
+        // Log error details for debugging, but avoid leaking sensitive info in response
         console.error('Transcription error:', error);
-        return NextResponse.json(
-            { error: 'Transcription processing failed' },
-            { status: 500 }
-        );
+
+        // Distinguish between OpenAI and other errors
+        const isOpenAIError = error?.response?.status || error?.name === 'OpenAIError';
+        const status = isOpenAIError ? 503 : 500;
+        const message = isOpenAIError
+            ? 'OpenAI transcription failed'
+            : 'Transcription processing failed';
+
+        return NextResponse.json({ error: message }, { status });
     }
 }
