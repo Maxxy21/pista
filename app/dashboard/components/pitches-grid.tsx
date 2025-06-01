@@ -11,7 +11,7 @@ import { EmptyFavorites } from "@/app/dashboard/components/empty-favorites";
 import { EmptyPitches } from "@/app/dashboard/components/empty-pitches";
 import { Id } from "@/convex/_generated/dataModel";
 
-interface Pitch {
+export interface Pitch {
     _id: Id<"pitches">;
     title: string;
     text: string;
