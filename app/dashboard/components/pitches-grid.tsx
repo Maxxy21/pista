@@ -9,14 +9,15 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { EmptySearch } from "@/app/dashboard/components/empty-search";
 import { EmptyFavorites } from "@/app/dashboard/components/empty-favorites";
 import { EmptyPitches } from "@/app/dashboard/components/empty-pitches";
+import { Id } from "@/convex/_generated/dataModel";
 
 interface Pitch {
-    _id: string;
+    _id: Id<"pitches">;
     title: string;
     text: string;
     userId: string;
     authorName: string;
-    _creationTime: string;
+    _creationTime: number;
     orgId: string;
     isFavorite: boolean;
     evaluation: {
@@ -25,11 +26,11 @@ interface Pitch {
 }
 
 interface PitchesGridProps {
-    data?: Pitch[];
+    data: Pitch[] | undefined;
     viewMode: "grid" | "list";
     searchQuery: string;
     currentView: string;
-    organization?: OrganizationResource | null;
+    organization: OrganizationResource | null | undefined;
     isLoading?: boolean;
 }
 

@@ -89,7 +89,11 @@ export default function Dashboard() {
 
     useEffect(() => {
         if (!isLoading && data !== undefined && typeof window !== 'undefined' && 'performance' in window) {
-            performance.mark('dashboard-content-loaded');
+            try {
+                performance.mark('dashboard-content-loaded');
+            } catch (error) {
+                console.warn('Failed to mark performance:', error);
+            }
         }
     }, [isLoading, data]);
 

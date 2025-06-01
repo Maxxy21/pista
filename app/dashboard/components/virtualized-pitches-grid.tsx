@@ -11,9 +11,10 @@ import { NewPitchButton } from "./new-pitch-button";
 import { EmptySearch } from "@/app/dashboard/components/empty-search";
 import { EmptyFavorites } from "@/app/dashboard/components/empty-favorites";
 import { EmptyPitches } from "@/app/dashboard/components/empty-pitches";
+import { Pitch } from "./pitches-grid";
 
 interface VirtualizedPitchesGridProps {
-    data?: any[];
+    data?: Pitch[];
     viewMode: "grid" | "list";
     searchQuery: string;
     currentView: string;
