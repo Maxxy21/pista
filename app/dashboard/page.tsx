@@ -73,7 +73,7 @@ export default function Dashboard() {
                     orgId: organization.id,
                     search: searchParam,
                     favorites: viewParam === "favorites",
-                    sortBy: viewParam === "recent" ? "date" : sortBy === "newest" ? "date" : "score",
+                    sortBy: (viewParam === "recent" ? "date" : sortBy === "newest" ? "date" : "score") as "score" | "date",
                     scoreRange: getScoreRange(scoreFilter),
                 }
             : "skip"
