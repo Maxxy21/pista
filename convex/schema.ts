@@ -2,7 +2,7 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
-// Reusable value schemas
+
 const questionAnswer = v.object({
     text: v.string(),
     answer: v.string(),
@@ -54,13 +54,13 @@ const userFavorites = defineTable({
     .index("by_user_pitch", ["userId", "pitchId"])
     .index("by_user_org_pitch", ["userId", "orgId", "pitchId"]);
 
-// Export schema
+
 export default defineSchema({
     pitches,
     userFavorites,
 });
 
-// Optionally export value schemas for reuse elsewhere
+
 export {
     questionAnswer,
     evaluation,
