@@ -29,10 +29,8 @@ export async function POST(req: Request) {
 
         return NextResponse.json({ text: transcription });
     } catch (error: any) {
-        // Log error details for debugging, but avoid leaking sensitive info in response
         console.error('Transcription error:', error);
 
-        // Distinguish between OpenAI and other errors
         const isOpenAIError = error?.response?.status || error?.name === 'OpenAIError';
         const status = isOpenAIError ? 503 : 500;
         const message = isOpenAIError

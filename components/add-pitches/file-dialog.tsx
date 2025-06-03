@@ -103,7 +103,7 @@ export function FileDialog({
 
     const { mutate: createPitch, pending } = useApiMutation(api.pitches.create);
 
-    // Memoize dropzone config for performance and to avoid unnecessary re-renders
+
     const onDrop = useCallback(
         (acceptedFiles: File[]) => setFiles(acceptedFiles),
         []
