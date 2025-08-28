@@ -3,20 +3,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { cn, getScoreColor } from "./utils";
-import { ScoreRadarChart } from "./radar-chart";
-
-interface Evaluation {
-    criteria: string;
-    score: number;
-}
+import { ScoreBarChart } from "./score-bar-chart";
+import { UniversalPitchData } from "@/lib/types/pitch";
+import { getEvaluations } from "@/lib/utils/evaluation-utils";
 
 interface ScoreOverviewProps {
-    data: {
-        evaluation: {
-            overallScore: number;
-            evaluations: Evaluation[];
-        };
-    };
+    data: UniversalPitchData;
 }
 
 const getScoreDescription = (score: number) => {
@@ -27,11 +19,12 @@ const getScoreDescription = (score: number) => {
 };
 
 export const ScoreOverview = ({ data }: ScoreOverviewProps) => {
-    const { overallScore, evaluations } = data.evaluation;
+    const evaluations = getEvaluations(data.evaluation);
+    const overallScore = data.evaluation.overallScore;
 
     return (
         <div className="space-y-6">
-            <div className="grid gap-4 lg:grid-cols-2">
+            <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
                 <motion.div whileHover={{ y: -5 }} transition={{ duration: 0.2 }}>
                     <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20 h-full">
                         <CardContent className="p-6">
@@ -56,7 +49,7 @@ export const ScoreOverview = ({ data }: ScoreOverviewProps) => {
                     </Card>
                 </motion.div>
 
-                <ScoreRadarChart data={evaluations} />
+                <ScoreBarChart data={evaluations} />
             </div>
 
             <Card>

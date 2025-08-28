@@ -23,6 +23,7 @@ import {
     SidebarMenu,
     SidebarMenuItem,
     SidebarMenuButton,
+    SidebarMenuBadge,
     SidebarGroupLabel,
     useSidebar,
 } from "@/components/ui/sidebar";
@@ -32,33 +33,26 @@ import { TeamSwitcher } from "@/components/team-switcher";
 import { SearchForm } from "@/components/search-form";
 import { InviteButton } from "@/components/invite-button";
 import LogoIcon from "@/components/ui/logo-icon";
-import { CollapseTrigger } from "@/components/collapse-trigger";
-import { ExpandTrigger } from "@/components/expand-trigger";
-import { Badge } from "@/components/ui/badge";
 
 const NAVIGATION_ITEMS = [
     {
-        title: "Home",
+        title: "All Pitches",
+        url: "/dashboard",
         icon: Home,
-        value: "home",
+        value: "all",
     },
     {
         title: "Recent",
+        url: "/dashboard?view=recent",
         icon: Clock,
         value: "recent",
     },
     {
         title: "Favorites",
+        url: "/dashboard?view=favorites", 
         icon: Star,
         value: "favorites",
-        badge: (
-            <Badge
-                variant="outline"
-                className="ml-auto text-xs bg-primary/5 border-primary/20"
-            >
-                New
-            </Badge>
-        ),
+        badge: "New",
     },
 ];
 
@@ -95,7 +89,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
         (value: string) => {
             const current = new URLSearchParams(Array.from(searchParams.entries()));
 
-            if (value === "home") {
+            if (value === "all") {
                 current.delete("view");
             } else {
                 current.set("view", value);
@@ -112,7 +106,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
     const currentView = searchParams.get("view");
 
     return (
-        <Sidebar collapsible="icon" className="border-r" {...props}>
+        <Sidebar collapsible="icon" {...props}>
             <SidebarHeader className="py-4">
                 {state === "collapsed" ? (
                     <div className="flex justify-center">
@@ -126,20 +120,17 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
                     </div>
                 ) : (
                     <div className="px-4 space-y-4">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <motion.div
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                    className="bg-primary/10 p-2 rounded-lg"
-                                >
-                                    <LogoIcon className="h-5 w-5 text-primary" />
-                                </motion.div>
-                                <h1 className="text-lg font-semibold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70">
-                                    Pista
-                                </h1>
-                            </div>
-                            <CollapseTrigger />
+                        <div className="flex items-center gap-2">
+                            <motion.div
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                className="bg-primary/10 p-2 rounded-lg"
+                            >
+                                <LogoIcon className="h-5 w-5 text-primary" />
+                            </motion.div>
+                            <h1 className="text-lg font-semibold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70">
+                                Pista
+                            </h1>
                         </div>
                         {isLoaded && organization && (
                             <>
@@ -165,51 +156,57 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
                         <SidebarMenu>
                             {NAVIGATION_ITEMS.map((item) => {
                                 const isActive =
-                                    (item.value === "home" && !currentView) ||
+                                    (item.value === "all" && !currentView) ||
                                     currentView === item.value;
 
                                 return (
                                     <SidebarMenuItem key={item.value}>
                                         <SidebarMenuButton
                                             isActive={isActive}
-                                            onClick={() => handleNavigation(item.value)}
-                                            className={isActive ? "bg-primary/10 text-primary font-medium" : ""}
                                             tooltip={state === "collapsed" ? item.title : undefined}
+                                            onClick={() => handleNavigation(item.value)}
                                         >
-                                            <item.icon className={`h-4 w-4 ${isActive ? "text-primary" : ""}`} />
+                                            <item.icon />
                                             <span>{item.title}</span>
-                                            {item.badge}
                                         </SidebarMenuButton>
+                                        {item.badge && (
+                                            <SidebarMenuBadge>
+                                                {item.badge}
+                                            </SidebarMenuBadge>
+                                        )}
                                     </SidebarMenuItem>
                                 );
                             })}
+                        </SidebarMenu>
+
+                        {/* Quick Actions */}
+                        <SidebarMenu>
+                            <SidebarMenuItem>
+                                <SidebarMenuButton 
+                                    className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground"
+                                    onClick={() => {
+                                        // Navigate to the new pitch creation page or open modal
+                                        router.push('/dashboard?create=pitch');
+                                    }}
+                                    tooltip={state === "collapsed" ? "New Pitch" : undefined}
+                                >
+                                    <PlusCircle />
+                                    <span>New Pitch</span>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
                         </SidebarMenu>
                     </>
                 )}
             </SidebarContent>
 
-            <SidebarFooter className="pb-4 pt-2">
-                {state === "collapsed" && (
-                    <div className="flex justify-center mb-4">
-                        <ExpandTrigger />
-                    </div>
+            <SidebarFooter>
+                {organization && (
+                    <SidebarMenu>
+                        <SidebarMenuItem>
+                            <NavUser isDark={isDark} />
+                        </SidebarMenuItem>
+                    </SidebarMenu>
                 )}
-
-                {organization && state === "expanded" && (
-                    <div className="px-4 mb-2">
-                        <Button
-                            className="w-full gap-2 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
-                            size="sm"
-                        >
-                            <PlusCircle className="h-4 w-4" />
-                            New Pitch
-                        </Button>
-                    </div>
-                )}
-
-                {organization && <InviteButton isDark={isDark} />}
-
-                <NavUser isDark={isDark} />
             </SidebarFooter>
             <SidebarRail />
         </Sidebar>

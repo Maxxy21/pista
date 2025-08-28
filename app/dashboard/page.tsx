@@ -4,7 +4,7 @@ import React, { useEffect, useState, Suspense, lazy, useMemo, useCallback } from
 import { useOrganization, useUser } from "@clerk/nextjs";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { SidebarInset } from "@/components/ui/sidebar";
+import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { Loading } from "@/components/auth/loading";
 import { DashboardHeader } from "@/app/dashboard/components/dashboard-header";
 import { DashboardTabs } from "@/app/dashboard/components/dashboard-tabs";
@@ -12,6 +12,7 @@ import { useSearchParams } from "next/navigation";
 import { useDashboardState } from "./hooks/use-dashboard-state";
 import { usePrefetchPitches } from "@/hooks/use-prefetch-pitches";
 import { SkeletonCard } from "@/components/ui/skeleton-card";
+import { Separator } from "@/components/ui/separator";
 
 // Empty state components
 import { EmptyOrg } from "@/app/dashboard/components/empty-org";
@@ -32,7 +33,7 @@ const VirtualizedPitchesGrid = lazy(() =>
 
 // Skeleton loaders
 const StatsSkeleton = () => (
-    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         {Array.from({ length: 4 }).map((_, i) => (
             <SkeletonCard key={i} variant="stat" />
         ))}
@@ -111,33 +112,26 @@ export default function Dashboard() {
     if (!isLoaded) return <Loading />;
 
     return (
-        <SidebarInset className="w-full">
-            <div className="flex flex-col h-full w-full">
-                <DashboardHeader
-                    searchValue={searchValue}
-                    setSearchValue={setSearchValue}
-                    viewMode={viewMode}
-                    setViewMode={setViewMode}
-                    scoreFilter={scoreFilter}
-                    setScoreFilter={setScoreFilter}
-                    sortBy={sortBy}
-                    setSortBy={setSortBy}
-                    handleSearch={handleSearch}
-                    organization={organization}
-                />
-
+        <SidebarInset>
+            <header className="flex h-16 shrink-0 items-center gap-2">
+                <div className="flex items-center gap-2 px-4">
+                    <SidebarTrigger className="-ml-1" />
+                    <Separator orientation="vertical" className="mr-2 h-4" />
+                    <h1 className="text-xl font-semibold">Dashboard</h1>
+                </div>
+            </header>
+            
+            <div className="flex flex-col flex-1">
                 <DashboardTabs
                     currentView={viewParam}
                     handleTabChange={handleTabChange}
                 />
 
-                <div className="w-full px-4 md:px-6 lg:px-8 py-6">
+                <div className="flex-1 flex flex-col space-y-4 p-4 md:p-6">
                     <Suspense fallback={<StatsSkeleton />}>
                         <DashboardStats />
                     </Suspense>
-                </div>
 
-                <div className="w-full px-4 md:px-6 lg:px-8 pb-6 flex-1">
                     {renderEmptyState() || (
                         <Suspense fallback={<PitchesGridSkeleton />}>
                             {useVirtualizedGrid ? (

@@ -1,23 +1,23 @@
 import { useSidebar } from "@/components/ui/sidebar"
-import { ArrowRightFromLine } from "lucide-react";
+import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export function ExpandTrigger() {
-    const { toggleSidebar, state } = useSidebar()
+    const { toggleSidebar, isMobile, openMobile } = useSidebar()
 
     return (
         <Button
             onClick={toggleSidebar}
             variant="ghost"
             size="icon"
-            className={cn(
-                "h-6 w-6 mt-2",
-                state == "expanded" && "rotate-180"
-            )}
+            className="h-8 w-8"
+            aria-label={isMobile ? "Open sidebar" : "Toggle sidebar"}
         >
-            <ArrowRightFromLine className="h-4 w-4" />
-            <span className="sr-only">Toggle Sidebar</span>
+            <Menu className="h-5 w-5" />
+            <span className="sr-only">
+                {isMobile ? "Open sidebar" : "Toggle sidebar"}
+            </span>
         </Button>
     );
 }

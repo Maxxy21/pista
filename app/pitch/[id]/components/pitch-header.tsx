@@ -4,29 +4,12 @@ import Link from "next/link";
 import { useRenameModal } from "@/store/use-rename-modal";
 import { copyToClipboard } from "./utils";
 import { ExportPDFButton } from "./pdf-export";
-import { Id } from "@/convex/_generated/dataModel";
+import { UniversalPitchData } from "@/lib/types/pitch";
+import { getOverallFeedback } from "@/lib/utils/evaluation-utils";
 import React from "react";
 
-interface Evaluation {
-    overallScore: number;
-    overallFeedback: string;
-    evaluations: Array<{
-        criteria: string;
-        score: number;
-        comment: string;
-        strengths: string[];
-        improvements: string[];
-    }>;
-}
-
 interface PitchHeaderProps {
-    data: {
-        _id: Id<"pitches">;
-        title: string;
-        _creationTime: number;
-        text: string;
-        evaluation: Evaluation;
-    };
+    data: UniversalPitchData;
 }
 
 export const PitchHeader: React.FC<PitchHeaderProps> = React.memo(({ data }) => {
@@ -37,8 +20,10 @@ export const PitchHeader: React.FC<PitchHeaderProps> = React.memo(({ data }) => 
     }, [onOpen, data._id, data.title]);
 
     const handleShare = React.useCallback(() => {
-        copyToClipboard(data.evaluation.overallFeedback);
-    }, [data.evaluation.overallFeedback]);
+        const feedback = getOverallFeedback(data.evaluation);
+        const feedbackText = typeof feedback === 'string' ? feedback : feedback.overallAssessment.summary;
+        copyToClipboard(feedbackText);
+    }, [data.evaluation]);
 
     return (
         <header className="sticky top-0 z-10 bg-background/90 backdrop-blur-sm border-b w-full">

@@ -65,16 +65,16 @@ const steps: StepsConfig = {
     pitch: {
         title: "Upload Your Pitch",
         description: "Share your pitch as text, audio, or upload a file",
-        progress: 33,
+        progress: 50,
     },
     questions: {
-        title: "Answer Questions",
+        title: "Answer Questions", // Hidden step
         description: "Respond to follow-up questions to improve your evaluation",
-        progress: 66,
+        progress: 75,
     },
     review: {
         title: "Review and Submit",
-        description: "Review your pitch and responses before getting your evaluation",
+        description: "Review your pitch before getting your evaluation",
         progress: 100,
     },
 };
@@ -171,22 +171,26 @@ export function FileDialog({
             const text = await processContent();
             setPitchText(text);
 
-            const response = await fetch("/api/generate-questions", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ text }),
-            });
+            // Skip Q&A generation for testing with external pitches
+            // const response = await fetch("/api/generate-questions", {
+            //     method: "POST",
+            //     headers: { "Content-Type": "application/json" },
+            //     body: JSON.stringify({ text }),
+            // });
 
-            if (!response.ok) throw new Error("Failed to generate questions");
-            const data = await response.json();
+            // if (!response.ok) throw new Error("Failed to generate questions");
+            // const data = await response.json();
 
-            setQuestions(
-                data.questions.map((q: string) => ({
-                    text: q,
-                    answer: "",
-                }))
-            );
-            setCurrentStep("questions");
+            // setQuestions(
+            //     data.questions.map((q: string) => ({
+            //         text: q,
+            //         answer: "",
+            //     }))
+            // );
+            
+            // Skip questions step and go directly to review
+            setQuestions([]);
+            setCurrentStep("review");
         } catch (error) {
             toast.error("Failed to process pitch");
         } finally {
@@ -297,10 +301,8 @@ export function FileDialog({
                                 Step{" "}
                                 {currentStep === "pitch"
                                     ? 1
-                                    : currentStep === "questions"
-                                    ? 2
-                                    : 3}{" "}
-                                of 3
+                                    : 2}{" "}
+                                of 2
                             </span>
                             <span>{steps[currentStep].progress}% Complete</span>
                         </div>
@@ -588,25 +590,29 @@ export function FileDialog({
                                             </div>
                                         </div>
 
-                                        <Separator />
-
-                                        <div>
-                                            <h3 className="text-lg font-semibold mb-2">
-                                                Follow-up Questions
-                                            </h3>
-                                            <div className="space-y-3">
-                                                {questions.map((q, index) => (
-                                                    <div key={index} className="space-y-1">
-                                                        <p className="text-sm font-medium">
-                                                            {index + 1}. {q.text}
-                                                        </p>
-                                                        <p className="text-sm text-muted-foreground pl-5">
-                                                            {q.answer}
-                                                        </p>
+                                        {/* Q&A section hidden for testing with external pitches */}
+                                        {questions.length > 0 && (
+                                            <>
+                                                <Separator />
+                                                <div>
+                                                    <h3 className="text-lg font-semibold mb-2">
+                                                        Follow-up Questions
+                                                    </h3>
+                                                    <div className="space-y-3">
+                                                        {questions.map((q, index) => (
+                                                            <div key={index} className="space-y-1">
+                                                                <p className="text-sm font-medium">
+                                                                    {index + 1}. {q.text}
+                                                                </p>
+                                                                <p className="text-sm text-muted-foreground pl-5">
+                                                                    {q.answer}
+                                                                </p>
+                                                            </div>
+                                                        ))}
                                                     </div>
-                                                ))}
-                                            </div>
-                                        </div>
+                                                </div>
+                                            </>
+                                        )}
                                     </CardContent>
                                 </Card>
                             </motion.div>

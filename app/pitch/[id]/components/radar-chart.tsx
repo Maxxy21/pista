@@ -81,12 +81,25 @@ export const ScoreRadarChart = ({ data }: RadarChartProps) => {
           >
             <RadarChart data={chartData}>
               <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-              <PolarAngleAxis dataKey="category" />
-              <PolarGrid />
+              <PolarAngleAxis 
+                dataKey="category" 
+                tick={{ 
+                  fontSize: 12, 
+                  fill: 'hsl(var(--foreground))',
+                  textAnchor: 'middle'
+                }}
+                className="text-foreground"
+              />
+              <PolarGrid 
+                stroke="hsl(var(--border))" 
+                strokeOpacity={0.3}
+              />
               <Radar
                 dataKey="score"
                 fill="var(--color-score)"
                 fillOpacity={0.6}
+                stroke="var(--color-score)"
+                strokeWidth={2}
                 animationDuration={1000}
                 animationEasing="ease-out"
                 isAnimationActive

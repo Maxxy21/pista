@@ -1,13 +1,11 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { CopyButton } from "./copy-button";
+import { UniversalPitchData } from "@/lib/types/pitch";
+import { getOverallFeedback } from "@/lib/utils/evaluation-utils";
 import React, { FC, ReactNode, useMemo } from "react";
 
 interface EvaluationSummaryProps {
-    data: {
-        evaluation: {
-            overallFeedback: string;
-        };
-    };
+    data: UniversalPitchData;
 }
 
 const formatFeedback = (text: string): ReactNode[] => {
@@ -44,7 +42,8 @@ const formatFeedback = (text: string): ReactNode[] => {
 };
 
 export const EvaluationSummary: FC<EvaluationSummaryProps> = ({ data }) => {
-    const { overallFeedback } = data.evaluation;
+    const feedback = getOverallFeedback(data.evaluation);
+    const overallFeedback = typeof feedback === 'string' ? feedback : feedback.overallAssessment.summary;
 
     // Memoize formatted feedback for performance
     const formattedFeedback = useMemo(

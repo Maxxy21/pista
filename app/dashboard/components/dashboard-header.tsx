@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { useSidebar } from "@/components/ui/sidebar";
+import { useSidebar, SidebarTrigger } from "@/components/ui/sidebar";
 import { Filter, ArrowDownUp, List, GridIcon } from "lucide-react";
 import { NewPitchButton } from "./new-pitch-button";
 import { SearchForm } from "@/components/search-form";
@@ -71,9 +71,9 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             <div className="px-4 md:px-6 lg:px-8 py-4 w-full">
                 <div className="flex items-center justify-between gap-4">
                     {/* Left section */}
-                    <div className="flex items-center gap-2">
-                        {isMobile && <ExpandTrigger />}
-                        <h1 className="text-2xl font-bold">Dashboard</h1>
+                    <div className="flex items-center gap-2 min-w-0">
+                        {isMobile && <SidebarTrigger />}
+                        <h1 className="text-xl sm:text-2xl font-bold truncate">Dashboard</h1>
                     </div>
 
                     {/* Middle section - Search */}
@@ -89,11 +89,11 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                     </div>
 
                     {/* Right section - Controls */}
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1 sm:gap-2">
                         {/* Score Filter */}
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="outline" className="h-10 gap-2" aria-label="Score Filter">
+                                <Button variant="outline" className="h-9 sm:h-10 gap-1 sm:gap-2" aria-label="Score Filter">
                                     <Filter className="h-4 w-4" />
                                     <span className="hidden md:inline">{scoreFilterLabel}</span>
                                 </Button>
@@ -114,7 +114,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                         {/* Sort By */}
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="outline" className="h-10 gap-2" aria-label="Sort By">
+                                <Button variant="outline" className="h-9 sm:h-10 gap-1 sm:gap-2" aria-label="Sort By">
                                     <ArrowDownUp className="h-4 w-4" />
                                     <span className="hidden md:inline">{sortByLabel}</span>
                                 </Button>
@@ -136,7 +136,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                         <Button
                             variant="outline"
                             size="icon"
-                            className="h-10 w-10"
+                            className="h-9 w-9 sm:h-10 sm:w-10"
                             onClick={handleViewModeToggle}
                             aria-label={`Switch to ${viewMode === "grid" ? "list" : "grid"} view`}
                         >

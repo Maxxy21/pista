@@ -1,5 +1,6 @@
 import * as React from "react"
 
+// Standard shadcn sidebar breakpoint (md: 768px)
 const MOBILE_BREAKPOINT = 768
 
 export function useIsMobile() {

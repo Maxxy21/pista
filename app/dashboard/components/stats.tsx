@@ -35,21 +35,21 @@ const StatCard = memo<StatCardProps>(
                 transition={{ duration: 0.3 }}
             >
                 <Card className={cn("overflow-hidden", className)}>
-                    <CardContent className="p-6">
+                    <CardContent className="p-4 sm:p-6">
                         <div className="flex justify-between items-start">
-                            <div>
+                            <div className="flex-1 min-w-0">
                                 <p className="text-sm font-medium text-muted-foreground mb-1">
                                     {title}
                                 </p>
-                                <h3 className="text-2xl font-bold">{value}</h3>
+                                <h3 className="text-xl sm:text-2xl font-bold truncate">{value}</h3>
                                 {description && (
                                     <p className={cn("text-xs mt-1", trendColor)}>
                                         {description}
                                     </p>
                                 )}
                             </div>
-                            <div className="bg-primary/10 p-2 rounded-full">
-                                <Icon className="h-5 w-5 text-primary" />
+                            <div className="bg-primary/10 p-2 rounded-full ml-2 flex-shrink-0">
+                                <Icon className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                             </div>
                         </div>
                     </CardContent>
@@ -103,7 +103,7 @@ export function DashboardStats() {
     // Loading state
     if (!shouldFetch || !stats) {
         return (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
                 {Array.from({ length: 4 }).map((_, i) => (
                     <SkeletonCard key={i} variant="stat" />
                 ))}
@@ -115,7 +115,7 @@ export function DashboardStats() {
     const mergedStats = { ...defaultStats, ...stats };
 
     return (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
             <StatCard
                 title="Total Pitches"
                 value={mergedStats.totalPitches}

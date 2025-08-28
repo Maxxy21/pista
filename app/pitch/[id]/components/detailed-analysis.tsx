@@ -3,22 +3,12 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CopyButton } from "./copy-button";
 import { cn, getScoreColor } from "./utils";
+import { UniversalPitchData } from "@/lib/types/pitch";
+import { getEvaluations } from "@/lib/utils/evaluation-utils";
 import React, { FC, ReactNode, useMemo } from "react";
 
-interface Evaluation {
-    criteria: string;
-    score: number;
-    comment: string;
-    strengths: string[];
-    improvements: string[];
-}
-
 interface DetailedAnalysisProps {
-    data: {
-        evaluation: {
-            evaluations: Evaluation[];
-        };
-    };
+    data: UniversalPitchData;
 }
 
 // Extracted for readability and reusability
@@ -78,26 +68,34 @@ const ImprovementsList: FC<{ improvements: string[] }> = ({ improvements }) => (
     </div>
 );
 
-const getCopyText = (evaluation: Evaluation) =>
-    [
+const getCopyText = (evaluation: any) => {
+    const comment = evaluation.summary || evaluation.comment || ''
+    const strengths = evaluation.breakdown?.strengths?.map((s: any) => s.point) || evaluation.strengths || []
+    const improvements = evaluation.breakdown?.improvements?.map((i: any) => i.area) || evaluation.improvements || []
+    
+    return [
         evaluation.criteria,
         "",
         `Score: ${evaluation.score.toFixed(1)}/10`,
         "",
-        `Comment: ${evaluation.comment}`,
+        `Comment: ${comment}`,
         "",
         "Strengths:",
-        ...evaluation.strengths.map((s) => `• ${s}`),
+        ...strengths.map((s: string) => `• ${s}`),
         "",
         "Areas for Improvement:",
-        ...evaluation.improvements.map((i) => `• ${i}`),
+        ...improvements.map((i: string) => `• ${i}`),
     ].join("\n");
+}
 
-export const DetailedAnalysis: FC<DetailedAnalysisProps> = ({ data }) => (
-    <div>
-        <h2 className="text-2xl font-bold mb-6">Detailed Analysis</h2>
-        <div className="grid gap-6 md:grid-cols-2">
-            {data.evaluation.evaluations.map((evaluation) => (
+export const DetailedAnalysis: FC<DetailedAnalysisProps> = ({ data }) => {
+    const evaluations = getEvaluations(data.evaluation);
+    
+    return (
+        <div>
+            <h2 className="text-2xl font-bold mb-6">Detailed Analysis</h2>
+            <div className="grid gap-6 md:grid-cols-2">
+                {evaluations.map((evaluation) => (
                 <motion.div
                     key={evaluation.criteria}
                     whileHover={{ y: -5 }}
@@ -113,10 +111,10 @@ export const DetailedAnalysis: FC<DetailedAnalysisProps> = ({ data }) => (
                             </div>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                            <div className="space-y-2">{formatComment(evaluation.comment)}</div>
+                            <div className="space-y-2">{formatComment(evaluation.summary || (evaluation as any).comment || '')}</div>
                             <div className="grid gap-6 md:grid-cols-2">
-                                <StrengthsList strengths={evaluation.strengths} />
-                                <ImprovementsList improvements={evaluation.improvements} />
+                                <StrengthsList strengths={evaluation.breakdown?.strengths?.map(s => s.point) || (evaluation as any).strengths || []} />
+                                <ImprovementsList improvements={evaluation.breakdown?.improvements?.map(i => i.area) || (evaluation as any).improvements || []} />
                             </div>
                             <div className="absolute top-2 right-4">
                                 <CopyButton text={getCopyText(evaluation)} />
@@ -124,7 +122,8 @@ export const DetailedAnalysis: FC<DetailedAnalysisProps> = ({ data }) => (
                         </CardContent>
                     </Card>
                 </motion.div>
-            ))}
+                ))}
+            </div>
         </div>
-    </div>
-);
+    );
+};

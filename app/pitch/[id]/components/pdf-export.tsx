@@ -11,24 +11,11 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { toast } from '@/components/ui/use-toast'
+import { UniversalPitchData } from '@/lib/types/pitch'
+import { getOverallFeedback, getEvaluations } from '@/lib/utils/evaluation-utils'
 
 interface ExportPDFButtonProps {
-  data: {
-    title: string
-    _creationTime: number
-    text: string
-    evaluation: {
-      overallScore: number
-      overallFeedback: string
-      evaluations: Array<{
-        criteria: string
-        score: number
-        comment: string
-        strengths: string[]
-        improvements: string[]
-      }>
-    }
-  }
+  data: UniversalPitchData
 }
 
 export const ExportPDFButton = ({ data }: ExportPDFButtonProps) => {
@@ -73,7 +60,9 @@ export const ExportPDFButton = ({ data }: ExportPDFButtonProps) => {
       
       doc.setFontSize(12)
       doc.setTextColor(44, 62, 80)
-      const feedbackLines = doc.splitTextToSize(data.evaluation.overallFeedback, 170)
+      const feedback = getOverallFeedback(data.evaluation)
+      const feedbackText = typeof feedback === 'string' ? feedback : feedback.overallAssessment.summary
+      const feedbackLines = doc.splitTextToSize(feedbackText, 170)
       doc.text(feedbackLines, 20, 80)
       
       let yPosition = 80 + (feedbackLines.length * 7)
@@ -99,7 +88,8 @@ export const ExportPDFButton = ({ data }: ExportPDFButtonProps) => {
         yPosition += 10 + (transcriptLines.length * 5)
         
         // Add detailed analysis
-        data.evaluation.evaluations.forEach((evaluation) => {
+        const evaluations = getEvaluations(data.evaluation)
+        evaluations.forEach((evaluation) => {
           if (yPosition > 240) {
             doc.addPage()
             yPosition = 20
@@ -118,10 +108,11 @@ export const ExportPDFButton = ({ data }: ExportPDFButtonProps) => {
           
           yPosition += 10
           
-          // Comment
+          // Comment/Summary
           doc.setFontSize(10)
           doc.setTextColor(44, 62, 80)
-          const commentLines = doc.splitTextToSize(evaluation.comment, 170)
+          const comment = evaluation.summary || (evaluation as any).comment || ''
+          const commentLines = doc.splitTextToSize(comment, 170)
           doc.text(commentLines, 20, yPosition)
           
           yPosition += (commentLines.length * 5) + 5
@@ -135,7 +126,8 @@ export const ExportPDFButton = ({ data }: ExportPDFButtonProps) => {
           
           doc.setFontSize(10)
           doc.setTextColor(44, 62, 80)
-          evaluation.strengths.forEach((strength) => {
+          const strengths = evaluation.breakdown?.strengths?.map(s => s.point) || (evaluation as any).strengths || []
+          strengths.forEach((strength: string) => {
             const strengthLines = doc.splitTextToSize(`• ${strength}`, 160)
             doc.text(strengthLines, 25, yPosition)
             yPosition += (strengthLines.length * 5) + 2
@@ -152,7 +144,8 @@ export const ExportPDFButton = ({ data }: ExportPDFButtonProps) => {
           
           doc.setFontSize(10)
           doc.setTextColor(44, 62, 80)
-          evaluation.improvements.forEach((improvement) => {
+          const improvements = evaluation.breakdown?.improvements?.map(i => i.area) || (evaluation as any).improvements || []
+          improvements.forEach((improvement: string) => {
             const improvementLines = doc.splitTextToSize(`• ${improvement}`, 160)
             doc.text(improvementLines, 25, yPosition)
             yPosition += (improvementLines.length * 5) + 2

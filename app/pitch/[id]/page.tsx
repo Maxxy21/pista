@@ -12,6 +12,7 @@ import { SkeletonCard } from "@/components/ui/skeleton-card"
 
 // Import the header component normally as it's needed immediately
 import { PitchHeader } from "./components/pitch-header"
+import { isStructuredEvaluationData } from "@/lib/types/evaluation"
 
 // Lazy load other components
 const TranscriptSection = lazy(() => import("./components/transcript-section").then(mod => ({ default: mod.TranscriptSection })))
@@ -19,6 +20,10 @@ const ScoreOverview = lazy(() => import("./components/score-overview").then(mod 
 const EvaluationSummary = lazy(() => import("./components/evaluation-summary").then(mod => ({ default: mod.EvaluationSummary })))
 const DetailedAnalysis = lazy(() => import("./components/detailed-analysis").then(mod => ({ default: mod.DetailedAnalysis })))
 const QuestionsSection = lazy(() => import("./components/questions-section").then(mod => ({ default: mod.QuestionsSection })))
+
+// New structured components
+const StructuredEvaluationSummary = lazy(() => import("./components/structured-evaluation-summary").then(mod => ({ default: mod.StructuredEvaluationSummary })))
+const StructuredDetailedAnalysis = lazy(() => import("./components/structured-detailed-analysis").then(mod => ({ default: mod.StructuredDetailedAnalysis })))
 
 // Skeleton components for lazy-loaded sections
 const TranscriptSkeleton = () => <SkeletonCard className="h-[200px] mb-6" />
@@ -41,29 +46,47 @@ const PitchDetails = () => {
 
     if (!data) return <Loading />
 
+    // Determine if we should use structured or legacy components
+    const useStructuredComponents = isStructuredEvaluationData(data.evaluation)
+
     return (
         <SidebarInset className="h-screen bg-background">
             <PitchHeader data={data} />
             
             <ScrollArea className="h-[calc(100vh-4rem)]">
-                <div className="container mx-auto py-6 space-y-10">
+                <div className="container mx-auto py-4 px-4 sm:py-6 sm:px-6 space-y-8 sm:space-y-10">
                     <div className="space-y-6">
                         <Suspense fallback={<TranscriptSkeleton />}>
                             <TranscriptSection data={data} />
                         </Suspense>
-                        <Suspense fallback={<QuestionsSkeleton />}>
+                        {/* Q&A section commented out for testing with external pitches */}
+                        {/* <Suspense fallback={<QuestionsSkeleton />}>
                             <QuestionsSection data={data} />
-                        </Suspense>
+                        </Suspense> */}
                     </div>
                     <Suspense fallback={<ScoreOverviewSkeleton />}>
                         <ScoreOverview data={data} />
                     </Suspense>
-                    <Suspense fallback={<EvaluationSummarySkeleton />}>
-                        <EvaluationSummary data={data} />
-                    </Suspense>
-                    <Suspense fallback={<DetailedAnalysisSkeleton />}>
-                        <DetailedAnalysis data={data} />
-                    </Suspense>
+                    
+                    {useStructuredComponents ? (
+                        <>
+                            <Suspense fallback={<EvaluationSummarySkeleton />}>
+                                <StructuredEvaluationSummary data={data} />
+                            </Suspense>
+                            <Suspense fallback={<DetailedAnalysisSkeleton />}>
+                                <StructuredDetailedAnalysis data={data} />
+                            </Suspense>
+                        </>
+                    ) : (
+                        <>
+                            <Suspense fallback={<EvaluationSummarySkeleton />}>
+                                <EvaluationSummary data={data} />
+                            </Suspense>
+                            <Suspense fallback={<DetailedAnalysisSkeleton />}>
+                                <DetailedAnalysis data={data} />
+                            </Suspense>
+                        </>
+                    )}
                 </div>
             </ScrollArea>
         </SidebarInset>
