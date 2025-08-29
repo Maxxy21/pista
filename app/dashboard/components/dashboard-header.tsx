@@ -1,8 +1,8 @@
 import React, { useCallback, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { useSidebar, SidebarTrigger } from "@/components/ui/sidebar";
+import { Separator } from "@/components/ui/separator";
 import { Filter, ArrowDownUp, List, GridIcon } from "lucide-react";
-import { NewPitchButton } from "./new-pitch-button";
 import { SearchForm } from "@/components/search-form";
 import {
     DropdownMenu,
@@ -11,7 +11,6 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { OrganizationResource } from "@clerk/types";
-import { ExpandTrigger } from "@/components/expand-trigger";
 
 interface DashboardHeaderProps {
     searchValue: string;
@@ -68,106 +67,94 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
 
     return (
         <div className="border-b">
-            <div className="px-4 md:px-6 lg:px-8 py-4 w-full">
-                <div className="flex items-center justify-between gap-4">
-                    {/* Left section */}
-                    <div className="flex items-center gap-2 min-w-0">
-                        {isMobile && <SidebarTrigger />}
-                        <h1 className="text-xl sm:text-2xl font-bold truncate">Dashboard</h1>
-                    </div>
-
-                    {/* Middle section - Search */}
-                    <div className="hidden md:flex flex-1 justify-center max-w-xl mx-auto">
-                        <SearchForm
-                            value={searchValue}
-                            onChange={setSearchValue}
-                            className="w-full max-w-md"
-                            placeholder="Search pitches..."
-                            variant="standalone"
-                            autoFocus={false}
-                        />
-                    </div>
-
-                    {/* Right section - Controls */}
-                    <div className="flex items-center gap-1 sm:gap-2">
-                        {/* Score Filter */}
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="outline" className="h-9 sm:h-10 gap-1 sm:gap-2" aria-label="Score Filter">
-                                    <Filter className="h-4 w-4" />
-                                    <span className="hidden md:inline">{scoreFilterLabel}</span>
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                                {Object.entries(SCORE_FILTER_LABELS).map(([key, label]) => (
-                                    <DropdownMenuItem
-                                        key={key}
-                                        onClick={() => setScoreFilter(key)}
-                                        aria-selected={scoreFilter === key}
-                                    >
-                                        {label}
-                                    </DropdownMenuItem>
-                                ))}
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-
-                        {/* Sort By */}
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="outline" className="h-9 sm:h-10 gap-1 sm:gap-2" aria-label="Sort By">
-                                    <ArrowDownUp className="h-4 w-4" />
-                                    <span className="hidden md:inline">{sortByLabel}</span>
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                                {Object.entries(SORT_BY_LABELS).map(([key, label]) => (
-                                    <DropdownMenuItem
-                                        key={key}
-                                        onClick={() => setSortBy(key as DashboardHeaderProps["sortBy"])}
-                                        aria-selected={sortBy === key}
-                                    >
-                                        {label}
-                                    </DropdownMenuItem>
-                                ))}
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-
-                        {/* View Mode Toggle */}
-                        <Button
-                            variant="outline"
-                            size="icon"
-                            className="h-9 w-9 sm:h-10 sm:w-10"
-                            onClick={handleViewModeToggle}
-                            aria-label={`Switch to ${viewMode === "grid" ? "list" : "grid"} view`}
-                        >
-                            {viewMode === "grid" ? (
-                                <List className="h-4 w-4" />
-                            ) : (
-                                <GridIcon className="h-4 w-4" />
-                            )}
-                        </Button>
-
-                        {/* New Pitch Button */}
-                        {organization && (
-                            <NewPitchButton
-                                orgId={organization.id as string}
-                                className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
-                            />
-                        )}
-                    </div>
-                </div>
-
-                {/* Mobile search - shown below header on small screens */}
-                <div className="md:hidden mt-4">
+            <div className="flex h-16 shrink-0 items-center gap-2 px-4 md:px-6 lg:px-8 w-full">
+                <SidebarTrigger className="-ml-1" />
+                <Separator orientation="vertical" className="mr-2 h-4" />
+                <h1 className="text-lg font-semibold">Dashboard</h1>
+                
+                {/* Middle section - Search */}
+                <div className="hidden md:flex flex-1 justify-center max-w-xl mx-4">
                     <SearchForm
                         value={searchValue}
                         onChange={setSearchValue}
-                        className="w-full"
+                        className="w-full max-w-md"
                         placeholder="Search pitches..."
                         variant="standalone"
                         autoFocus={false}
                     />
                 </div>
+
+                {/* Right section - Controls */}
+                <div className="flex items-center gap-2 ml-auto">
+                    {/* Score Filter */}
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="outline" className="h-8 gap-1 sm:gap-2" aria-label="Score Filter">
+                                <Filter className="h-3.5 w-3.5" />
+                                <span className="hidden md:inline text-sm">{scoreFilterLabel}</span>
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            {Object.entries(SCORE_FILTER_LABELS).map(([key, label]) => (
+                                <DropdownMenuItem
+                                    key={key}
+                                    onClick={() => setScoreFilter(key)}
+                                    aria-selected={scoreFilter === key}
+                                >
+                                    {label}
+                                </DropdownMenuItem>
+                            ))}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+
+                    {/* Sort By */}
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="outline" className="h-8 gap-1 sm:gap-2" aria-label="Sort By">
+                                <ArrowDownUp className="h-3.5 w-3.5" />
+                                <span className="hidden md:inline text-sm">{sortByLabel}</span>
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            {Object.entries(SORT_BY_LABELS).map(([key, label]) => (
+                                <DropdownMenuItem
+                                    key={key}
+                                    onClick={() => setSortBy(key as DashboardHeaderProps["sortBy"])}
+                                    aria-selected={sortBy === key}
+                                >
+                                    {label}
+                                </DropdownMenuItem>
+                            ))}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+
+                    {/* View Mode Toggle */}
+                    <Button
+                        variant="outline"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={handleViewModeToggle}
+                        aria-label={`Switch to ${viewMode === "grid" ? "list" : "grid"} view`}
+                    >
+                        {viewMode === "grid" ? (
+                            <List className="h-3.5 w-3.5" />
+                        ) : (
+                            <GridIcon className="h-3.5 w-3.5" />
+                        )}
+                    </Button>
+                </div>
+            </div>
+            
+            {/* Mobile search - shown below header on small screens */}
+            <div className="md:hidden px-4 pb-4">
+                <SearchForm
+                    value={searchValue}
+                    onChange={setSearchValue}
+                    className="w-full"
+                    placeholder="Search pitches..."
+                    variant="standalone"
+                    autoFocus={false}
+                />
             </div>
         </div>
     );

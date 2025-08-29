@@ -13,6 +13,7 @@ export const EmptyPitches = ({ orgId }: EmptyPitchesProps) => {
             imageSrc="/empty-favorites.svg"
             imageAlt="No pitches"
             imageSize={110}
+            className="min-h-[60vh]"
             action={
                 <NewPitchButton 
                     orgId={orgId}

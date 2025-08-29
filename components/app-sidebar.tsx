@@ -6,12 +6,10 @@ import {
     Clock,
     Star,
     PlusCircle,
+    Search,
 } from "lucide-react";
 import { useOrganization } from "@clerk/nextjs";
 import { useTheme } from "next-themes";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useDebounceValue } from "usehooks-ts";
-import qs from "query-string";
 import { motion } from "framer-motion";
 
 import {
@@ -28,6 +26,7 @@ import {
     useSidebar,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import { NavUser } from "@/components/nav-user";
 import { TeamSwitcher } from "@/components/team-switcher";
 import { SearchForm } from "@/components/search-form";
@@ -56,38 +55,20 @@ const NAVIGATION_ITEMS = [
     },
 ];
 
-export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
+interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
+    searchValue?: string;
+    onSearchChange?: (value: string) => void;
+}
+
+export function AppSidebar({ searchValue = "", onSearchChange, ...props }: AppSidebarProps) {
     const { organization, isLoaded } = useOrganization();
     const { resolvedTheme } = useTheme();
     const isDark = resolvedTheme === "dark";
-    const router = useRouter();
-    const searchParams = useSearchParams();
-    const [search, setSearch] = React.useState("");
-    const [debouncedSearch] = useDebounceValue(search, 500);
     const { state } = useSidebar();
-
-    React.useEffect(() => {
-        const url = qs.stringifyUrl(
-            {
-                url: window.location.pathname,
-                query: {
-                    ...Object.fromEntries(searchParams.entries()),
-                    search: debouncedSearch,
-                },
-            },
-            { skipEmptyString: true, skipNull: true }
-        );
-        router.push(url);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [debouncedSearch]);
-
-    const handleSearchChange = React.useCallback((value: string) => {
-        setSearch(value);
-    }, []);
 
     const handleNavigation = React.useCallback(
         (value: string) => {
-            const current = new URLSearchParams(Array.from(searchParams.entries()));
+            const current = new URLSearchParams(window.location.search);
 
             if (value === "all") {
                 current.delete("view");
@@ -98,18 +79,18 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
             const searchString = current.toString();
             const query = searchString ? `?${searchString}` : "";
 
-            router.replace(`/dashboard${query}`);
+            window.location.href = `/dashboard${query}`;
         },
-        [router, searchParams]
+        []
     );
 
-    const currentView = searchParams.get("view");
+    const currentView = new URLSearchParams(window.location.search).get("view");
 
     return (
         <Sidebar collapsible="icon" {...props}>
             <SidebarHeader className="py-4">
                 {state === "collapsed" ? (
-                    <div className="flex justify-center">
+                    <div className="flex flex-col items-center space-y-3">
                         <motion.div
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.95 }}
@@ -117,27 +98,35 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
                         >
                             <LogoIcon className="h-6 w-6 text-primary" />
                         </motion.div>
+                        {isLoaded && organization && onSearchChange && (
+                            <SearchForm
+                                value={searchValue}
+                                onChange={onSearchChange}
+                                placeholder="Search pitches..."
+                                variant="sidebar"
+                            />
+                        )}
                     </div>
                 ) : (
                     <div className="px-4 space-y-4">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-3">
                             <motion.div
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
-                                className="bg-primary/10 p-2 rounded-lg"
+                                className="bg-gradient-to-br from-primary/20 to-primary/10 p-2.5 rounded-xl shadow-sm"
                             >
-                                <LogoIcon className="h-5 w-5 text-primary" />
+                                <LogoIcon className="h-6 w-6 text-primary" />
                             </motion.div>
-                            <h1 className="text-lg font-semibold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70">
+                            <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70">
                                 Pista
                             </h1>
                         </div>
-                        {isLoaded && organization && (
+                        {isLoaded && organization && onSearchChange && (
                             <>
                                 <TeamSwitcher isDark={isDark} />
                                 <SearchForm
-                                    value={search}
-                                    onChange={handleSearchChange}
+                                    value={searchValue}
+                                    onChange={onSearchChange}
                                     placeholder="Search pitches..."
                                     variant="sidebar"
                                 />
@@ -147,46 +136,60 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
                 )}
             </SidebarHeader>
 
-            <SidebarContent className="px-2">
+            <SidebarContent className="px-2 flex flex-col">
                 {organization && (
                     <>
-                        <SidebarGroupLabel className="px-4 pt-2">
-                            Navigation
-                        </SidebarGroupLabel>
-                        <SidebarMenu>
-                            {NAVIGATION_ITEMS.map((item) => {
-                                const isActive =
-                                    (item.value === "all" && !currentView) ||
-                                    currentView === item.value;
+                        <div className="flex-1 py-2">
+                            <SidebarGroupLabel className="px-4 pt-2 pb-1 text-xs font-medium text-muted-foreground/70">
+                                Navigation
+                            </SidebarGroupLabel>
+                            <SidebarMenu className="mb-6 space-y-1">
+                                {NAVIGATION_ITEMS.map((item) => {
+                                    const isActive =
+                                        (item.value === "all" && !currentView) ||
+                                        currentView === item.value;
 
-                                return (
-                                    <SidebarMenuItem key={item.value}>
-                                        <SidebarMenuButton
-                                            isActive={isActive}
-                                            tooltip={state === "collapsed" ? item.title : undefined}
-                                            onClick={() => handleNavigation(item.value)}
-                                        >
-                                            <item.icon />
-                                            <span>{item.title}</span>
-                                        </SidebarMenuButton>
-                                        {item.badge && (
-                                            <SidebarMenuBadge>
-                                                {item.badge}
-                                            </SidebarMenuBadge>
-                                        )}
-                                    </SidebarMenuItem>
-                                );
-                            })}
-                        </SidebarMenu>
+                                    return (
+                                        <SidebarMenuItem key={item.value}>
+                                            <SidebarMenuButton
+                                                isActive={isActive}
+                                                tooltip={state === "collapsed" ? item.title : undefined}
+                                                onClick={() => handleNavigation(item.value)}
+                                                className="rounded-lg transition-all duration-200 hover:shadow-sm"
+                                            >
+                                                <item.icon className="h-4 w-4" />
+                                                <span className="font-medium">{item.title}</span>
+                                            </SidebarMenuButton>
+                                            {item.badge && (
+                                                <SidebarMenuBadge className="bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xs font-medium">
+                                                    {item.badge}
+                                                </SidebarMenuBadge>
+                                            )}
+                                        </SidebarMenuItem>
+                                    );
+                                })}
+                            </SidebarMenu>
 
-                        {/* Quick Actions */}
-                        <SidebarMenu>
+                        </div>
+                    </>
+                )}
+            </SidebarContent>
+
+            <div className="px-2 mb-2">
+                <Separator className="bg-gradient-to-r from-transparent via-border to-transparent" />
+            </div>
+
+            <SidebarFooter className="p-2 space-y-2">
+                {organization && (
+                    <>
+                        {/* Action Buttons */}
+                        <SidebarMenu className="space-y-1">
                             <SidebarMenuItem>
                                 <SidebarMenuButton 
-                                    className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground"
+                                    className="bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary/80 text-primary-foreground font-medium shadow-sm transition-all duration-200"
                                     onClick={() => {
                                         // Navigate to the new pitch creation page or open modal
-                                        router.push('/dashboard?create=pitch');
+                                        window.location.href = '/dashboard?create=pitch';
                                     }}
                                     tooltip={state === "collapsed" ? "New Pitch" : undefined}
                                 >
@@ -194,18 +197,18 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
                                     <span>New Pitch</span>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
+                            <SidebarMenuItem>
+                                <InviteButton isDark={isDark} />
+                            </SidebarMenuItem>
+                        </SidebarMenu>
+                        
+                        {/* User Profile */}
+                        <SidebarMenu>
+                            <SidebarMenuItem>
+                                <NavUser isDark={isDark} />
+                            </SidebarMenuItem>
                         </SidebarMenu>
                     </>
-                )}
-            </SidebarContent>
-
-            <SidebarFooter>
-                {organization && (
-                    <SidebarMenu>
-                        <SidebarMenuItem>
-                            <NavUser isDark={isDark} />
-                        </SidebarMenuItem>
-                    </SidebarMenu>
                 )}
             </SidebarFooter>
             <SidebarRail />

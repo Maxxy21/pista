@@ -34,29 +34,46 @@ export function SearchForm({
     const [debouncedValue] = useDebounceValue(value, 500);
     const [isFocused, setIsFocused] = React.useState(false);
 
+    // Only update URL for standalone variant (dashboard header)
+    // Sidebar variant is handled by parent component  
     useEffect(() => {
-        const current = new URLSearchParams(Array.from(searchParams.entries()));
+        if (variant === "standalone" && typeof window !== 'undefined') {
+            const current = new URLSearchParams(Array.from(searchParams.entries()));
 
-        if (debouncedValue) {
-            current.set("search", debouncedValue);
-        } else {
-            current.delete("search");
+            if (debouncedValue) {
+                current.set("search", debouncedValue);
+            } else {
+                current.delete("search");
+            }
+
+            const search = current.toString();
+            const query = search ? `?${search}` : "";
+
+            router.push(`${pathname}${query}`);
         }
-
-        const search = current.toString();
-        const query = search ? `?${search}` : "";
-
-        router.push(`${pathname}${query}`);
-    }, [debouncedValue, pathname, router, searchParams]);
+    }, [debouncedValue, pathname, router, searchParams, variant]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         onChange(e.target.value);
     };
 
-    const clearSearch = () => {
+    const clearSearch = React.useCallback((e?: React.MouseEvent | React.TouchEvent) => {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        // Force immediate clear for both local state and parent
         onChange("");
-        inputRef.current?.focus();
-    };
+        
+        // Also directly clear the input value to ensure immediate UI update
+        if (inputRef.current) {
+            inputRef.current.value = "";
+        }
+        
+        setTimeout(() => {
+            inputRef.current?.focus();
+        }, 0);
+    }, [onChange]);
 
     useEffect(() => {
         if (autoFocus && inputRef.current) {
@@ -82,7 +99,7 @@ export function SearchForm({
                         ref={inputRef}
                         id="search-standalone"
                         placeholder={placeholder}
-                        className="pl-10 pr-8 w-full border-input bg-background"
+                        className="pl-10 pr-9 w-full border-input bg-background h-10"
                         value={value}
                         onChange={handleChange}
                         onFocus={() => setIsFocused(true)}
@@ -95,11 +112,12 @@ export function SearchForm({
                                 animate={{ opacity: 1, scale: 1 }}
                                 exit={{ opacity: 0, scale: 0.8 }}
                                 type="button"
-                                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full h-5 w-5 flex items-center justify-center bg-muted hover:bg-muted-foreground/20 transition-colors"
+                                className="absolute right-2.5 top-2.5 h-5 w-5 rounded-full flex items-center justify-center bg-muted/70 hover:bg-muted-foreground/20 transition-colors cursor-pointer z-10"
                                 onClick={clearSearch}
+                                onMouseDown={(e) => e.preventDefault()}
                                 aria-label="Clear search"
                             >
-                                <X className="h-3 w-3 text-muted-foreground" />
+                                <X className="h-3 w-3 text-muted-foreground hover:text-foreground" />
                             </motion.button>
                         )}
                     </AnimatePresence>
@@ -109,63 +127,45 @@ export function SearchForm({
     }
 
     // Sidebar search input
+    if (state === "collapsed") {
+        return null;
+    }
+
     return (
         <form
             onSubmit={(e) => e.preventDefault()}
             className={className}
         >
-            <SidebarGroup className="py-0">
-                <SidebarGroupContent className="relative">
-                    <Label htmlFor="search" className="sr-only">
-                        Search
-                    </Label>
-                    {state === "collapsed" ? (
-                        <Hint label="Search" side="right" sideOffset={12}>
-                            <button
-                                type="button"
-                                className="p-2 rounded-lg transition-colors hover:bg-primary/10"
-                                onClick={toggleSidebar}
-                            >
-                                <Search className="h-4 w-4 text-muted-foreground"/>
-                            </button>
-                        </Hint>
-                    ) : (
-                        <div className={cn(
-                            "relative rounded-lg transition-all duration-200",
-                            isFocused && "ring-1 ring-primary/50 bg-muted/40"
-                        )}>
-                            <Search
-                                className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
-                            />
-                            <SidebarInput
-                                ref={inputRef}
-                                id="search"
-                                placeholder={placeholder}
-                                className="pl-10 pr-8 w-full border-none shadow-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
-                                value={value}
-                                onChange={handleChange}
-                                onFocus={() => setIsFocused(true)}
-                                onBlur={() => setIsFocused(false)}
-                            />
-                            <AnimatePresence>
-                                {value && (
-                                    <motion.button
-                                        initial={{ opacity: 0, scale: 0.8 }}
-                                        animate={{ opacity: 1, scale: 1 }}
-                                        exit={{ opacity: 0, scale: 0.8 }}
-                                        type="button"
-                                        className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full h-5 w-5 flex items-center justify-center bg-muted hover:bg-muted-foreground/20 transition-colors"
-                                        onClick={clearSearch}
-                                        aria-label="Clear search"
-                                    >
-                                        <X className="h-3 w-3 text-muted-foreground" />
-                                    </motion.button>
-                                )}
-                            </AnimatePresence>
-                        </div>
-                    )}
-                </SidebarGroupContent>
-            </SidebarGroup>
+            <div className={cn(
+                "relative rounded-lg transition-all duration-200",
+                isFocused && "ring-1 ring-primary/50 bg-muted/40"
+            )}>
+                <Search
+                    className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+                />
+                <SidebarInput
+                    ref={inputRef}
+                    id="search"
+                    placeholder={placeholder}
+                    className="pl-10 pr-9 w-full border-none shadow-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 h-8"
+                    value={value}
+                    onChange={handleChange}
+                    onFocus={() => setIsFocused(true)}
+                    onBlur={() => setIsFocused(false)}
+                />
+                {value && (
+                    <button
+                        type="button"
+                        className="absolute right-2.5 top-1.5 h-5 w-5 rounded-full flex items-center justify-center bg-muted/70 hover:bg-muted-foreground/20 transition-colors cursor-pointer z-20"
+                        onClick={clearSearch}
+                        onMouseDown={(e) => e.preventDefault()}
+                        onTouchStart={clearSearch}
+                        aria-label="Clear search"
+                    >
+                        <X className="h-3 w-3 text-muted-foreground hover:text-foreground" />
+                    </button>
+                )}
+            </div>
         </form>
     );
 }

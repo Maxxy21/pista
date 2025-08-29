@@ -7,7 +7,7 @@ export const EmptyFavorites = () => {
             description="Try favoriting a pitch to see it here"
             imageSrc="/empty-favorites.svg"
             imageAlt="No favorites"
-            className="h-[calc(100vh-16rem)]"
+            className="min-h-[60vh]"
         />
     );
 }; 

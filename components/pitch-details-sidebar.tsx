@@ -14,7 +14,9 @@ import {
     Calendar,
     FileText,
     Clock8,
-    Folder
+    Folder,
+    PlusCircle,
+    UserPlus
 } from "lucide-react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { useOrganization, useAuth, useUser } from "@clerk/nextjs";
@@ -170,7 +172,7 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
         <Sidebar collapsible="icon" className="border-r" {...props}>
             <SidebarHeader className="py-4">
                 {state === "collapsed" ? (
-                    <div className="flex justify-center">
+                    <div className="flex flex-col items-center space-y-3">
                         <motion.div
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.95 }}
@@ -181,29 +183,29 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
                     </div>
                 ) : (
                     <div className="px-4 space-y-4">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <motion.div
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                    className="bg-primary/10 p-2 rounded-lg"
-                                >
-                                    <LogoIcon className="h-5 w-5 text-primary" />
-                                </motion.div>
-                                <h1 className="text-lg font-semibold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70">
-                                    Pista
-                                </h1>
-                            </div>
-                            <SidebarTrigger />
+                        <div className="flex items-center gap-3">
+                            <motion.div
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                className="bg-gradient-to-br from-primary/20 to-primary/10 p-2.5 rounded-xl shadow-sm"
+                            >
+                                <LogoIcon className="h-6 w-6 text-primary" />
+                            </motion.div>
+                            <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70">
+                                Pista
+                            </h1>
                         </div>
-                        <div className="relative">
-                            <SearchForm
-                                value={search}
-                                onChange={setSearch}
-                                placeholder="Search pitches..."
-                                variant="sidebar"
-                            />
-                        </div>
+                        {isAuthLoaded && organization && (
+                            <>
+                                <TeamSwitcher isDark={isDark} />
+                                <SearchForm
+                                    value={search}
+                                    onChange={setSearch}
+                                    placeholder="Search pitches..."
+                                    variant="sidebar"
+                                />
+                            </>
+                        )}
                     </div>
                 )}
             </SidebarHeader>
@@ -317,71 +319,74 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
                             </div>
                         </div>
                     ) : (
-                        <SidebarMenu>
-                            <TooltipProvider>
+                        <div className="px-2 py-2">
+                            <SidebarMenu className="space-y-1">
                                 <SidebarMenuItem>
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <SidebarMenuButton
-                                                onClick={handleBack}
-                                                className="rounded-lg"
-                                            >
-                                                <Home className="h-4 w-4" />
-                                            </SidebarMenuButton>
-                                        </TooltipTrigger>
-                                        <TooltipContent side="right">
-                                            Back to Dashboard
-                                        </TooltipContent>
-                                    </Tooltip>
+                                    <SidebarMenuButton
+                                        onClick={handleBack}
+                                        className="rounded-lg transition-all duration-200 hover:shadow-sm"
+                                        tooltip="Back to Dashboard"
+                                    >
+                                        <Home className="h-4 w-4" />
+                                    </SidebarMenuButton>
                                 </SidebarMenuItem>
                                 <SidebarMenuItem>
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <SidebarMenuButton className="rounded-lg">
-                                                <Star className="h-4 w-4" />
-                                            </SidebarMenuButton>
-                                        </TooltipTrigger>
-                                        <TooltipContent side="right">
-                                            Favorite Pitch
-                                        </TooltipContent>
-                                    </Tooltip>
+                                    <SidebarMenuButton 
+                                        className="rounded-lg transition-all duration-200 hover:shadow-sm"
+                                        tooltip="Favorite Pitch"
+                                    >
+                                        <Star className="h-4 w-4" />
+                                    </SidebarMenuButton>
                                 </SidebarMenuItem>
                                 <SidebarMenuItem>
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <SidebarMenuButton className="rounded-lg">
-                                                <FileText className="h-4 w-4" />
-                                            </SidebarMenuButton>
-                                        </TooltipTrigger>
-                                        <TooltipContent side="right">
-                                            All Pitches
-                                        </TooltipContent>
-                                    </Tooltip>
+                                    <SidebarMenuButton 
+                                        className="rounded-lg transition-all duration-200 hover:shadow-sm"
+                                        tooltip="All Pitches"
+                                        onClick={handleBack}
+                                    >
+                                        <FileText className="h-4 w-4" />
+                                    </SidebarMenuButton>
                                 </SidebarMenuItem>
-                            </TooltipProvider>
-                        </SidebarMenu>
+                            </SidebarMenu>
+                        </div>
                     )}
                 </ScrollArea>
             </SidebarContent>
 
-            <SidebarFooter className="pb-4 pt-2">
-                {state === "collapsed" && (
-                    <div className="flex justify-center pb-2">
-                        <SidebarTrigger />
-                    </div>
+            <div className="px-2 mb-2">
+                <Separator className="bg-gradient-to-r from-transparent via-border to-transparent" />
+            </div>
+
+            <SidebarFooter className="p-2 space-y-2">
+                {organization && (
+                    <>
+                        {/* Action Buttons */}
+                        <SidebarMenu className="space-y-1">
+                            <SidebarMenuItem>
+                                <SidebarMenuButton 
+                                    className="bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary/80 text-primary-foreground font-medium shadow-sm transition-all duration-200"
+                                    onClick={() => {
+                                        router.push('/dashboard?create=pitch');
+                                    }}
+                                    tooltip={state === "collapsed" ? "New Pitch" : undefined}
+                                >
+                                    <PlusCircle />
+                                    <span>New Pitch</span>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                            <SidebarMenuItem>
+                                <InviteButton isDark={isDark} />
+                            </SidebarMenuItem>
+                        </SidebarMenu>
+                        
+                        {/* User Profile */}
+                        <SidebarMenu>
+                            <SidebarMenuItem>
+                                <NavUser isDark={isDark} />
+                            </SidebarMenuItem>
+                        </SidebarMenu>
+                    </>
                 )}
-                {organization && state === "expanded" && (
-                    <div className="px-4 mb-2">
-                        <Button
-                            className="w-full gap-2 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
-                            size="sm"
-                        >
-                            <Plus className="h-4 w-4" />
-                            New Pitch
-                        </Button>
-                    </div>
-                )}
-                <NavUser isDark={isDark} />
             </SidebarFooter>
             <SidebarRail />
         </Sidebar>
