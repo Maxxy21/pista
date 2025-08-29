@@ -257,12 +257,10 @@ export const getFilteredPitches = query({
     handler: async (ctx, args) => {
         const identity = await validateUser(ctx);
 
-        // Base query
+        // Base query - get all pitches in organization
         let pitches = await ctx.db
             .query("pitches")
-            .withIndex("by_user_org", (q) =>
-                q.eq("userId", identity.subject).eq("orgId", args.orgId)
-            )
+            .withIndex("by_org", (q) => q.eq("orgId", args.orgId))
             .collect();
 
         // Apply filters

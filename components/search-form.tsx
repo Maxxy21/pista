@@ -54,6 +54,7 @@ export function SearchForm({
     }, [debouncedValue, pathname, router, searchParams, variant]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        console.log('Input changed to:', `"${e.target.value}"`);
         onChange(e.target.value);
     };
 
@@ -62,14 +63,11 @@ export function SearchForm({
             e.preventDefault();
             e.stopPropagation();
         }
-        // Force immediate clear for both local state and parent
+        console.log('Clear search clicked, calling onChange with empty string');
+        // Clear search through parent component
         onChange("");
         
-        // Also directly clear the input value to ensure immediate UI update
-        if (inputRef.current) {
-            inputRef.current.value = "";
-        }
-        
+        // Focus the input after clearing
         setTimeout(() => {
             inputRef.current?.focus();
         }, 0);
@@ -127,9 +125,7 @@ export function SearchForm({
     }
 
     // Sidebar search input
-    if (state === "collapsed") {
-        return null;
-    }
+    // Note: Don't return null for collapsed state as it might be used in other sidebars
 
     return (
         <form
@@ -159,7 +155,6 @@ export function SearchForm({
                         className="absolute right-2.5 top-1.5 h-5 w-5 rounded-full flex items-center justify-center bg-muted/70 hover:bg-muted-foreground/20 transition-colors cursor-pointer z-20"
                         onClick={clearSearch}
                         onMouseDown={(e) => e.preventDefault()}
-                        onTouchStart={clearSearch}
                         aria-label="Clear search"
                     >
                         <X className="h-3 w-3 text-muted-foreground hover:text-foreground" />

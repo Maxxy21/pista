@@ -1,4 +1,7 @@
-import { DashboardLayoutWrapper } from "@/components/dashboard-layout-wrapper";
+import { AppSidebar } from "@/components/app-sidebar"
+import {
+    SidebarProvider,
+} from "@/components/ui/sidebar"
 import {cookies} from "next/headers";
 
 export default async function DashboardLayout({children}: { children: React.ReactNode }) {
@@ -6,8 +9,11 @@ export default async function DashboardLayout({children}: { children: React.Reac
     const defaultOpen = cookieStore.get("sidebar:state")?.value === "true"
 
     return (
-        <DashboardLayoutWrapper defaultOpen={defaultOpen}>
-            {children}
-        </DashboardLayoutWrapper>
+        <SidebarProvider defaultOpen={defaultOpen}>
+            <AppSidebar />
+            <main className="flex-1 overflow-auto">
+                {children}
+            </main>
+        </SidebarProvider>
     )
 }

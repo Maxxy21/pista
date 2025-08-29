@@ -6,7 +6,6 @@ import {
     Clock,
     Star,
     PlusCircle,
-    Search,
 } from "lucide-react";
 import { useOrganization } from "@clerk/nextjs";
 import { useTheme } from "next-themes";
@@ -26,11 +25,9 @@ import {
     SidebarGroupLabel,
     useSidebar,
 } from "@/components/ui/sidebar";
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { NavUser } from "@/components/nav-user";
 import { TeamSwitcher } from "@/components/team-switcher";
-import { SearchForm } from "@/components/search-form";
 import { InviteButton } from "@/components/invite-button";
 import LogoIcon from "@/components/ui/logo-icon";
 
@@ -56,12 +53,7 @@ const NAVIGATION_ITEMS = [
     },
 ];
 
-interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
-    searchValue?: string;
-    onSearchChange?: (value: string) => void;
-}
-
-export function AppSidebar({ searchValue = "", onSearchChange, ...props }: AppSidebarProps) {
+export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
     const { organization, isLoaded } = useOrganization();
     const { resolvedTheme } = useTheme();
     const isDark = resolvedTheme === "dark";
@@ -101,14 +93,6 @@ export function AppSidebar({ searchValue = "", onSearchChange, ...props }: AppSi
                         >
                             <LogoIcon className="h-6 w-6 text-primary" />
                         </motion.div>
-                        {isLoaded && organization && onSearchChange && (
-                            <SearchForm
-                                value={searchValue}
-                                onChange={onSearchChange}
-                                placeholder="Search pitches..."
-                                variant="sidebar"
-                            />
-                        )}
                     </div>
                 ) : (
                     <div className="px-4 space-y-4">
@@ -124,16 +108,8 @@ export function AppSidebar({ searchValue = "", onSearchChange, ...props }: AppSi
                                 Pista
                             </h1>
                         </div>
-                        {isLoaded && organization && onSearchChange && (
-                            <>
-                                <TeamSwitcher isDark={isDark} />
-                                <SearchForm
-                                    value={searchValue}
-                                    onChange={onSearchChange}
-                                    placeholder="Search pitches..."
-                                    variant="sidebar"
-                                />
-                            </>
+                        {isLoaded && organization && (
+                            <TeamSwitcher isDark={isDark} />
                         )}
                     </div>
                 )}
@@ -172,7 +148,6 @@ export function AppSidebar({ searchValue = "", onSearchChange, ...props }: AppSi
                                     );
                                 })}
                             </SidebarMenu>
-
                         </div>
                     </>
                 )}
@@ -191,7 +166,6 @@ export function AppSidebar({ searchValue = "", onSearchChange, ...props }: AppSi
                                 <SidebarMenuButton 
                                     className="bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary/80 text-primary-foreground font-medium shadow-sm transition-all duration-200"
                                     onClick={() => {
-                                        // Navigate to the new pitch creation page or open modal
                                         router.push('/dashboard?create=pitch');
                                     }}
                                     tooltip={state === "collapsed" ? "New Pitch" : undefined}
