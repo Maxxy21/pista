@@ -478,6 +478,13 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
                             </SidebarMenuItem>
                         </SidebarMenu>
                         
+                        {/* Team Switcher */}
+                        <SidebarMenu>
+                            <SidebarMenuItem>
+                                <TeamSwitcher isDark={isDark} />
+                            </SidebarMenuItem>
+                        </SidebarMenu>
+                        
                         {/* User Profile */}
                         <SidebarMenu>
                             <SidebarMenuItem>

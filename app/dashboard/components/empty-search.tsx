@@ -26,7 +26,7 @@ export const EmptySearch = () => {
                 </h2>
                 
                 <p className="text-muted-foreground text-base max-w-md mx-auto leading-relaxed">
-                    We couldn't find any pitches matching your search. Try adjusting your search terms or filters.
+                    We couldn&apos;t find any pitches matching your search. Try adjusting your search terms or filters.
                 </p>
             </motion.div>
         </div>

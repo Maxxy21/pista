@@ -108,9 +108,6 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
                                 Pista
                             </h1>
                         </div>
-                        {isLoaded && organization && (
-                            <TeamSwitcher isDark={isDark} />
-                        )}
                     </div>
                 )}
             </SidebarHeader>
@@ -178,6 +175,15 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
                                 <InviteButton isDark={isDark} />
                             </SidebarMenuItem>
                         </SidebarMenu>
+                        
+                        {/* Team Switcher */}
+                        {isLoaded && organization && (
+                            <SidebarMenu>
+                                <SidebarMenuItem>
+                                    <TeamSwitcher isDark={isDark} />
+                                </SidebarMenuItem>
+                            </SidebarMenu>
+                        )}
                         
                         {/* User Profile */}
                         <SidebarMenu>

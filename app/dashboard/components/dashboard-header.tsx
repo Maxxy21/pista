@@ -66,11 +66,15 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
     );
 
     return (
-        <div className="border-b">
-            <div className="flex h-16 shrink-0 items-center gap-2 px-4 md:px-6 lg:px-8 w-full">
-                <SidebarTrigger className="-ml-1" />
-                <Separator orientation="vertical" className="mr-2 h-4" />
-                <h1 className="text-lg font-semibold">Dashboard</h1>
+        <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+            <div className="flex h-20 shrink-0 items-center gap-4 px-4 md:px-6 lg:px-8 w-full">
+                <div className="flex items-center gap-3">
+                    <SidebarTrigger className="-ml-1" />
+                    <Separator orientation="vertical" className="h-5" />
+                    <h1 className="text-xl font-bold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
+                        Dashboard
+                    </h1>
+                </div>
                 
                 {/* Middle section - Search */}
                 <div className="hidden md:flex flex-1 justify-center max-w-xl mx-4">
@@ -84,24 +88,42 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                     />
                 </div>
 
-                {/* Right section - Controls */}
-                <div className="flex items-center gap-2 ml-auto">
+                {/* Right section - Enhanced Controls */}
+                <div className="flex items-center gap-3 ml-auto">
                     {/* Score Filter */}
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="outline" className="h-8 gap-1 sm:gap-2" aria-label="Score Filter">
-                                <Filter className="h-3.5 w-3.5" />
-                                <span className="hidden md:inline text-sm">{scoreFilterLabel}</span>
+                            <Button 
+                                variant={scoreFilter !== "all" ? "default" : "outline"} 
+                                className={`h-9 gap-2 px-4 font-medium transition-all duration-200 ${
+                                    scoreFilter !== "all" 
+                                        ? "bg-primary/10 text-primary border-primary/20 hover:bg-primary/15 shadow-sm" 
+                                        : "hover:bg-muted/50 hover:border-muted-foreground/30"
+                                }`}
+                                aria-label="Score Filter"
+                            >
+                                <Filter className="h-4 w-4" />
+                                <span className="hidden sm:inline font-semibold">{scoreFilterLabel}</span>
+                                {scoreFilter !== "all" && (
+                                    <div className="w-2 h-2 rounded-full bg-primary/60 animate-pulse" />
+                                )}
                             </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
+                        <DropdownMenuContent align="end" className="min-w-48">
                             {Object.entries(SCORE_FILTER_LABELS).map(([key, label]) => (
                                 <DropdownMenuItem
                                     key={key}
                                     onClick={() => setScoreFilter(key)}
-                                    aria-selected={scoreFilter === key}
+                                    className={`font-medium ${
+                                        scoreFilter === key 
+                                            ? "bg-primary/10 text-primary" 
+                                            : ""
+                                    }`}
                                 >
                                     {label}
+                                    {scoreFilter === key && (
+                                        <div className="ml-auto w-2 h-2 rounded-full bg-primary" />
+                                    )}
                                 </DropdownMenuItem>
                             ))}
                         </DropdownMenuContent>
@@ -110,36 +132,61 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                     {/* Sort By */}
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="outline" className="h-8 gap-1 sm:gap-2" aria-label="Sort By">
-                                <ArrowDownUp className="h-3.5 w-3.5" />
-                                <span className="hidden md:inline text-sm">{sortByLabel}</span>
+                            <Button 
+                                variant={sortBy !== "newest" ? "default" : "outline"} 
+                                className={`h-9 gap-2 px-4 font-medium transition-all duration-200 ${
+                                    sortBy !== "newest" 
+                                        ? "bg-secondary/60 text-secondary-foreground border-secondary/40 hover:bg-secondary/70 shadow-sm" 
+                                        : "hover:bg-muted/50 hover:border-muted-foreground/30"
+                                }`}
+                                aria-label="Sort By"
+                            >
+                                <ArrowDownUp className="h-4 w-4" />
+                                <span className="hidden sm:inline font-semibold">{sortByLabel}</span>
+                                {sortBy !== "newest" && (
+                                    <div className="w-2 h-2 rounded-full bg-secondary-foreground/60 animate-pulse" />
+                                )}
                             </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
+                        <DropdownMenuContent align="end" className="min-w-48">
                             {Object.entries(SORT_BY_LABELS).map(([key, label]) => (
                                 <DropdownMenuItem
                                     key={key}
                                     onClick={() => setSortBy(key as DashboardHeaderProps["sortBy"])}
-                                    aria-selected={sortBy === key}
+                                    className={`font-medium ${
+                                        sortBy === key 
+                                            ? "bg-secondary/20 text-secondary-foreground" 
+                                            : ""
+                                    }`}
                                 >
                                     {label}
+                                    {sortBy === key && (
+                                        <div className="ml-auto w-2 h-2 rounded-full bg-secondary-foreground" />
+                                    )}
                                 </DropdownMenuItem>
                             ))}
                         </DropdownMenuContent>
                     </DropdownMenu>
 
+                    {/* Visual Separator */}
+                    <Separator orientation="vertical" className="h-6 mx-1" />
+
                     {/* View Mode Toggle */}
                     <Button
-                        variant="outline"
+                        variant={viewMode === "list" ? "default" : "outline"}
                         size="icon"
-                        className="h-8 w-8"
+                        className={`h-9 w-9 transition-all duration-200 ${
+                            viewMode === "list" 
+                                ? "bg-accent/60 text-accent-foreground shadow-sm" 
+                                : "hover:bg-muted/50"
+                        }`}
                         onClick={handleViewModeToggle}
                         aria-label={`Switch to ${viewMode === "grid" ? "list" : "grid"} view`}
                     >
                         {viewMode === "grid" ? (
-                            <List className="h-3.5 w-3.5" />
+                            <List className="h-4 w-4" />
                         ) : (
-                            <GridIcon className="h-3.5 w-3.5" />
+                            <GridIcon className="h-4 w-4" />
                         )}
                     </Button>
                 </div>
