@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { useOrganization } from "@clerk/nextjs";
 import { useTheme } from "next-themes";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 
 import {
@@ -64,11 +65,13 @@ export function AppSidebar({ searchValue = "", onSearchChange, ...props }: AppSi
     const { organization, isLoaded } = useOrganization();
     const { resolvedTheme } = useTheme();
     const isDark = resolvedTheme === "dark";
+    const router = useRouter();
+    const searchParams = useSearchParams();
     const { state } = useSidebar();
 
     const handleNavigation = React.useCallback(
         (value: string) => {
-            const current = new URLSearchParams(window.location.search);
+            const current = new URLSearchParams(Array.from(searchParams.entries()));
 
             if (value === "all") {
                 current.delete("view");
@@ -79,12 +82,12 @@ export function AppSidebar({ searchValue = "", onSearchChange, ...props }: AppSi
             const searchString = current.toString();
             const query = searchString ? `?${searchString}` : "";
 
-            window.location.href = `/dashboard${query}`;
+            router.replace(`/dashboard${query}`);
         },
-        []
+        [router, searchParams]
     );
 
-    const currentView = new URLSearchParams(window.location.search).get("view");
+    const currentView = searchParams.get("view");
 
     return (
         <Sidebar collapsible="icon" {...props}>
@@ -189,7 +192,7 @@ export function AppSidebar({ searchValue = "", onSearchChange, ...props }: AppSi
                                     className="bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary/80 text-primary-foreground font-medium shadow-sm transition-all duration-200"
                                     onClick={() => {
                                         // Navigate to the new pitch creation page or open modal
-                                        window.location.href = '/dashboard?create=pitch';
+                                        router.push('/dashboard?create=pitch');
                                     }}
                                     tooltip={state === "collapsed" ? "New Pitch" : undefined}
                                 >
