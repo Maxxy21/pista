@@ -12,7 +12,13 @@
       "Bash(npm install:*)",
       "Bash(echo $APPDATA)",
       "Read(C:\\Users\\aboag\\AppData\\Roaming\\Claude/**)",
-      "Read(C:\\Users\\aboag\\AppData\\Roaming\\Claude/**)"
+      "Read(C:\\Users\\aboag\\AppData\\Roaming\\Claude/**)",
+      "Bash(powershell Move-Item:*)",
+      "Bash(Move-Item lib src\\ -Force)",
+      "Bash(Move-Item hooks src\\ -Force)",
+      "Bash(Move-Item providers src\\ -Force)",
+      "Bash(Move-Item store src\\ -Force)",
+      "Bash(curl:*)"
     ],
     "deny": [],
     "ask": []
