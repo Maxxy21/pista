@@ -1,0 +1,84 @@
+\documentclass[10pt,a4paper]{book}  % Changed to 10pt
+
+% Normal margins
+\usepackage[margin=2.5cm]{geometry}  % Standard margins
+
+
+% Single spacing
+\usepackage{setspace}
+\singlespacing
+
+% Other packages
+\usepackage[a-1b]{pdfx}
+\usepackage{fourier}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[ngerman,italian,english]{babel}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{hyphenat}
+\usepackage{longtable}
+\usepackage{array,booktabs}
+\usepackage{pdflscape}
+\usepackage{caption}
+\usepackage[absolute]{textpos}
+\usepackage{pifont}
+\usepackage{listings}
+\usepackage{enumitem}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{tikz}
+\usepackage{float}
+
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.17}
+
+
+
+\input{definitions}
+
+\def\titleOfTheThesis{GenAI-Powered System for Automated Startup Pitch Evaluation}
+\def\author{}
+
+\def\candidate{}
+\def\supervisor{}
+\def\cosupervisor{}
+\def\date{2024/2025}
+\def\curriculum{Bachelor in Computer Science}
+\def\typeOfThesis{Bachelor Thesis}
+
+\begin{document}
+\frontmatter
+\input{cover}
+
+\input{abstracts/abstract_english} 
+
+%This is only needed for a bachelor thesis
+% \input{abstract_italiano} 
+% \input{abstract_deutsch} 
+
+% \input{acknowledgements}
+
+\tableofcontents
+\listoftables
+\listoffigures
+\lstlistoflistings
+
+\mainmatter
+
+\input{chapters/1-introduction}
+\input{chapters/2-background}
+\input{chapters/3-problem-solution}
+\input{chapters/4-evaluation}
+% \input{chapters/6-conclusion}
+
+
+
+
+\appendix
+
+% \input{help} 
+
+\bibliographystyle{unsrt}                                 
+\bibliography{bibliography}
+
+\end{document}
