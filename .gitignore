@@ -8,6 +8,9 @@
 
 # testing
 /coverage
+/__tests__
+TESTING.md
+/src/test
 
 # next.js
 /.next/
@@ -50,5 +53,22 @@ next-env.d.ts
 /.clerk/
 .claude
 .claude.md
-
 claude.md
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Development artifacts
+RESTRUCTURE_PLAN.md
+diagram.mmd
+flow-diagram.mermaid
+
+# Build cache
+tsconfig.tsbuildinfo
+
+# Temporary files
+undefined

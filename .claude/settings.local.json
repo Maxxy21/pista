@@ -18,7 +18,10 @@
       "Bash(Move-Item hooks src\\ -Force)",
       "Bash(Move-Item providers src\\ -Force)",
       "Bash(Move-Item store src\\ -Force)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(grep:*)",
+      "Bash(npm test)",
+      "Bash(npm test:*)"
     ],
     "deny": [],
     "ask": []
