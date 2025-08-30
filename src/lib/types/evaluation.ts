@@ -67,6 +67,8 @@ export interface StructuredEvaluationData {
     evaluatedAt: string;
     modelVersion: string;
     processingTime?: number;
+    promptVersion?: string;
+    policyVersion?: string;
   };
 }
 

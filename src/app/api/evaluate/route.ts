@@ -1,5 +1,3 @@
-// app/api/evaluate/route.ts
-
 import { NextResponse } from "next/server";
 import { getOpenAI } from "@/lib/utils";
 import { backOff } from "exponential-backoff";
@@ -8,10 +6,11 @@ import {
   StructuredEvaluation, 
   StructuredFeedback 
 } from "@/lib/types/evaluation";
+import { MODEL_VERSION, PROMPT_VERSION, POLICY_VERSION, CONTENT_LIMITS } from "@/lib/constants/eval";
 
-// Constants
 export const runtime = "edge";
 export const maxDuration = 300;
+const MAX_CONTENT_CHARS = CONTENT_LIMITS.evaluateChars;
 
 const EVALUATION_CRITERIA = {
   problemSolution: {
@@ -63,26 +62,35 @@ const WEIGHTS: Record<string, number> = {
   "Pitch Quality": 0.15,
 };
 
-// Types
 type Question = {
   text: string;
   answer: string;
 };
 
-// Utility Functions
 function parseStructuredEvaluationResponse(
   response: string,
   criteriaName: string,
   aspects: string[]
 ): StructuredEvaluation {
   try {
-    // Try to parse as JSON first
     const parsed = JSON.parse(response);
+    const numericAspectScores = Array.isArray(parsed.aspectScores)
+      ? parsed.aspectScores
+          .map((s: any) => Number(s?.score))
+          .filter((n: any) => Number.isFinite(n))
+      : [];
+    const baseScore = Number(parsed.score);
+    const clamped = (n: number) => Math.min(Math.max(n, 1), 10);
+    const aspectAvg = numericAspectScores.length
+      ? numericAspectScores.reduce((a: number, b: number) => a + b, 0) / numericAspectScores.length
+      : NaN;
+    const criterionScore = Number.isFinite(aspectAvg)
+      ? clamped(aspectAvg)
+      : clamped(Number.isFinite(baseScore) ? baseScore : 5);
     
-    // Validate and structure the response
     return {
       criteria: criteriaName,
-      score: Math.min(Math.max(parsed.score || 5, 1), 10),
+      score: criterionScore,
       breakdown: {
         strengths: (parsed.strengths || []).map((s: any) => ({
           point: typeof s === 'string' ? s : s.point || '',
@@ -103,7 +111,6 @@ function parseStructuredEvaluationResponse(
       recommendations: parsed.recommendations || []
     };
   } catch (error) {
-    // Fallback to text parsing if JSON parsing fails
     return parseTextEvaluationResponse(response, criteriaName, aspects);
   }
 }
@@ -197,12 +204,19 @@ async function makeOpenAIRequest(prompt: string) {
   }
 }
 
+function truncateContent(content: string, maxChars: number): string {
+  if (content.length <= maxChars) return content;
+  const keep = Math.floor(maxChars / 2);
+  return content.slice(0, keep) + "\n...\n" + content.slice(-keep);
+}
+
 function buildFullContent(text: string, questions?: Question[]): string {
   const qna =
     questions
       ?.map((q, i) => `Q${i + 1}: ${q.text}\nA${i + 1}: ${q.answer}`)
       .join("\n\n") || "";
-  return `Pitch Presentation:\n"${text}"\n\nFollow-up Q&A:\n${qna}`;
+  const raw = `Pitch Presentation:\n"${text}"\n\nFollow-up Q&A:\n${qna}`;
+  return truncateContent(raw, MAX_CONTENT_CHARS);
 }
 
 function buildStructuredPrompt(
@@ -246,17 +260,25 @@ Respond with a JSON object containing:
   "recommendations": ["actionable recommendation 1", "actionable recommendation 2"]
 }
 
-Ensure the response is valid JSON. Focus on actionable, specific insights that would help founders improve their pitch.
+Ensure the response is valid JSON. Use the full 1-10 scale when evidence supports it (avoid central tendency). Focus on actionable, specific insights that help founders improve their pitch.
 `;
 }
 
 function calculateOverallScore(evaluations: StructuredEvaluation[]): number {
-  return Math.round(
-    evaluations.reduce((sum, evali) => {
-      const weight = WEIGHTS[evali.criteria] || 0.25;
-      return sum + evali.score * weight;
-    }, 0)
+  const { weightedSum, totalWeight } = evaluations.reduce(
+    (acc, evali) => {
+      const weight = WEIGHTS[evali.criteria] ?? 0.25;
+      return {
+        weightedSum: acc.weightedSum + evali.score * weight,
+        totalWeight: acc.totalWeight + weight,
+      };
+    },
+    { weightedSum: 0, totalWeight: 0 }
   );
+
+  if (totalWeight === 0) return 0;
+  const avg = weightedSum / totalWeight;
+  return Number(avg.toFixed(2));
 }
 
 async function generateStructuredFeedback(
@@ -328,7 +350,6 @@ Respond with this JSON structure:
   try {
     return JSON.parse(completion.choices[0].message.content || "{}");
   } catch (error) {
-    // Fallback structured feedback if JSON parsing fails
     return {
       overallAssessment: {
         summary: "Unable to parse detailed feedback, but evaluation completed successfully.",
@@ -363,7 +384,6 @@ Respond with this JSON structure:
   }
 }
 
-// Main Handler
 export async function POST(req: Request) {
   const startTime = Date.now();
   
@@ -376,7 +396,6 @@ export async function POST(req: Request) {
 
     const fullContent = buildFullContent(text, questions);
 
-    // Generate structured evaluations
     const evaluations: StructuredEvaluation[] = await Promise.all(
       Object.entries(EVALUATION_CRITERIA).map(async ([, criteria]) => {
         const prompt = buildStructuredPrompt(
@@ -394,7 +413,6 @@ export async function POST(req: Request) {
       })
     );
 
-    // Generate structured overall feedback
     const overallFeedback = await generateStructuredFeedback(fullContent, evaluations);
     const overallScore = calculateOverallScore(evaluations);
     const processingTime = Date.now() - startTime;
@@ -405,19 +423,14 @@ export async function POST(req: Request) {
       overallFeedback,
       metadata: {
         evaluatedAt: new Date().toISOString(),
-        modelVersion: "gpt-4-structured-v1",
-        processingTime
+        modelVersion: MODEL_VERSION,
+        processingTime,
+        promptVersion: PROMPT_VERSION,
+        policyVersion: POLICY_VERSION,
       }
     };
 
-    // Logging for debugging (can be removed in production)
-    if (process.env.NODE_ENV !== "production") {
-      console.log("Structured API Response:", {
-        overallScore,
-        evaluationsCount: evaluations.length,
-        processingTime: `${processingTime}ms`
-      });
-    }
+    // no debug logging in production builds
 
     return NextResponse.json(result);
   } catch (error) {

@@ -83,7 +83,9 @@ const structuredFeedback = v.object({
 const evaluationMetadata = v.object({
     evaluatedAt: v.string(),
     modelVersion: v.string(),
-    processingTime: v.optional(v.number())
+    processingTime: v.optional(v.number()),
+    promptVersion: v.optional(v.string()),
+    policyVersion: v.optional(v.string())
 });
 
 // Union type to support both legacy and new structured evaluations

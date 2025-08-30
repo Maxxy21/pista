@@ -2,9 +2,7 @@ import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import React, { useEffect, useRef } from "react";
 import { useDebounceValue } from "usehooks-ts";
 import { Search, X } from "lucide-react";
-import { SidebarGroup, SidebarGroupContent, SidebarInput, useSidebar } from "@/components/ui/sidebar";
-import { Label } from "@/components/ui/label";
-import { Hint } from "../common/hint";
+import { SidebarInput } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { Input } from "@/components/ui/input";
@@ -29,32 +27,26 @@ export function SearchForm({
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
-    const { state, toggleSidebar } = useSidebar();
+    
     const inputRef = useRef<HTMLInputElement>(null);
     const [debouncedValue] = useDebounceValue(value, 500);
     const [isFocused, setIsFocused] = React.useState(false);
 
-    // Only update URL for standalone variant (dashboard header)
-    // Sidebar variant is handled by parent component  
     useEffect(() => {
-        if (variant === "standalone" && typeof window !== 'undefined') {
-            const current = new URLSearchParams(Array.from(searchParams.entries()));
-
-            if (debouncedValue) {
-                current.set("search", debouncedValue);
-            } else {
-                current.delete("search");
-            }
-
-            const search = current.toString();
-            const query = search ? `?${search}` : "";
-
-            router.push(`${pathname}${query}`);
+        if (variant !== "standalone" || typeof window === 'undefined') return;
+        const current = new URLSearchParams(Array.from(searchParams.entries()));
+        if (debouncedValue) current.set("search", debouncedValue);
+        else current.delete("search");
+        const search = current.toString();
+        const query = search ? `?${search}` : "";
+        const currentUrl = `${pathname}${window.location.search || ''}`;
+        const newUrl = `${pathname}${query}`;
+        if (newUrl !== currentUrl) {
+            router.replace(newUrl);
         }
-    }, [debouncedValue, pathname, router, searchParams, variant]);
+    }, [debouncedValue, pathname, router, variant]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        console.log('Input changed to:', `"${e.target.value}"`);
         onChange(e.target.value);
     };
 
@@ -63,7 +55,6 @@ export function SearchForm({
             e.preventDefault();
             e.stopPropagation();
         }
-        console.log('Clear search clicked, calling onChange with empty string');
         // Clear search through parent component
         onChange("");
         
@@ -123,9 +114,6 @@ export function SearchForm({
             </form>
         );
     }
-
-    // Sidebar search input
-    // Note: Don't return null for collapsed state as it might be used in other sidebars
 
     return (
         <form

@@ -1,23 +1,7 @@
 "use client";
 
 import * as React from "react";
-import {
-    ChevronLeft,
-    Search as SearchIcon,
-    X,
-    Home,
-    Clock,
-    Plus,
-    ArrowLeft,
-    Star,
-    Settings,
-    Calendar,
-    FileText,
-    Clock8,
-    Folder,
-    PlusCircle,
-    UserPlus
-} from "lucide-react";
+import { ChevronLeft, ArrowLeft, Star, Calendar, FileText, Clock8, Folder, PlusCircle } from "lucide-react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { useOrganization, useAuth, useUser } from "@clerk/nextjs";
 import { useDebounceValue } from "usehooks-ts";
@@ -33,21 +17,17 @@ import {
     SidebarMenu,
     SidebarMenuItem,
     SidebarMenuButton,
-    SidebarInput,
     useSidebar,
-    SidebarTrigger,
-    SidebarGroupLabel,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useQuery } from "convex/react";
 import { Id } from "@/convex/_generated/dataModel";
 import { api } from "@/convex/_generated/api";
-import { cn } from "@/lib/utils";
+import { type UniversalPitchData } from "@/lib/types/pitch";
 import { NavUser } from "./nav-user";
 import { TeamSwitcher } from "./team-switcher";
 import { SearchForm } from "../forms/search-form";
-import { Hint } from "../common/hint";
 import { InviteButton } from "../common/invite-button";
 import { useTheme } from "next-themes";
 import LogoIcon from "@/components/ui/logo-icon";
@@ -55,17 +35,8 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { format } from "date-fns";
 import { Separator } from "@/components/ui/separator";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
-// Extracted pitch type for clarity
-type Pitch = {
-    _id: string;
-    title: string;
-    _creationTime: string | number | Date;
-    evaluation: { overallScore: number };
-    type: string;
-    authorName?: string;
-};
+// Using shared pitch type from lib/types
 
 export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>) {
     const router = useRouter();
@@ -80,7 +51,6 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
     const [debouncedSearch] = useDebounceValue(search, 500);
     const { state } = useSidebar();
 
-    // Sync search state with URL parameters on load
     React.useEffect(() => {
         const searchQuery = searchParams.get("search") || "";
         if (searchQuery) {
@@ -88,7 +58,6 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
         }
     }, [searchParams]);
 
-    // Update URL when search changes
     React.useEffect(() => {
         const url = qs.stringifyUrl(
             {
@@ -100,16 +69,14 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
             },
             { skipEmptyString: true, skipNull: true }
         );
-        router.push(url);
+        router.replace(url);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [debouncedSearch]);
 
     const handleSearchChange = React.useCallback((value: string) => {
-        console.log('Search input changed to:', `"${value}"`);
         setSearch(value);
     }, []);
 
-    // Queries
     const queryParams = isAuthLoaded && isSignedIn && organization
         ? {
               orgId: organization.id,
@@ -117,17 +84,8 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
               sortBy: "date" as const,
           }
         : "skip";
-    
-    console.log('Sidebar query params:', queryParams);
-    
     const pitches = useQuery(api.pitches.getFilteredPitches, queryParams);
     
-    React.useEffect(() => {
-        console.log('Pitches query result:', pitches?.length || 0, 'pitches');
-        if (pitches && pitches.length > 0) {
-            console.log('First few pitch titles:', pitches.slice(0, 3).map(p => p.title));
-        }
-    }, [pitches]);
 
     const currentPitch = useQuery(
         api.pitches.getPitch,
@@ -138,36 +96,25 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
             : "skip"
     );
 
-    // Memoize search results or recent pitches
     const displayPitches = React.useMemo(() => {
         if (!pitches) {
-            console.log('No pitches data available');
-            return [];
+            return [] as UniversalPitchData[];
         }
         
-        console.log('Current pitch ID:', params.id);
-        console.log('All pitch IDs:', pitches.map(p => ({ id: p._id, title: p.title })));
-        
-        // For search results, show all matches including current pitch
-        // For recent pitches, filter out current pitch
         const filtered = debouncedSearch 
             ? pitches // Show all search results including current pitch
-            : pitches.filter((pitch: Pitch) => pitch._id !== params.id);
+            : (pitches as UniversalPitchData[]).filter((pitch) => pitch._id !== params.id);
         
         const limited = debouncedSearch ? filtered : filtered.slice(0, 5);
-        
-        console.log(`Search: "${debouncedSearch}", Total pitches: ${pitches.length}, Showing: ${limited.length}`);
-        return limited;
+        return limited as unknown as UniversalPitchData[];
     }, [pitches, params.id, debouncedSearch]);
 
-    // Redirect if not signed in
     React.useEffect(() => {
         if (isAuthLoaded && !isSignedIn) {
             router.push("/sign-in");
         }
     }, [isAuthLoaded, isSignedIn, router]);
 
-    // Handlers
     const handleBack = React.useCallback(() => {
         const view = searchParams.get("view");
         const url = qs.stringifyUrl(
@@ -350,7 +297,7 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
                                 </div>
                                 {displayPitches.length > 0 ? (
                                     <div className="space-y-2">
-                                        {displayPitches.map((pitch: Pitch) => (
+                                        {displayPitches.map((pitch: UniversalPitchData) => (
                                             <motion.div
                                                 key={pitch._id}
                                                 whileHover={{ x: 4, scale: 1.01 }}
@@ -433,6 +380,7 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
                                     <SidebarMenuButton 
                                         className="rounded-lg transition-all duration-200 hover:shadow-sm"
                                         tooltip="Favorite Pitch"
+                                        aria-label="Favorite Pitch"
                                     >
                                         <Star className="h-4 w-4" />
                                     </SidebarMenuButton>
@@ -442,6 +390,7 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
                                         className="rounded-lg transition-all duration-200 hover:shadow-sm"
                                         tooltip="All Pitches"
                                         onClick={handleBack}
+                                        aria-label="All Pitches"
                                     >
                                         <FileText className="h-4 w-4" />
                                     </SidebarMenuButton>

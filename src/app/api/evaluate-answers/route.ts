@@ -1,6 +1,6 @@
-// app/api/evaluate-answers/route.ts
 import { NextResponse } from "next/server";
 import { getOpenAI } from "@/lib/utils";
+import { PROMPT_VERSION, POLICY_VERSION } from "@/lib/constants/eval";
 
 export const runtime = "edge";
 
@@ -22,6 +22,11 @@ interface EvaluationResponse {
     evaluations: Evaluation[];
     overallScore: number;
     overallFeedback: string;
+    meta?: {
+        promptVersion: string;
+        policyVersion: string;
+        evaluatedAt: string;
+    }
 }
 
 export async function POST(req: Request) {
@@ -44,7 +49,7 @@ export async function POST(req: Request) {
             messages: [
                 {
                     role: "system",
-                    content: "You are an expert pitch evaluator analyzing follow-up responses.",
+                    content: "You are an expert pitch evaluator analyzing follow-up responses. Respond in valid JSON only.",
                 },
                 {
                     role: "user",
@@ -54,14 +59,16 @@ export async function POST(req: Request) {
             temperature: 0.7,
         });
 
-        const response = completion.choices[0]?.message?.content?.trim() ?? "";
+        const raw = completion.choices[0]?.message?.content?.trim() ?? "";
+
+        const parsed = parseStructuredAnswerEvaluation(raw);
 
         const evaluation: Evaluation = {
             criteria: "Follow-up Responses",
-            comment: response,
-            score: calculateScore(response),
-            strengths: extractStrengths(response),
-            improvements: extractImprovements(response),
+            comment: parsed.comment,
+            score: parsed.score,
+            strengths: parsed.strengths,
+            improvements: parsed.improvements,
             aspects: [
                 "Response Clarity",
                 "Market Understanding",
@@ -75,6 +82,11 @@ export async function POST(req: Request) {
             evaluations: [evaluation],
             overallScore: evaluation.score,
             overallFeedback: evaluation.comment,
+            meta: {
+                promptVersion: PROMPT_VERSION,
+                policyVersion: POLICY_VERSION,
+                evaluatedAt: new Date().toISOString(),
+            }
         };
 
         return NextResponse.json(result);
@@ -87,6 +99,14 @@ export async function POST(req: Request) {
     }
 }
 
+const MAX_PROMPT_CHARS = 6000;
+
+function truncate(text: string, max: number) {
+    if (text.length <= max) return text;
+    const keep = Math.floor(max / 2);
+    return text.slice(0, keep) + "\n...\n" + text.slice(-keep);
+}
+
 function buildPrompt(pitchText: string, answers: QA[]): string {
     const qaSection = answers
         .map(
@@ -95,7 +115,7 @@ function buildPrompt(pitchText: string, answers: QA[]): string {
         )
         .join("\n\n");
 
-    return `
+    const base = `
 Analyze this startup pitch and the follow-up Q&A:
 
 Original Pitch:
@@ -111,46 +131,42 @@ Evaluate the answers considering:
 4. Business model viability
 5. Team capability signals
 
-Provide an updated evaluation with:
-1. Specific strengths from the answers
-2. Areas needing more clarification
-3. Adjusted scores based on new insights
-`.trim();
+Provide an updated evaluation in JSON format with this exact schema:
+{
+  "score": number (1-10),
+  "strengths": ["specific strength 1", "specific strength 2"],
+  "improvements": ["improvement area 1", "improvement area 2"],
+  "comment": "2-3 sentence summary of the impact of the answers"
 }
 
-// Helper functions to parse the AI response
-function calculateScore(response: string): number {
-    const positiveSignals = [
-        "excellent", "strong", "comprehensive", "impressive",
-        "clear", "detailed", "well-thought", "insightful"
-    ];
+Use the full 1-10 scale when appropriate based on evidence (avoid defaulting to the center). Ensure valid JSON only.
+`;
 
-    let score = 7; // Base score
-    for (const signal of positiveSignals) {
-        if (response.toLowerCase().includes(signal)) {
-            score += 0.5;
-        }
+    return truncate(base.trim(), MAX_PROMPT_CHARS);
+}
+
+function parseStructuredAnswerEvaluation(raw: string): { score: number; strengths: string[]; improvements: string[]; comment: string } {
+    try {
+        const data = JSON.parse(raw);
+        const scoreNum = typeof data.score === 'number' ? data.score : Number(data.score);
+        const bounded = Math.min(Math.max(scoreNum || 0, 1), 10);
+        const strengths = Array.isArray(data.strengths) ? data.strengths.filter(Boolean).map(String) : [];
+        const improvements = Array.isArray(data.improvements) ? data.improvements.filter(Boolean).map(String) : [];
+        const comment = typeof data.comment === 'string' ? data.comment : '';
+        return { score: Number(bounded.toFixed(2)), strengths, improvements, comment };
+    } catch {
+        const strengths = extractByKeyword(raw, /strength|positive|good/i);
+        const improvements = extractByKeyword(raw, /improve|clarif|concern|risk|weak/i);
+        const balance = strengths.length - improvements.length;
+        const dynamicCenter = 5 + Math.tanh(balance);
+        return { score: Number(Math.min(Math.max(dynamicCenter, 1), 10).toFixed(2)), strengths, improvements, comment: raw };
     }
-
-    return Math.min(Math.max(score, 1), 10);
 }
 
-function extractStrengths(response: string): string[] {
-    // Looks for lines starting with "Strength" or containing "strength"
-    return response
+function extractByKeyword(text: string, re: RegExp): string[] {
+    return text
         .split("\n")
-        .filter(line => /strength/i.test(line))
-        .map(line => line.replace(/^[^:]+:/, "").trim())
-        .filter(Boolean);
-}
-
-function extractImprovements(response: string): string[] {
-    // Looks for lines containing "improve" or "clarif"
-    return response
-        .split("\n")
-        .filter(line =>
-            /improve|clarif/i.test(line)
-        )
+        .filter(line => re.test(line))
         .map(line => line.replace(/^[^:]+:/, "").trim())
         .filter(Boolean);
 }

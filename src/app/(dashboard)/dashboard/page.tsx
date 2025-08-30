@@ -30,6 +30,8 @@ const VirtualizedPitchesGrid = lazy(() =>
     import("./_components/grids/virtualized-pitches-grid").then(mod => ({ default: mod.VirtualizedPitchesGrid }))
 );
 
+import { ErrorBoundary } from "./_components/error-boundary";
+
 // Skeleton loaders
 const StatsSkeleton = () => (
     <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
@@ -91,8 +93,8 @@ export default function Dashboard() {
         if (!isLoading && data !== undefined && typeof window !== 'undefined' && 'performance' in window) {
             try {
                 performance.mark('dashboard-content-loaded');
-            } catch (error) {
-                console.warn('Failed to mark performance:', error);
+            } catch {
+                // no-op
             }
         }
     }, [isLoading, data]);
@@ -119,9 +121,11 @@ export default function Dashboard() {
 
             <div className="flex-1 flex flex-col">
                 <div className="p-4 md:p-6 pb-0">
-                    <Suspense fallback={<StatsSkeleton />}>
-                        <DashboardStats />
-                    </Suspense>
+                    <ErrorBoundary fallback={<StatsSkeleton />}>
+                        <Suspense fallback={<StatsSkeleton />}>
+                            <DashboardStats />
+                        </Suspense>
+                    </ErrorBoundary>
                 </div>
 
                 {/* Filters below stats */}
@@ -139,27 +143,29 @@ export default function Dashboard() {
 
                 <div className="flex-1 p-4 md:p-6 pt-0">
                     {renderEmptyState() || (
-                        <Suspense fallback={<PitchesGridSkeleton />}>
-                            {useVirtualizedGrid ? (
-                                <VirtualizedPitchesGrid
-                                    data={data}
-                                    viewMode={viewMode}
-                                    searchQuery={searchParam}
-                                    currentView={viewParam}
-                                    organization={organization}
-                                    isLoading={isLoading}
-                                />
-                            ) : (
-                                <PitchesGrid
-                                    data={data}
-                                    viewMode={viewMode}
-                                    searchQuery={searchParam}
-                                    currentView={viewParam}
-                                    organization={organization}
-                                    isLoading={isLoading}
-                                />
-                            )}
-                        </Suspense>
+                        <ErrorBoundary fallback={<PitchesGridSkeleton />}>
+                            <Suspense fallback={<PitchesGridSkeleton />}>
+                                {useVirtualizedGrid ? (
+                                    <VirtualizedPitchesGrid
+                                        data={data}
+                                        viewMode={viewMode}
+                                        searchQuery={searchParam}
+                                        currentView={viewParam}
+                                        organization={organization}
+                                        isLoading={isLoading}
+                                    />
+                                ) : (
+                                    <PitchesGrid
+                                        data={data}
+                                        viewMode={viewMode}
+                                        searchQuery={searchParam}
+                                        currentView={viewParam}
+                                        organization={organization}
+                                        isLoading={isLoading}
+                                    />
+                                )}
+                            </Suspense>
+                        </ErrorBoundary>
                     )}
                 </div>
             </div>

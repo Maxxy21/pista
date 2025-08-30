@@ -48,7 +48,6 @@ export const create = mutation({
     },
 });
 
-// Get all pitches for an organization
 export const get = query({
     args: {
         orgId: v.string(),
@@ -58,7 +57,6 @@ export const get = query({
     handler: async (ctx, args) => {
         const identity = await validateUser(ctx);
 
-        // Handle favorites
         if (args.favorites) {
             const favoritedPitches = await ctx.db
                 .query("userFavorites")
@@ -77,7 +75,6 @@ export const get = query({
             }));
         }
 
-        // Handle search
         let pitches: Doc<"pitches">[];
         const searchTerm = args.search?.trim();
         if (searchTerm) {
@@ -95,7 +92,6 @@ export const get = query({
                 .collect();
         }
 
-        // Add favorite status
         const favorites = await ctx.db
             .query("userFavorites")
             .withIndex("by_user_org_pitch", (q) =>
@@ -112,7 +108,6 @@ export const get = query({
     },
 });
 
-// Get a single pitch
 export const getPitch = query({
     args: {
         id: v.id("pitches"),
@@ -131,7 +126,6 @@ export const getPitch = query({
     },
 });
 
-// Update existing pitch
 export const update = mutation({
     args: {
         id: v.id("pitches"),
@@ -161,7 +155,6 @@ export const update = mutation({
     },
 });
 
-// Delete a pitch
 export const remove = mutation({
     args: { id: v.id("pitches") },
     handler: async (ctx, args) => {
@@ -171,7 +164,6 @@ export const remove = mutation({
         if (!pitch) throw new ConvexError("Pitch not found");
         if (pitch.userId !== identity.subject) throw new ConvexError("Unauthorized");
 
-        // Delete associated favorites
         const favorites = await ctx.db
             .query("userFavorites")
             .withIndex("by_user_pitch", (q) =>
@@ -184,7 +176,6 @@ export const remove = mutation({
     },
 });
 
-// Favorite/unfavorite functions
 export const favorite = mutation({
     args: {
         id: v.id("pitches"),
@@ -240,7 +231,6 @@ export const unfavorite = mutation({
     },
 });
 
-// Get filtered pitches
 export const getFilteredPitches = query({
     args: {
         orgId: v.string(),
@@ -257,13 +247,11 @@ export const getFilteredPitches = query({
     handler: async (ctx, args) => {
         const identity = await validateUser(ctx);
 
-        // Base query - get all pitches in organization
         let pitches = await ctx.db
             .query("pitches")
             .withIndex("by_org", (q) => q.eq("orgId", args.orgId))
             .collect();
 
-        // Apply filters
         if (args.search) {
             const searchTerm = args.search.trim().toLowerCase();
             pitches = pitches.filter(
@@ -281,7 +269,6 @@ export const getFilteredPitches = query({
             );
         }
 
-        // Sort pitches
         if (args.sortBy) {
             pitches.sort((a, b) =>
                 args.sortBy === "date"
@@ -290,7 +277,6 @@ export const getFilteredPitches = query({
             );
         }
 
-        // Get favorites status
         const favorites = await ctx.db
             .query("userFavorites")
             .withIndex("by_user_org_pitch", (q) =>
@@ -300,7 +286,6 @@ export const getFilteredPitches = query({
 
         const favoritedIds = new Set(favorites.map((f) => f.pitchId));
 
-        // Filter by favorites if requested
         if (args.favorites) {
             pitches = pitches.filter((pitch) => favoritedIds.has(pitch._id));
         }
@@ -366,14 +351,12 @@ export const prefetch = mutation({
     handler: async (ctx, args) => {
         const identity = await validateUser(ctx);
 
-        // Prefetch recent pitches
         await ctx.db
             .query("pitches")
             .withIndex("by_org", (q) => q.eq("orgId", args.orgId))
             .order("desc")
             .take(PREFETCH_COUNT);
 
-        // Prefetch user's favorites
         const favorites = await ctx.db
             .query("userFavorites")
             .withIndex("by_user_org_pitch", (q) =>
@@ -383,13 +366,71 @@ export const prefetch = mutation({
 
         const favoritedIds = favorites.map((f) => f.pitchId);
 
-        // Prefetch the actual favorite pitches if there are any
         if (favoritedIds.length > 0) {
             await Promise.all(
                 favoritedIds.slice(0, PREFETCH_COUNT).map((id) => ctx.db.get(id))
             );
         }
 
-        return { success: true };
+    return { success: true };
     },
+});
+
+// Export user's pitches and evaluations as CSV (thesis analysis)
+export const exportCSV = query({
+    args: {},
+    handler: async (ctx) => {
+        const identity = await validateUser(ctx);
+
+        const rows: string[] = [];
+        const headers = [
+            'id','title','type','author','createdAt','overallScore','evaluatedAt','modelVersion','promptVersion','policyVersion'
+        ];
+        rows.push(headers.join(','));
+
+        const pitches = await ctx.db
+            .query("pitches")
+            .filter((q) => q.eq(q.field("userId"), identity.subject))
+            .collect();
+
+        for (const p of pitches) {
+            const id = String(p._id);
+            const title = JSON.stringify(p.title ?? "");
+            const type = JSON.stringify(p.type ?? "");
+            const author = JSON.stringify(p.authorName ?? "");
+            const createdAt = new Date(p.createdAt).toISOString();
+
+            let overallScore = '';
+            let evaluatedAt = '';
+            let modelVersion = '';
+            let promptVersion = '';
+            let policyVersion = '';
+
+            const ev: any = p.evaluation as any;
+            if (ev && typeof ev === 'object') {
+                overallScore = String(ev.overallScore ?? '');
+                if (ev.metadata) {
+                    evaluatedAt = ev.metadata.evaluatedAt ?? '';
+                    modelVersion = ev.metadata.modelVersion ?? '';
+                    promptVersion = ev.metadata.promptVersion ?? '';
+                    policyVersion = ev.metadata.policyVersion ?? '';
+                }
+            }
+
+            rows.push([
+                id,
+                title,
+                type,
+                author,
+                createdAt,
+                overallScore,
+                evaluatedAt,
+                JSON.stringify(modelVersion),
+                JSON.stringify(promptVersion),
+                JSON.stringify(policyVersion)
+            ].join(','));
+        }
+
+        return rows.join('\n');
+    }
 });

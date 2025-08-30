@@ -1,8 +1,10 @@
-// app/api/generate-questions/route.ts
 import { NextResponse } from "next/server";
 import { getOpenAI } from "@/lib/utils";
 
 export const runtime = "edge";
+const MAX_PROMPT_CHARS = 4000;
+const truncate = (text: string, max: number) =>
+  text.length <= max ? text : `${text.slice(0, Math.floor(max / 2))}\n...\n${text.slice(-Math.floor(max / 2))}`;
 
 export async function POST(req: Request) {
   try {
@@ -21,7 +23,7 @@ export async function POST(req: Request) {
     const prompt = [
       `Analyze the following startup pitch and identify up to 3 important aspects that are missing or unclear such as 
        problem definition, business model, team, market, etc.`,
-      `Pitch: "${text}"`,
+      `Pitch: "${truncate(text, MAX_PROMPT_CHARS)}"`,
       "",
       `For each missing or unclear aspect, generate a specific follow-up question that would help clarify or complete the pitch.`,
       "",
