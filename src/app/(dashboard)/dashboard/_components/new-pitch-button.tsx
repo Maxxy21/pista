@@ -11,6 +11,8 @@ interface NewPitchButtonProps {
     className?: string;
     variant?: "default" | "gradient" | "outline";
     size?: "default" | "sm" | "lg" | "icon";
+    showIcon?: boolean;
+    mobileIconOnly?: boolean;
 }
 
 const BUTTON_STYLES: Record<
@@ -29,6 +31,8 @@ export function NewPitchButton({
     className,
     variant = "default",
     size = "default",
+    showIcon = true,
+    mobileIconOnly = false,
 }: NewPitchButtonProps) {
     return (
         <FileDialog orgId={orgId}>
@@ -37,11 +41,19 @@ export function NewPitchButton({
                 disabled={disabled}
                 variant={variant === "outline" ? "outline" : "default"}
                 size={size}
-                className={cn("gap-2", BUTTON_STYLES[variant], className)}
+                className={cn(
+                    mobileIconOnly ? "w-9 h-9 p-0 sm:w-auto sm:h-9 sm:gap-2 sm:px-4" : "gap-2", 
+                    BUTTON_STYLES[variant], 
+                    className
+                )}
                 aria-label="Create new pitch"
             >
-                <PlusCircle className="h-4 w-4" aria-hidden="true" />
-                {size !== "icon" && <span>New Pitch</span>}
+                {showIcon && <PlusCircle className="h-4 w-4" aria-hidden="true" />}
+                {mobileIconOnly ? (
+                    <span className="hidden sm:inline">Create New</span>
+                ) : (
+                    size !== "icon" && <span>Create New</span>
+                )}
             </Button>
         </FileDialog>
     );

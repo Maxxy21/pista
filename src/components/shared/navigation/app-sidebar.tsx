@@ -26,9 +26,9 @@ import {
     useSidebar,
 } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
-import { NavUser } from "./nav-user";
 import { TeamSwitcher } from "./team-switcher";
 import { InviteButton } from "../common/invite-button";
+import { FileDialog } from "@/components/shared/forms/add-pitches/file-dialog";
 import LogoIcon from "@/components/ui/logo-icon";
 
 const NAVIGATION_ITEMS = [
@@ -160,16 +160,15 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
                         {/* Action Buttons */}
                         <SidebarMenu className="space-y-1">
                             <SidebarMenuItem>
-                                <SidebarMenuButton 
-                                    className="bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary/80 text-primary-foreground font-medium shadow-sm transition-all duration-200"
-                                    onClick={() => {
-                                        router.push('/dashboard?create=pitch');
-                                    }}
-                                    tooltip={state === "collapsed" ? "New Pitch" : undefined}
-                                >
-                                    <PlusCircle />
-                                    <span>New Pitch</span>
-                                </SidebarMenuButton>
+                                <FileDialog orgId={organization.id}>
+                                    <SidebarMenuButton 
+                                        className="bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary/80 text-primary-foreground font-medium shadow-sm transition-all duration-200"
+                                        tooltip={state === "collapsed" ? "Create New" : undefined}
+                                    >
+                                        <PlusCircle />
+                                        <span>Create New</span>
+                                    </SidebarMenuButton>
+                                </FileDialog>
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <InviteButton isDark={isDark} />
@@ -184,13 +183,6 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
                                 </SidebarMenuItem>
                             </SidebarMenu>
                         )}
-                        
-                        {/* User Profile */}
-                        <SidebarMenu>
-                            <SidebarMenuItem>
-                                <NavUser isDark={isDark} />
-                            </SidebarMenuItem>
-                        </SidebarMenu>
                     </>
                 )}
             </SidebarFooter>

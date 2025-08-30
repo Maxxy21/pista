@@ -1,19 +1,23 @@
+"use client"
+
 import { AppSidebar } from "@/components/shared/navigation/app-sidebar"
+import { DashboardNavbar } from "./_components/dashboard-navbar"
 import {
     SidebarProvider,
+    SidebarInset,
 } from "@/components/ui/sidebar"
 import {cookies} from "next/headers";
 
-export default async function DashboardLayout({children}: { children: React.ReactNode }) {
-    const cookieStore = await cookies()
-    const defaultOpen = cookieStore.get("sidebar:state")?.value === "true"
-
+export default function DashboardLayout({children}: { children: React.ReactNode }) {
     return (
-        <SidebarProvider defaultOpen={defaultOpen}>
+        <SidebarProvider defaultOpen={true}>
             <AppSidebar />
-            <main className="flex-1 overflow-auto">
-                {children}
-            </main>
+            <SidebarInset>
+                <DashboardNavbar />
+                <main className="flex-1 overflow-auto">
+                    {children}
+                </main>
+            </SidebarInset>
         </SidebarProvider>
     )
 }

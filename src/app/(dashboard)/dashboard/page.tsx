@@ -4,10 +4,9 @@ import React, { useEffect, useState, Suspense, lazy, useMemo, useCallback } from
 import { useOrganization, useUser } from "@clerk/nextjs";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { Loading } from "@/components/shared/auth/loading";
-import { DashboardHeader } from "./_components/dashboard-header";
 import { DashboardTabs } from "./_components/dashboard-tabs";
+import { PitchFilters } from "./_components/pitch-filters";
 import { useSearchParams } from "next/navigation";
 import { useDashboardState } from "./_hooks/use-dashboard-state";
 import { usePrefetchPitches } from "@/hooks/use-prefetch-pitches";
@@ -112,31 +111,33 @@ export default function Dashboard() {
     if (!isLoaded) return <Loading />;
 
     return (
-        <SidebarInset>
-            <DashboardHeader
-                searchValue={searchValue}
-                setSearchValue={setSearchValue}
-                viewMode={viewMode}
-                setViewMode={setViewMode}
-                scoreFilter={scoreFilter}
-                setScoreFilter={setScoreFilter}
-                sortBy={sortBy}
-                setSortBy={setSortBy}
-                handleSearch={handleSearch}
-                organization={organization}
+        <div className="flex flex-col flex-1">
+            <DashboardTabs
+                currentView={viewParam}
+                handleTabChange={handleTabChange}
             />
-            
-            <div className="flex flex-col flex-1">
-                <DashboardTabs
-                    currentView={viewParam}
-                    handleTabChange={handleTabChange}
-                />
 
-                <div className="flex-1 flex flex-col space-y-4 p-4 md:p-6">
+            <div className="flex-1 flex flex-col">
+                <div className="p-4 md:p-6 pb-0">
                     <Suspense fallback={<StatsSkeleton />}>
                         <DashboardStats />
                     </Suspense>
+                </div>
 
+                {/* Filters below stats */}
+                <PitchFilters
+                    searchValue={searchValue}
+                    setSearchValue={setSearchValue}
+                    viewMode={viewMode}
+                    setViewMode={setViewMode}
+                    scoreFilter={scoreFilter}
+                    setScoreFilter={setScoreFilter}
+                    sortBy={sortBy}
+                    setSortBy={setSortBy}
+                    handleSearch={handleSearch}
+                />
+
+                <div className="flex-1 p-4 md:p-6 pt-0">
                     {renderEmptyState() || (
                         <Suspense fallback={<PitchesGridSkeleton />}>
                             {useVirtualizedGrid ? (
@@ -162,6 +163,6 @@ export default function Dashboard() {
                     )}
                 </div>
             </div>
-        </SidebarInset>
+        </div>
     );
 }
