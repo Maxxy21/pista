@@ -345,14 +345,30 @@ export const getFilteredPitches = query({
 
 // Get pitch statistics
 export const getPitchStats = query({
-    args: {},
-    handler: async (ctx): Promise<PitchStats> => {
+    args: {
+        orgId: v.optional(v.string()),
+        ownerUserId: v.optional(v.string()),
+    },
+    handler: async (ctx, args): Promise<PitchStats> => {
         const identity = await validateUser(ctx);
 
-        const pitches = await ctx.db
-            .query("pitches")
-            .filter((q) => q.eq(q.field("userId"), identity.subject))
-            .collect();
+        let pitches: Doc<"pitches">[] = [];
+        if (args.orgId) {
+            pitches = await ctx.db
+                .query("pitches")
+                .withIndex("by_org", (q) => q.eq("orgId", args.orgId!))
+                .collect();
+        } else if (args.ownerUserId) {
+            pitches = await ctx.db
+                .query("pitches")
+                .withIndex("by_user", (q) => q.eq("userId", args.ownerUserId!))
+                .collect();
+        } else {
+            pitches = await ctx.db
+                .query("pitches")
+                .withIndex("by_user", (q) => q.eq("userId", identity.subject))
+                .collect();
+        }
 
         if (pitches.length === 0) {
             return {

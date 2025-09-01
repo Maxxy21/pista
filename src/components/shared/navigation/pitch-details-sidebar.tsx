@@ -141,7 +141,7 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
     );
 
     // Loading state
-    if (!isAuthLoaded || !organization) {
+    if (!isAuthLoaded) {
         return (
             <Sidebar collapsible="icon" className="border-r" {...props}>
                 <SidebarHeader className="p-4 border-b">
@@ -212,7 +212,7 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
                             <span className="truncate" title={organization.name}>{organization.name}</span>
                           </div>
                         )}
-                        {isAuthLoaded && organization && (
+                        {isAuthLoaded && (
                             <div className="space-y-4">
                                 <motion.div
                                     whileHover={{ x: 2 }}

@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { LineChart, ChevronUp, CalendarDays, BarChart3 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useMemo, memo } from "react";
+import { useWorkspace } from "@/hooks/use-workspace";
 import { motion } from "framer-motion";
 import { SkeletonCard } from "@/components/ui/skeleton-card";
 
@@ -63,6 +64,7 @@ StatCard.displayName = "StatCard";
 
 export function DashboardStats() {
     const { userId, isLoaded, isSignedIn } = useAuth();
+    const workspace = useWorkspace();
 
     // Default stats for fallback/merging
     const defaultStats = useMemo(
@@ -82,7 +84,11 @@ export function DashboardStats() {
     const shouldFetch = isLoaded && isSignedIn && !!userId;
     const stats = useQuery(
         api.pitches.getPitchStats,
-        shouldFetch ? {} : "skip"
+        shouldFetch
+            ? (workspace.mode === 'org' && workspace.orgId
+                ? { orgId: workspace.orgId }
+                : userId ? { ownerUserId: userId } : {})
+            : "skip"
     );
 
     // Memoized derived values

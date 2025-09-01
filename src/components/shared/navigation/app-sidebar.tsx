@@ -124,41 +124,37 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
             </SidebarHeader>
 
             <SidebarContent className="px-2 flex flex-col">
-                {organization && (
-                    <>
-                        <div className="flex-1 py-2">
-                            <SidebarGroupLabel className="px-4 pt-2 pb-1 text-xs font-medium text-muted-foreground/70">
-                                Navigation
-                            </SidebarGroupLabel>
-                            <SidebarMenu className="mb-6 space-y-1">
-                                {NAVIGATION_ITEMS.map((item) => {
-                                    const isActive =
-                                        (item.value === "all" && !currentView) ||
-                                        currentView === item.value;
+                <div className="flex-1 py-2">
+                    <SidebarGroupLabel className="px-4 pt-2 pb-1 text-xs font-medium text-muted-foreground/70">
+                        Navigation
+                    </SidebarGroupLabel>
+                    <SidebarMenu className="mb-6 space-y-1">
+                        {NAVIGATION_ITEMS.map((item) => {
+                            const isActive =
+                                (item.value === "all" && !currentView) ||
+                                currentView === item.value;
 
-                                    return (
-                                        <SidebarMenuItem key={item.value}>
-                                            <SidebarMenuButton
-                                                isActive={isActive}
-                                                tooltip={state === "collapsed" ? item.title : undefined}
-                                                onClick={() => handleNavigation(item.value)}
-                                                className="rounded-lg transition-all duration-200 hover:shadow-sm"
-                                            >
-                                                <item.icon className="h-4 w-4" />
-                                                <span className="font-medium">{item.title}</span>
-                                            </SidebarMenuButton>
-                                            {item.badge && (
-                                                <SidebarMenuBadge className="bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xs font-medium">
-                                                    {item.badge}
-                                                </SidebarMenuBadge>
-                                            )}
-                                        </SidebarMenuItem>
-                                    );
-                                })}
-                            </SidebarMenu>
-                        </div>
-                    </>
-                )}
+                            return (
+                                <SidebarMenuItem key={item.value}>
+                                    <SidebarMenuButton
+                                        isActive={isActive}
+                                        tooltip={state === "collapsed" ? item.title : undefined}
+                                        onClick={() => handleNavigation(item.value)}
+                                        className="rounded-lg transition-all duration-200 hover:shadow-sm"
+                                    >
+                                        <item.icon className="h-4 w-4" />
+                                        <span className="font-medium">{item.title}</span>
+                                    </SidebarMenuButton>
+                                    {item.badge && (
+                                        <SidebarMenuBadge className="bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xs font-medium">
+                                            {item.badge}
+                                        </SidebarMenuBadge>
+                                    )}
+                                </SidebarMenuItem>
+                            );
+                        })}
+                    </SidebarMenu>
+                </div>
             </SidebarContent>
 
             <div className="px-2 mb-2">
@@ -166,29 +162,25 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
             </div>
 
             <SidebarFooter className="p-2 space-y-2">
-                {organization && (
-                    <>
-                        {/* Action Buttons */}
-                        <SidebarMenu className="space-y-1">
-                            <SidebarMenuItem>
-                                <FileDialog orgId={organization.id}>
-                                    <SidebarMenuButton 
-                                        className="bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary/80 text-primary-foreground font-medium shadow-sm transition-all duration-200"
-                                        tooltip={state === "collapsed" ? "Create New" : undefined}
-                                    >
-                                        <PlusCircle />
-                                        <span>Create New</span>
-                                    </SidebarMenuButton>
-                                </FileDialog>
-                            </SidebarMenuItem>
-                            <SidebarMenuItem>
-                                <InviteButton isDark={isDark} />
-                            </SidebarMenuItem>
-                        </SidebarMenu>
-                        
-                        {/* Team switcher moved to avatar menu */}
-                    </>
-                )}
+                {/* Action Buttons */}
+                <SidebarMenu className="space-y-1">
+                    {organization && (
+                        <SidebarMenuItem>
+                            <FileDialog orgId={organization.id}>
+                                <SidebarMenuButton 
+                                    className="bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary/80 text-primary-foreground font-medium shadow-sm transition-all duration-200"
+                                    tooltip={state === "collapsed" ? "Create New" : undefined}
+                                >
+                                    <PlusCircle />
+                                    <span>Create New</span>
+                                </SidebarMenuButton>
+                            </FileDialog>
+                        </SidebarMenuItem>
+                    )}
+                    <SidebarMenuItem>
+                        <InviteButton isDark={isDark} />
+                    </SidebarMenuItem>
+                </SidebarMenu>
             </SidebarFooter>
             <SidebarRail />
         </Sidebar>

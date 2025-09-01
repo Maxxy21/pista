@@ -1,7 +1,7 @@
 "use client"
 
-import {UserPlus} from "lucide-react";
-import { OrganizationProfile } from "@clerk/nextjs";
+import {UserPlus, Building2, Plus} from "lucide-react";
+import { OrganizationProfile, CreateOrganization } from "@clerk/nextjs";
 import {
     Dialog,
     DialogContent,
@@ -9,11 +9,9 @@ import {
     DialogTitle
 } from "@/components/ui/dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
-import {
-    SidebarMenuButton,
-    useSidebar,
-} from "@/components/ui/sidebar";
+import { SidebarMenuButton, useSidebar } from "@/components/ui/sidebar";
 import {dark} from "@clerk/themes";
+import { useWorkspace } from "@/hooks/use-workspace";
 
 interface InviteButtonProps {
     isDark?: boolean;
@@ -21,23 +19,31 @@ interface InviteButtonProps {
 
 export const InviteButton = ({ isDark }: InviteButtonProps) => {
     const { state } = useSidebar();
+    const workspace = useWorkspace();
     
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <SidebarMenuButton tooltip={state === "collapsed" ? "Invite members" : undefined}>
-                    <UserPlus />
-                    <span>Invite members</span>
+                <SidebarMenuButton tooltip={state === "collapsed" ? (workspace.mode === 'org' ? 'Invite members' : 'Create Team') : undefined}>
+                    {workspace.mode === 'org' ? <UserPlus /> : <Plus />}
+                    <span>{workspace.mode === 'org' ? 'Invite members' : 'Create Team'}</span>
                 </SidebarMenuButton>
             </DialogTrigger>
             <DialogContent className="p-0 bg-transparent border-none max-w-[880px]">
                 <VisuallyHidden>
-                    <DialogTitle>Organization Management</DialogTitle>
+                    <DialogTitle>Organization</DialogTitle>
                 </VisuallyHidden>
-                <OrganizationProfile
-                    appearance={{ baseTheme: isDark ? dark : undefined }}
-                    routing="hash"
-                />
+                {workspace.mode === 'org' ? (
+                    <OrganizationProfile
+                        appearance={{ baseTheme: isDark ? dark : undefined }}
+                        routing="hash"
+                    />
+                ) : (
+                    <CreateOrganization
+                        appearance={{ baseTheme: isDark ? dark : undefined }}
+                        routing="hash"
+                    />
+                )}
             </DialogContent>
         </Dialog>
     );
