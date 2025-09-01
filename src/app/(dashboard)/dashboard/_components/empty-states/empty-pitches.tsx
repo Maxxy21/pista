@@ -2,7 +2,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { NewPitchButton } from "../new-pitch-button";
 
 interface EmptyPitchesProps {
-    orgId: string;
+    orgId?: string;
 }
 
 export const EmptyPitches = ({ orgId }: EmptyPitchesProps) => {

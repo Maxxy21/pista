@@ -15,7 +15,6 @@ import { SkeletonCard } from "@/components/ui/skeleton-card";
 import { Separator } from "@/components/ui/separator";
 
 // Empty state components
-import { EmptyOrg } from "./_components/empty-states/empty-org";
 import { EmptySearch } from "./_components/empty-states/empty-search";
 import { EmptyPitches } from "./_components/empty-states/empty-pitches";
 import { EmptyFavorites } from "./_components/empty-states/empty-favorites";
@@ -103,10 +102,9 @@ export default function Dashboard() {
 
     // Empty state rendering
     const renderEmptyState = useCallback(() => {
-        if (!organization) return <EmptyOrg />;
-        if (searchParam && (!data || data.length === 0)) return <EmptySearch />;
+                if (searchParam && (!data || data.length === 0)) return <EmptySearch />;
         if (viewParam === "favorites" && (!data || data.length === 0)) return <EmptyFavorites />;
-        if (!data || data.length === 0) return <EmptyPitches orgId={organization.id} />;
+        if (!data || data.length === 0) return <EmptyPitches orgId={organization?.id} />;
         return null;
     }, [organization, searchParam, data, viewParam]);
 
