@@ -6,6 +6,7 @@ import {useClerk, useUser, useOrganization, useOrganizationList, CreateOrganizat
 import {useTheme} from "next-themes"
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import {
     Avatar,
@@ -44,7 +45,9 @@ export function NavUserNavbar({isDark, className}: NavUserNavbarProps) {
     const {signOut} = useClerk()
     const {setTheme, theme} = useTheme()
     const {openUserProfile} = useClerk();
-    // const router = useRouter()
+    const router = useRouter()
+    const pathname = usePathname()
+    const searchParams = useSearchParams()
     const { organization } = useOrganization()
     const workspace = useWorkspace()
     const [exportRequested, setExportRequested] = useState(false)
@@ -55,6 +58,14 @@ export function NavUserNavbar({isDark, className}: NavUserNavbarProps) {
     ) as any[] | "skip" | undefined
 
     if (!user) return null
+
+    const setCtx = (mode: 'user' | 'org') => {
+        const current = new URLSearchParams(Array.from(searchParams.entries()))
+        if (mode === 'user') current.delete('ctx')
+        else current.set('ctx', 'org')
+        const q = current.toString()
+        router.replace(`${pathname}${q ? `?${q}` : ''}`)
+    }
 
     const handleSignOut = async () => {
         try {
@@ -173,6 +184,15 @@ export function NavUserNavbar({isDark, className}: NavUserNavbarProps) {
                     </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator/>
+                {/* Workspace switcher */}
+                <DropdownMenuItem onClick={() => setCtx('user')} className="gap-2">
+                    <span className="mr-2 inline-flex h-4 w-4 items-center justify-center">🏠</span>
+                    <span>My Workspace</span>
+                    {workspace.mode === 'user' && (
+                        <Check className="ml-auto h-4 w-4 text-primary" />
+                    )}
+                </DropdownMenuItem>
+                <DropdownMenuSeparator/>
                 {/* Organization submenu with chevron + create */}
                 <DropdownMenuSub>
                   <DropdownMenuSubTrigger className="gap-2">
@@ -183,7 +203,7 @@ export function NavUserNavbar({isDark, className}: NavUserNavbarProps) {
                     {userMemberships?.data?.map((m) => (
                       <DropdownMenuItem
                         key={m.organization.id}
-                        onClick={() => setActive?.({ organization: m.organization.id })}
+                        onClick={() => { setActive?.({ organization: m.organization.id }); setCtx('org'); }}
                         className="gap-2"
                         aria-current={organization?.id === m.organization.id}
                       >
