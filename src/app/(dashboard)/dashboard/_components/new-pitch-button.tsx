@@ -3,7 +3,7 @@
 import { PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { FileDialog } from "@/components/shared/forms/add-pitches/file-dialog";
+import Link from "next/link";
 
 interface NewPitchButtonProps {
     orgId?: string;
@@ -35,8 +35,7 @@ export function NewPitchButton({
     mobileIconOnly = false,
 }: NewPitchButtonProps) {
     return (
-        <FileDialog orgId={orgId}>
-            <Button
+        <Button asChild
                 type="button"
                 disabled={disabled}
                 variant={variant === "outline" ? "outline" : "default"}
@@ -47,14 +46,15 @@ export function NewPitchButton({
                     className
                 )}
                 aria-label="New pitch"
-            >
+        >
+            <Link href="/pitch/new">
                 {showIcon && <PlusCircle className="h-4 w-4" aria-hidden="true" />}
                 {mobileIconOnly ? (
                     <span className="hidden sm:inline">New Pitch</span>
                 ) : (
                     size !== "icon" && <span>New Pitch</span>
                 )}
-            </Button>
-        </FileDialog>
+            </Link>
+        </Button>
     );
 }
