@@ -1,18 +1,19 @@
-import type {Config} from "tailwindcss"
+import type { Config } from "tailwindcss";
+import animate from "tailwindcss-animate";
 
-const {
-    default: flattenColorPalette,
-} = require("tailwindcss/lib/util/flattenColorPalette");
-
-
-const config = {
-    darkMode: ["class"],
-    content: [
-        './pages/**/*.{ts,tsx}',
-        './components/**/*.{ts,tsx}',
-        './app/**/*.{ts,tsx}',
-        './src/**/*.{ts,tsx}',
-    ],
+const config: Config = {
+    // Tailwind v4 uses class-based dark mode by default.
+    // Ensure we use the string form (v4) instead of the v3 array form.
+    darkMode: "class",
+    // In Tailwind v4, specifying content globs is optional since the
+    // new PostCSS plugin integrates with the bundler. Leaving them
+    // out avoids potential confusion and is safe in Next.js 15.
+    // content: [
+    //     './pages/**/*.{ts,tsx}',
+    //     './components/**/*.{ts,tsx}',
+    //     './app/**/*.{ts,tsx}',
+    //     './src/**/*.{ts,tsx}',
+    // ],
     prefix: "",
     theme: {
         container: {
@@ -100,18 +101,8 @@ const config = {
             }
         }
     },
-    plugins: [require("tailwindcss-animate"), addVariablesForColors],
-} satisfies Config
+    // Load plugins using ESM import for Tailwind v4
+    plugins: [animate],
+};
 
-export default config
-
-function addVariablesForColors({addBase, theme}: any) {
-    let allColors = flattenColorPalette(theme("colors"));
-    let newVars = Object.fromEntries(
-        Object.entries(allColors).map(([key, val]) => [`--${key}`, val])
-    );
-
-    addBase({
-        ":root": newVars,
-    });
-}
+export default config;

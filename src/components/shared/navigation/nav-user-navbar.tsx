@@ -1,8 +1,8 @@
 "use client"
 
-import { LogOut, Sun, Moon, Laptop, User, Download, Check, Building2, Plus } from 'lucide-react'
+import { LogOut, Sun, Moon, Laptop, User, Download, Check } from 'lucide-react'
 import { toast } from "sonner";
-import {useClerk, useUser, useOrganization, useOrganizationList, CreateOrganization, OrganizationProfile} from "@clerk/nextjs"
+import {useClerk, useUser, useOrganization, useOrganizationList} from "@clerk/nextjs"
 import {useTheme} from "next-themes"
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
@@ -193,79 +193,7 @@ export function NavUserNavbar({isDark, className}: NavUserNavbarProps) {
                     )}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator/>
-                {/* Organization submenu with chevron + create */}
-                <DropdownMenuSub>
-                  <DropdownMenuSubTrigger className="gap-2">
-                    <Building2 className="mr-2 h-4 w-4 text-muted-foreground" />
-                    <span>Organization</span>
-                  </DropdownMenuSubTrigger>
-                  <DropdownMenuSubContent>
-                    {userMemberships?.data?.map((m) => (
-                      <DropdownMenuItem
-                        key={m.organization.id}
-                        onClick={() => { setActive?.({ organization: m.organization.id }); setCtx('org'); }}
-                        className="gap-2"
-                        aria-current={organization?.id === m.organization.id}
-                      >
-                        <div className="flex h-6 w-6 items-center justify-center rounded-sm border border-border bg-muted overflow-hidden">
-                          {m.organization.imageUrl ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img src={m.organization.imageUrl} alt={m.organization.name} className="h-full w-full object-cover" />
-                          ) : (
-                            <Building2 className="h-4 w-4 text-muted-foreground" />
-                          )}
-                        </div>
-                        <span className="truncate">{m.organization.name}</span>
-                        {organization?.id === m.organization.id && (
-                          <Check className="ml-auto h-4 w-4 text-primary" />
-                        )}
-                      </DropdownMenuItem>
-                    ))}
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="gap-2">
-                          <div className="flex h-6 w-6 items-center justify-center rounded-sm border border-dashed border-muted-foreground/60">
-                            <Plus className="h-4 w-4 text-muted-foreground" />
-                          </div>
-                          <span>Create Organization</span>
-                        </DropdownMenuItem>
-                      </DialogTrigger>
-                      <DialogContent className="p-0 bg-transparent border-none max-w-[430px]">
-                        <CreateOrganization
-                          appearance={{
-                            baseTheme: isDark ? dark : undefined,
-                            elements: {
-                              formButtonPrimary: "bg-primary text-primary-foreground hover:bg-primary/90",
-                              card: "bg-background border border-border shadow-lg",
-                              headerTitle: "text-xl font-bold",
-                            },
-                          }}
-                          routing="hash"
-                        />
-                      </DialogContent>
-                    </Dialog>
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="gap-2">
-                          <Building2 className="mr-2 h-4 w-4 text-muted-foreground" />
-                          <span>Organization Settings</span>
-                        </DropdownMenuItem>
-                      </DialogTrigger>
-                      <DialogContent className="max-w-[860px] w-[95vw] p-4">
-                        <OrganizationProfile
-                          routing="hash"
-                          appearance={{
-                            baseTheme: isDark ? dark : undefined,
-                            elements: {
-                              formButtonPrimary: "bg-primary text-primary-foreground hover:bg-primary/90",
-                              card: "bg-background",
-                            },
-                          }}
-                        />
-                      </DialogContent>
-                    </Dialog>
-                  </DropdownMenuSubContent>
-                </DropdownMenuSub>
+                {/* Organization submenu removed; use sidebar team switcher */}
                 <DropdownMenuItem
                     onClick={() => openUserProfile({appearance: {baseTheme: isDark ? dark : undefined}})}
                     className="gap-2"

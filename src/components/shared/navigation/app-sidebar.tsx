@@ -30,6 +30,7 @@ import { Separator } from "@/components/ui/separator";
 import { InviteButton } from "../common/invite-button";
 import Link from "next/link";
 import LogoIcon from "@/components/ui/logo-icon";
+import { TeamSwitcher } from "./team-switcher";
 
 const NAVIGATION_ITEMS = [
     {
@@ -108,17 +109,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
                                 Pista
                             </h1>
                         </div>
-                        {organization && (
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground/90 px-1">
-                            <div className="flex h-6 w-6 items-center justify-center rounded-md border border-border bg-muted overflow-hidden">
-                              {/* eslint-disable-next-line @next/next/no-img-element */}
-                              {organization.imageUrl ? (
-                                <img src={organization.imageUrl} alt={organization.name} className="h-full w-full object-cover" />
-                              ) : null}
-                            </div>
-                            <span className="truncate" title={organization.name}>{organization.name}</span>
-                          </div>
-                        )}
+                        {/* Title and optional org indicator only; switcher moved to footer */}
                     </div>
                 )}
             </SidebarHeader>
@@ -178,6 +169,10 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
                     </SidebarMenuItem>
                     <SidebarMenuItem>
                         <InviteButton isDark={isDark} />
+                    </SidebarMenuItem>
+                    <SidebarMenuItem>
+                        {/* Team switcher positioned at bottom of sidebar */}
+                        <TeamSwitcher />
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarFooter>

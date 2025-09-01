@@ -103,7 +103,7 @@ export default function Dashboard() {
 
     // Empty state rendering
     const renderEmptyState = useCallback(() => {
-                if (searchParam && (!data || data.length === 0)) return <EmptySearch />;
+        if (searchParam && (!data || data.length === 0)) return <EmptySearch />;
         if (viewParam === "favorites" && (!data || data.length === 0)) return <EmptyFavorites />;
         if (!data || data.length === 0) return <EmptyPitches orgId={organization?.id} />;
         return null;
@@ -146,7 +146,9 @@ export default function Dashboard() {
                 <div className="flex-1 p-4 md:p-6 pt-0">
                     {viewParam === 'new' ? (
                         <NewPitchPanel />
-                    ) : (renderEmptyState() || (
+                    ) : ((() => {
+                        const empty = renderEmptyState();
+                        return empty ? empty : (
                         <ErrorBoundary fallback={<PitchesGridSkeleton />}>
                             <Suspense fallback={<PitchesGridSkeleton />}>
                                 {useVirtualizedGrid ? (
@@ -170,7 +172,9 @@ export default function Dashboard() {
                                 )}
                             </Suspense>
                         </ErrorBoundary>
-                    )}
+                            );
+                        })())
+                    }
                 </div>
             </div>
         </div>

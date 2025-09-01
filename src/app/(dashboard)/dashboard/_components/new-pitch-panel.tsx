@@ -14,6 +14,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Progress } from "@/components/ui/progress"
+import { FileAudio2, FileText as FileTextIcon } from "lucide-react"
+import { FileUpload as PrettyFileUpload } from "@/components/ui/file-upload"
 
 type PitchType = "text" | "textFile" | "audio"
 
@@ -36,8 +38,22 @@ export function NewPitchPanel() {
     return !!file
   }, [title, type, text, file])
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0] || null
+  const handleFilesSelected = (newFiles: File[]) => {
+    if (!newFiles?.length) return
+    const f = newFiles[0]
+    if (type === "audio") {
+      if (!f.type.startsWith("audio/")) {
+        toast.error("Please upload an audio file (mp3, wav, m4a, ...)")
+        return
+      }
+    } else if (type === "textFile") {
+      // Prefer text/plain, fallback to .txt extension check
+      const isTxt = f.type === "text/plain" || f.name.toLowerCase().endsWith(".txt")
+      if (!isTxt) {
+        toast.error("Please upload a plain text .txt file")
+        return
+      }
+    }
     setFile(f)
   }
 
@@ -102,8 +118,16 @@ export function NewPitchPanel() {
 
   return (
     <div className="max-w-4xl mx-auto p-0 md:p-2">
-      <Card>
-        <CardContent className="p-4 md:p-6 space-y-4">
+      <Card className="overflow-hidden">
+        <div className="px-4 md:px-6 pt-4 md:pt-6 pb-2 border-b bg-muted/20">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg md:text-xl font-semibold">Create a New Pitch</h2>
+            <span className="text-xs text-muted-foreground">
+              Creating in {workspace.mode === "org" ? (organization?.name || "Organization") : "My Workspace"}
+            </span>
+          </div>
+        </div>
+        <CardContent className="p-4 md:p-6 space-y-5">
           <div className="space-y-2">
             <Label htmlFor="title">Title</Label>
             <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="My awesome pitch" />
@@ -120,12 +144,26 @@ export function NewPitchPanel() {
               <Textarea id="pitch-text" rows={10} value={text} onChange={(e) => setText(e.target.value)} placeholder="Paste or write your pitch..." />
             </TabsContent>
             <TabsContent value="textFile" className="space-y-2">
-              <Label htmlFor="file">Upload .txt</Label>
-              <Input id="file" type="file" accept=".txt,text/plain" onChange={e => handleFileChange(e)} />
+              <Label>Upload .txt</Label>
+              <PrettyFileUpload accept="text/plain,.txt" maxSize={5 * 1024 * 1024} onChange={handleFilesSelected} showList={false} />
+              {file && (
+                <div className="mt-2 inline-flex items-center gap-2 text-xs">
+                  <FileTextIcon className="h-4 w-4" />
+                  <span className="font-medium">{file.name}</span>
+                  <Button variant="ghost" size="sm" className="h-6 px-2" onClick={() => setFile(null)}>Remove</Button>
+                </div>
+              )}
             </TabsContent>
             <TabsContent value="audio" className="space-y-2">
-              <Label htmlFor="audio">Upload audio</Label>
-              <Input id="audio" type="file" accept="audio/*" onChange={e => handleFileChange(e)} />
+              <Label>Upload audio</Label>
+              <PrettyFileUpload accept="audio/*" maxSize={25 * 1024 * 1024} onChange={handleFilesSelected} showList={false} />
+              {file && (
+                <div className="mt-2 inline-flex items-center gap-2 text-xs">
+                  <FileAudio2 className="h-4 w-4" />
+                  <span className="font-medium">{file.name}</span>
+                  <Button variant="ghost" size="sm" className="h-6 px-2" onClick={() => setFile(null)}>Remove</Button>
+                </div>
+              )}
             </TabsContent>
           </Tabs>
 
