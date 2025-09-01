@@ -1,6 +1,6 @@
 "use client"
 
-import {UserPlus, Building2, Plus} from "lucide-react";
+import {UserPlus, Building2} from "lucide-react";
 import { OrganizationProfile, CreateOrganization } from "@clerk/nextjs";
 import {
     Dialog,
@@ -25,7 +25,7 @@ export const InviteButton = ({ isDark }: InviteButtonProps) => {
         <Dialog>
             <DialogTrigger asChild>
                 <SidebarMenuButton tooltip={state === "collapsed" ? (workspace.mode === 'org' ? 'Invite members' : 'Create Team') : undefined}>
-                    {workspace.mode === 'org' ? <UserPlus /> : <Plus />}
+                    <UserPlus />
                     <span>{workspace.mode === 'org' ? 'Invite members' : 'Create Team'}</span>
                 </SidebarMenuButton>
             </DialogTrigger>

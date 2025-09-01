@@ -46,13 +46,13 @@ export function NewPitchButton({
                     BUTTON_STYLES[variant], 
                     className
                 )}
-                aria-label="Create new pitch"
+                aria-label="New pitch"
             >
                 {showIcon && <PlusCircle className="h-4 w-4" aria-hidden="true" />}
                 {mobileIconOnly ? (
-                    <span className="hidden sm:inline">Create New</span>
+                    <span className="hidden sm:inline">New Pitch</span>
                 ) : (
-                    size !== "icon" && <span>Create New</span>
+                    size !== "icon" && <span>New Pitch</span>
                 )}
             </Button>
         </FileDialog>

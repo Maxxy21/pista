@@ -157,36 +157,14 @@ export const PitchFilters: React.FC<PitchFiltersProps> = ({
                 </div>
 
                 <div className="flex items-center gap-2 sm:gap-3 justify-end flex-shrink-0">
-                    {workspace.mode === 'org' && organization ? (
-                        <NewPitchButton
-                            orgId={organization.id}
-                            variant="default"
-                            size="sm"
-                            className="h-9 gap-2 px-4 text-sm font-semibold"
-                            showIcon={true}
-                            mobileIconOnly={true}
-                        />
-                    ) : (
-                        <Dialog>
-                            <DialogTrigger asChild>
-                                <Button
-                                    variant="default"
-                                    size="sm"
-                                    className="h-9 gap-2 px-4 text-sm font-semibold"
-                                >
-                                    Create Team
-                                </Button>
-                            </DialogTrigger>
-                            <DialogContent className="max-w-[860px] w-[95vw] p-4">
-                                <CreateOrganization
-                                    routing="hash"
-                                    appearance={{
-                                        baseTheme: dark,
-                                    }}
-                                />
-                            </DialogContent>
-                        </Dialog>
-                    )}
+                    <NewPitchButton
+                        orgId={organization?.id}
+                        variant="default"
+                        size="sm"
+                        className="h-9 gap-2 px-4 text-sm font-semibold"
+                        showIcon={true}
+                        mobileIconOnly={true}
+                    />
 
                     <Separator orientation="vertical" className="h-5 hidden sm:block" />
 

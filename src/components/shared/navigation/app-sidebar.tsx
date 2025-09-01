@@ -169,10 +169,10 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
                             <FileDialog orgId={organization.id}>
                                 <SidebarMenuButton 
                                     className="bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary/80 text-primary-foreground font-medium shadow-sm transition-all duration-200"
-                                    tooltip={state === "collapsed" ? "Create New" : undefined}
+                                    tooltip={state === "collapsed" ? "New Pitch" : undefined}
                                 >
                                     <PlusCircle />
-                                    <span>Create New</span>
+                                    <span>New Pitch</span>
                                 </SidebarMenuButton>
                             </FileDialog>
                         ) : (
