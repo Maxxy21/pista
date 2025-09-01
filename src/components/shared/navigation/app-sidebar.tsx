@@ -26,7 +26,7 @@ import {
     useSidebar,
 } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
-import { TeamSwitcher } from "./team-switcher";
+// Team switcher moved into user avatar menu for consistency
 import { InviteButton } from "../common/invite-button";
 import { FileDialog } from "@/components/shared/forms/add-pitches/file-dialog";
 import LogoIcon from "@/components/ui/logo-icon";
@@ -95,7 +95,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
                         </motion.div>
                     </div>
                 ) : (
-                    <div className="px-4 space-y-4">
+                    <div className="px-4 space-y-3">
                         <div className="flex items-center gap-3">
                             <motion.div
                                 whileHover={{ scale: 1.05 }}
@@ -108,6 +108,17 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
                                 Pista
                             </h1>
                         </div>
+                        {organization && (
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground/90 px-1">
+                            <div className="flex h-6 w-6 items-center justify-center rounded-md border border-border bg-muted overflow-hidden">
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              {organization.imageUrl ? (
+                                <img src={organization.imageUrl} alt={organization.name} className="h-full w-full object-cover" />
+                              ) : null}
+                            </div>
+                            <span className="truncate" title={organization.name}>{organization.name}</span>
+                          </div>
+                        )}
                     </div>
                 )}
             </SidebarHeader>
@@ -175,14 +186,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
                             </SidebarMenuItem>
                         </SidebarMenu>
                         
-                        {/* Team Switcher */}
-                        {isLoaded && organization && (
-                            <SidebarMenu>
-                                <SidebarMenuItem>
-                                    <TeamSwitcher isDark={isDark} />
-                                </SidebarMenuItem>
-                            </SidebarMenu>
-                        )}
+                        {/* Team switcher moved to avatar menu */}
                     </>
                 )}
             </SidebarFooter>

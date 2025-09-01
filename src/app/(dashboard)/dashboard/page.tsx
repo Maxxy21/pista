@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, Suspense, lazy, useMemo, useCallback } from 'react';
 import { useOrganization, useUser } from "@clerk/nextjs";
+import { useWorkspace } from "@/hooks/use-workspace";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Loading } from "@/components/shared/auth/loading";
@@ -52,6 +53,7 @@ const PitchesGridSkeleton = () => (
 export default function Dashboard() {
     const { isLoaded } = useUser();
     const { organization } = useOrganization();
+    const workspace = useWorkspace();
     const searchParamsObj = useSearchParams();
 
     const {
@@ -69,17 +71,17 @@ export default function Dashboard() {
     const viewParam = searchParamsObj.get('view') || "all";
 
     // Memoize query params to avoid unnecessary re-renders
-    const queryParams = useMemo(() => (
-        organization
-            ? {
-                    orgId: organization.id,
-                    search: searchParam,
-                    favorites: viewParam === "favorites",
-                    sortBy: (viewParam === "recent" ? "date" : sortBy === "newest" ? "date" : "score") as "score" | "date",
-                    scoreRange: getScoreRange(scoreFilter),
-                }
-            : "skip"
-    ), [organization, searchParam, viewParam, sortBy, scoreFilter, getScoreRange]);
+    const queryParams = useMemo(() => {
+        const base = {
+            search: searchParam,
+            favorites: viewParam === "favorites",
+            sortBy: (viewParam === "recent" ? "date" : sortBy === "newest" ? "date" : "score") as "score" | "date",
+            scoreRange: getScoreRange(scoreFilter),
+        } as any
+        if (workspace.mode === 'org' && workspace.orgId) return { ...base, orgId: workspace.orgId }
+        if (workspace.userId) return { ...base, ownerUserId: workspace.userId }
+        return "skip"
+    }, [workspace.mode, workspace.orgId, workspace.userId, searchParam, viewParam, sortBy, scoreFilter, getScoreRange]);
 
     const data = useQuery(api.pitches.getFilteredPitches, queryParams);
 
@@ -139,6 +141,7 @@ export default function Dashboard() {
                     sortBy={sortBy}
                     setSortBy={setSortBy}
                     handleSearch={handleSearch}
+                    resultsCount={Array.isArray(data) ? data.length : undefined}
                 />
 
                 <div className="flex-1 p-4 md:p-6 pt-0">

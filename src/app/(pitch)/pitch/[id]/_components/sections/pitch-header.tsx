@@ -9,6 +9,8 @@ import { getOverallFeedback } from "@/lib/utils/evaluation-utils";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
 import React from "react";
+import { useTheme } from "next-themes";
+import { NavUserNavbar } from "@/components/shared/navigation/nav-user-navbar";
 
 interface PitchHeaderProps {
     data: UniversalPitchData;
@@ -16,6 +18,8 @@ interface PitchHeaderProps {
 
 export const PitchHeader: React.FC<PitchHeaderProps> = React.memo(({ data }) => {
     const { onOpen } = useRenameModal();
+    const { resolvedTheme } = useTheme();
+    const isDark = resolvedTheme === "dark";
 
     const handleEdit = React.useCallback(() => {
         onOpen(data._id, data.title);
@@ -32,13 +36,11 @@ export const PitchHeader: React.FC<PitchHeaderProps> = React.memo(({ data }) => 
             <div className="flex h-16 shrink-0 items-center gap-2 px-4 md:px-6 lg:px-8 w-full">
                 <SidebarTrigger className="-ml-1" />
                 <Separator orientation="vertical" className="mr-2 h-4" />
-                <Link href="/dashboard" passHref legacyBehavior>
-                    <Button asChild variant="ghost" size="icon" className="rounded-full h-7 w-7" aria-label="Back to dashboard">
-                        <a>
-                            <ChevronLeft className="h-4 w-4" />
-                        </a>
-                    </Button>
-                </Link>
+                <Button asChild variant="ghost" size="icon" className="rounded-full h-7 w-7">
+                    <Link href="/dashboard" aria-label="Back to dashboard">
+                        <ChevronLeft className="h-4 w-4" />
+                    </Link>
+                </Button>
                 <div className="flex-1 min-w-0">
                     <h1 className="text-lg font-semibold truncate" title={data.title}>
                         {data.title}
@@ -69,6 +71,7 @@ export const PitchHeader: React.FC<PitchHeaderProps> = React.memo(({ data }) => 
                         <span className="hidden sm:inline">Share</span>
                     </Button>
                     <ExportPDFButton data={data} />
+                    <NavUserNavbar isDark={isDark} />
                 </div>
             </div>
         </header>

@@ -1,9 +1,12 @@
 "use client"
 
-import {ChevronsUpDown, LogOut, Settings, Languages, CreditCard, Sun, Moon, Laptop, User, Shield} from 'lucide-react'
-import {useClerk, useUser} from "@clerk/nextjs"
+import {ChevronsUpDown, LogOut, Sun, Moon, Laptop, User, Download, Check, Building2, Plus} from 'lucide-react'
+import { toast } from "sonner";
+import {useClerk, useUser, useOrganization, useOrganizationList, CreateOrganization, OrganizationProfile} from "@clerk/nextjs"
 import {useTheme} from "next-themes"
 import { motion } from "framer-motion";
+import React, { useEffect, useState } from "react";
+import Link from "next/link";
 
 import {
     Avatar,
@@ -30,8 +33,12 @@ import {
 } from "@/components/ui/sidebar"
 import {Button} from "@/components/ui/button"
 import {dark} from "@clerk/themes"
-import {useRouter} from "next/navigation";
+// import {useRouter} from "next/navigation";
 import { Badge } from "@/components/ui/badge";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { useWorkspace } from "@/hooks/use-workspace";
 
 interface NavUserProps {
     isDark?: boolean
@@ -44,7 +51,15 @@ export function NavUser({isDark, className}: NavUserProps) {
     const {signOut} = useClerk()
     const {setTheme, theme} = useTheme()
     const {openUserProfile} = useClerk();
-    const router = useRouter()
+    // const router = useRouter()
+    const { organization } = useOrganization()
+    const workspace = useWorkspace()
+    const { userMemberships, setActive } = useOrganizationList({ userMemberships: { infinite: true } })
+    const [exportRequested, setExportRequested] = useState(false)
+    const pitches = useQuery(
+      api.pitches.getFilteredPitches,
+      workspace.mode === 'org' && workspace.orgId ? { orgId: workspace.orgId } : (workspace.userId ? { ownerUserId: workspace.userId } : "skip")
+    ) as any[] | "skip" | undefined
 
     if (!user) return null
 
@@ -55,6 +70,65 @@ export function NavUser({isDark, className}: NavUserProps) {
             console.error("Error signing out:", error);
         }
     };
+
+    useEffect(() => {
+        if (!exportRequested) return
+        if (!organization || !Array.isArray(pitches)) return
+
+        const toastId = toast.loading("Preparing CSV…")
+        const rows: string[] = []
+        const headers = [
+          'id','title','type','author','createdAt','overallScore','evaluatedAt','modelVersion','promptVersion','policyVersion'
+        ]
+        rows.push(headers.join(','))
+
+        try {
+          for (const p of pitches) {
+            const id = String(p._id)
+            const title = JSON.stringify(p.title ?? "")
+            const type = JSON.stringify(p.type ?? "")
+            const author = JSON.stringify(p.authorName ?? "")
+            const createdAt = new Date(p.createdAt).toISOString()
+
+            const ev = p.evaluation || {}
+            const overallScore = String(ev.overallScore ?? '')
+            const meta = ev.metadata || {}
+            const evaluatedAt = meta.evaluatedAt ?? ''
+            const modelVersion = JSON.stringify(meta.modelVersion ?? '')
+            const promptVersion = JSON.stringify(meta.promptVersion ?? '')
+            const policyVersion = JSON.stringify(meta.policyVersion ?? '')
+
+            rows.push([
+              id,
+              title,
+              type,
+              author,
+              createdAt,
+              overallScore,
+              evaluatedAt,
+              modelVersion,
+              promptVersion,
+              policyVersion,
+            ].join(','))
+          }
+
+          const csv = rows.join('\n')
+          const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+          const url = URL.createObjectURL(blob)
+          const a = document.createElement('a')
+          a.href = url
+          a.download = `pitches-export-${new Date().toISOString().slice(0,10)}.csv`
+          document.body.appendChild(a)
+          a.click()
+          document.body.removeChild(a)
+          URL.revokeObjectURL(url)
+          toast.success(`Exported ${Math.max(rows.length - 1, 0)} rows`, { id: toastId })
+        } catch (e) {
+          toast.error("Export failed", { id: toastId })
+        } finally {
+          setExportRequested(false)
+        }
+    }, [exportRequested, organization, pitches])
 
     return (
         <SidebarMenu>
@@ -122,6 +196,113 @@ export function NavUser({isDark, className}: NavUserProps) {
                             </div>
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator/>
+                        {/* Organization Switcher */}
+                        {userMemberships?.data && userMemberships.data.length > 0 && (
+                          <>
+                            <DropdownMenuLabel className="text-xs text-muted-foreground font-normal px-2">
+                              Switch organization
+                            </DropdownMenuLabel>
+                            {userMemberships.data.map((m) => (
+                              <DropdownMenuItem
+                                key={m.organization.id}
+                                onClick={() => setActive?.({ organization: m.organization.id })}
+                                className="gap-2"
+                                aria-current={organization?.id === m.organization.id}
+                              >
+                                <div className="flex h-6 w-6 items-center justify-center rounded-sm border border-border bg-muted overflow-hidden">
+                                  {m.organization.imageUrl ? (
+                                    // eslint-disable-next-line @next/next/no-img-element
+                                    <img src={m.organization.imageUrl} alt={m.organization.name} className="h-full w-full object-cover" />
+                                  ) : (
+                                    <Building2 className="h-4 w-4 text-muted-foreground" />
+                                  )}
+                                </div>
+                                <span className="truncate">
+                                  {m.organization.name}
+                                </span>
+                                {organization?.id === m.organization.id && (
+                                  <Check className="ml-auto h-4 w-4 text-primary" />
+                                )}
+                              </DropdownMenuItem>
+                            ))}
+                            <DropdownMenuSeparator/>
+                          </>
+                        )}
+                        {/* Organization submenu with chevron + create */}
+                        <DropdownMenuSub>
+                            <DropdownMenuSubTrigger className="gap-2">
+                                <Building2 className="mr-2 h-4 w-4 text-muted-foreground" />
+                                <span>Organization</span>
+                            </DropdownMenuSubTrigger>
+                            <DropdownMenuSubContent>
+                                {userMemberships?.data?.map((m) => (
+                                    <DropdownMenuItem
+                                        key={m.organization.id}
+                                        onClick={() => setActive?.({ organization: m.organization.id })}
+                                        className="gap-2"
+                                        aria-current={organization?.id === m.organization.id}
+                                    >
+                                        <div className="flex h-6 w-6 items-center justify-center rounded-sm border border-border bg-muted overflow-hidden">
+                                            {m.organization.imageUrl ? (
+                                                // eslint-disable-next-line @next/next/no-img-element
+                                                <img src={m.organization.imageUrl} alt={m.organization.name} className="h-full w-full object-cover" />
+                                            ) : (
+                                                <Building2 className="h-4 w-4 text-muted-foreground" />
+                                            )}
+                                        </div>
+                                        <span className="truncate">{m.organization.name}</span>
+                                        {organization?.id === m.organization.id && (
+                                            <Check className="ml-auto h-4 w-4 text-primary" />
+                                        )}
+                                    </DropdownMenuItem>
+                                ))}
+                                <Dialog>
+                                    <DialogTrigger asChild>
+                                        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="gap-2">
+                                            <div className="flex h-6 w-6 items-center justify-center rounded-sm border border-dashed border-muted-foreground/60">
+                                                <Plus className="h-4 w-4 text-muted-foreground" />
+                                            </div>
+                                            <span>Create Organization</span>
+                                        </DropdownMenuItem>
+                                    </DialogTrigger>
+                                    <DialogContent className="p-0 bg-transparent border-none max-w-[430px]">
+                                        <CreateOrganization
+                                            appearance={{
+                                                baseTheme: isDark ? dark : undefined,
+                                                elements: {
+                                                    formButtonPrimary: "bg-primary text-primary-foreground hover:bg-primary/90",
+                                                    card: "bg-background border border-border shadow-lg",
+                                                    headerTitle: "text-xl font-bold",
+                                                },
+                                            }}
+                                            routing="hash"
+                                        />
+                                    </DialogContent>
+                                </Dialog>
+                                <DropdownMenuSeparator />
+                                <Dialog>
+                                    <DialogTrigger asChild>
+                                        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="gap-2">
+                                            <Building2 className="mr-2 h-4 w-4 text-muted-foreground" />
+                                            <span>Organization Settings</span>
+                                        </DropdownMenuItem>
+                                    </DialogTrigger>
+                                    <DialogContent className="max-w-[860px] w-[95vw] p-4">
+                                        <OrganizationProfile
+                                            routing="hash"
+                                            appearance={{
+                                                baseTheme: isDark ? dark : undefined,
+                                                elements: {
+                                                    formButtonPrimary: "bg-primary text-primary-foreground hover:bg-primary/90",
+                                                    card: "bg-background",
+                                                },
+                                            }}
+                                        />
+                                    </DialogContent>
+                                </Dialog>
+                            </DropdownMenuSubContent>
+                        </DropdownMenuSub>
+
                         <DropdownMenuItem
                             onClick={() => openUserProfile({appearance: {baseTheme: isDark ? dark : undefined}})}
                             className="gap-2"
@@ -129,9 +310,13 @@ export function NavUser({isDark, className}: NavUserProps) {
                             <User className="mr-2 h-4 w-4 text-muted-foreground"/>
                             Account Settings
                         </DropdownMenuItem>
-                        <DropdownMenuItem className="gap-2">
-                            <Shield className="mr-2 h-4 w-4 text-muted-foreground"/>
-                            Privacy & Security
+                        <DropdownMenuItem
+                            className="gap-2"
+                            onClick={() => setExportRequested(true)}
+                            disabled={!organization || !Array.isArray(pitches)}
+                        >
+                            <Download className="mr-2 h-4 w-4 text-muted-foreground"/>
+                            Export CSV
                         </DropdownMenuItem>
                         <DropdownMenuSeparator/>
                         <DropdownMenuGroup>

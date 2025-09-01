@@ -44,7 +44,7 @@ export function SearchForm({
         if (newUrl !== currentUrl) {
             router.replace(newUrl);
         }
-    }, [debouncedValue, pathname, router, variant]);
+    }, [debouncedValue, pathname, router, variant, searchParams]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         onChange(e.target.value);

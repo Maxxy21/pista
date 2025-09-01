@@ -120,6 +120,7 @@ const pitches = defineTable({
     updatedAt: v.number(),
 })
     .index("by_org", ["orgId"])
+    .index("by_user", ["userId"]) 
     .index("by_user_org", ["userId", "orgId"])
     .searchIndex("search_title", {
         searchField: "title",

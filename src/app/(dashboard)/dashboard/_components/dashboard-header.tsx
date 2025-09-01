@@ -90,17 +90,6 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
 
                 {/* Right section - Enhanced Controls */}
                 <div className="flex items-center gap-3 ml-auto">
-                    {exportRequested && (
-                        <CsvDownloader onDone={() => setExportRequested(false)} />
-                    )}
-                    <Button
-                        variant="outline"
-                        className="h-9 px-4 font-medium hover:bg-muted/50 hover:border-muted-foreground/30"
-                        onClick={() => setExportRequested(true)}
-                        aria-label="Export CSV"
-                    >
-                        Export CSV
-                    </Button>
                     {/* Score Filter */}
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>

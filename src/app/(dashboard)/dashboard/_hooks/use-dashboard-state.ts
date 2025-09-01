@@ -5,19 +5,23 @@ import qs from "query-string";
 export const useDashboardState = (searchParams: ReadonlyURLSearchParams) => {
     const router = useRouter();
     const [searchValue, setSearchValue] = useState("");
-    const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-    const [scoreFilter, setScoreFilter] = useState<string>("all");
-    const [sortBy, setSortBy] = useState<"newest" | "score" | "updated">("newest");
+    const [viewMode, setViewModeState] = useState<"grid" | "list">("grid");
+    const [scoreFilter, setScoreFilterState] = useState<string>("all");
+    const [sortBy, setSortByState] = useState<"newest" | "score" | "updated">("newest");
 
     // Get search query from URL
     const searchQuery = searchParams.get("search") || "";
+    const modeQuery = (searchParams.get("mode") || "grid") as "grid" | "list";
+    const scoreQuery = (searchParams.get("score") || "all") as string;
+    const sortQuery = (searchParams.get("sort") || "newest") as "newest" | "score" | "updated";
 
     // Update search value when URL changes
     useEffect(() => {
-        if (searchQuery) {
-            setSearchValue(searchQuery);
-        }
-    }, [searchQuery]);
+        if (searchQuery) setSearchValue(searchQuery);
+        setViewModeState(modeQuery);
+        setScoreFilterState(scoreQuery);
+        setSortByState(sortQuery);
+    }, [searchQuery, modeQuery, scoreQuery, sortQuery]);
 
     // Handle search form submission
     const handleSearch = (e: FormEvent) => {
@@ -43,6 +47,45 @@ export const useDashboardState = (searchParams: ReadonlyURLSearchParams) => {
             },
         }, {skipEmptyString: true, skipNull: true});
 
+        router.push(url);
+    };
+
+    // Persist score filter to URL
+    const setScoreFilter = (value: string) => {
+        setScoreFilterState(value);
+        const url = qs.stringifyUrl({
+            url: "/dashboard",
+            query: {
+                ...Object.fromEntries(searchParams.entries()),
+                score: value === "all" ? undefined : value,
+            },
+        }, { skipEmptyString: true, skipNull: true });
+        router.push(url);
+    };
+
+    // Persist sort to URL
+    const setSortBy = (value: "newest" | "score" | "updated") => {
+        setSortByState(value);
+        const url = qs.stringifyUrl({
+            url: "/dashboard",
+            query: {
+                ...Object.fromEntries(searchParams.entries()),
+                sort: value === "newest" ? undefined : value,
+            },
+        }, { skipEmptyString: true, skipNull: true });
+        router.push(url);
+    };
+
+    // Persist view mode to URL
+    const setViewMode = (value: "grid" | "list") => {
+        setViewModeState(value);
+        const url = qs.stringifyUrl({
+            url: "/dashboard",
+            query: {
+                ...Object.fromEntries(searchParams.entries()),
+                mode: value === "grid" ? undefined : value,
+            },
+        }, { skipEmptyString: true, skipNull: true });
         router.push(url);
     };
 
@@ -73,4 +116,4 @@ export const useDashboardState = (searchParams: ReadonlyURLSearchParams) => {
         handleTabChange,
         getScoreRange
     };
-}; 
+};

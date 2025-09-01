@@ -4,6 +4,7 @@ import * as React from "react";
 import { ChevronLeft, ArrowLeft, Star, Calendar, FileText, Clock8, Folder, PlusCircle } from "lucide-react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { useOrganization, useAuth, useUser } from "@clerk/nextjs";
+import { useWorkspace } from "@/hooks/use-workspace";
 import { useDebounceValue } from "usehooks-ts";
 import { motion } from "framer-motion";
 import qs from "query-string";
@@ -25,8 +26,7 @@ import { useQuery } from "convex/react";
 import { Id } from "@/convex/_generated/dataModel";
 import { api } from "@/convex/_generated/api";
 import { type UniversalPitchData } from "@/lib/types/pitch";
-import { NavUser } from "./nav-user";
-import { TeamSwitcher } from "./team-switcher";
+// User menu and team switcher consolidated into top navbar
 import { SearchForm } from "../forms/search-form";
 import { InviteButton } from "../common/invite-button";
 import { useTheme } from "next-themes";
@@ -43,6 +43,7 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
     const params = useParams();
     const searchParams = useSearchParams();
     const { organization } = useOrganization();
+    const workspace = useWorkspace();
     const { isLoaded: isAuthLoaded, isSignedIn } = useAuth();
     const { user } = useUser();
     const { resolvedTheme } = useTheme();
@@ -77,12 +78,10 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
         setSearch(value);
     }, []);
 
-    const queryParams = isAuthLoaded && isSignedIn && organization
-        ? {
-              orgId: organization.id,
-              search: debouncedSearch,
-              sortBy: "date" as const,
-          }
+    const queryParams = isAuthLoaded && isSignedIn
+        ? (workspace.mode === 'org' && workspace.orgId
+            ? { orgId: workspace.orgId, search: debouncedSearch, sortBy: "date" as const }
+            : user?.id ? { ownerUserId: user.id, search: debouncedSearch, sortBy: "date" as const } : "skip")
         : "skip";
     const pitches = useQuery(api.pitches.getFilteredPitches, queryParams);
     
@@ -189,7 +188,7 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
                         </SidebarMenuButton>
                     </div>
                 ) : (
-                    <div className="px-4 space-y-4">
+                    <div className="px-4 space-y-3">
                         <div className="flex items-center gap-3">
                             <motion.div
                                 whileHover={{ scale: 1.05 }}
@@ -202,6 +201,17 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
                                 Pista
                             </h1>
                         </div>
+                        {organization && (
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground/90 px-1">
+                            <div className="flex h-6 w-6 items-center justify-center rounded-md border border-border bg-muted overflow-hidden">
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              {organization.imageUrl ? (
+                                <img src={organization.imageUrl} alt={organization.name} className="h-full w-full object-cover" />
+                              ) : null}
+                            </div>
+                            <span className="truncate" title={organization.name}>{organization.name}</span>
+                          </div>
+                        )}
                         {isAuthLoaded && organization && (
                             <div className="space-y-4">
                                 <motion.div
@@ -427,19 +437,7 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
                             </SidebarMenuItem>
                         </SidebarMenu>
                         
-                        {/* Team Switcher */}
-                        <SidebarMenu>
-                            <SidebarMenuItem>
-                                <TeamSwitcher isDark={isDark} />
-                            </SidebarMenuItem>
-                        </SidebarMenu>
-                        
-                        {/* User Profile */}
-                        <SidebarMenu>
-                            <SidebarMenuItem>
-                                <NavUser isDark={isDark} />
-                            </SidebarMenuItem>
-                        </SidebarMenu>
+                        {/* User Profile and Team Switcher moved to top avatar menu for consistency */}
                     </>
                 )}
             </SidebarFooter>

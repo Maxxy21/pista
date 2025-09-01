@@ -233,7 +233,8 @@ export const unfavorite = mutation({
 
 export const getFilteredPitches = query({
     args: {
-        orgId: v.string(),
+        orgId: v.optional(v.string()),
+        ownerUserId: v.optional(v.string()),
         search: v.optional(v.string()),
         favorites: v.optional(v.boolean()),
         sortBy: v.optional(v.union(v.literal("date"), v.literal("score"))),
@@ -247,10 +248,24 @@ export const getFilteredPitches = query({
     handler: async (ctx, args) => {
         const identity = await validateUser(ctx);
 
-        let pitches = await ctx.db
-            .query("pitches")
-            .withIndex("by_org", (q) => q.eq("orgId", args.orgId))
-            .collect();
+        let pitches: Doc<"pitches">[] = [];
+        if (args.orgId) {
+            pitches = await ctx.db
+                .query("pitches")
+                .withIndex("by_org", (q) => q.eq("orgId", args.orgId!))
+                .collect();
+        } else if (args.ownerUserId) {
+            pitches = await ctx.db
+                .query("pitches")
+                .withIndex("by_user", (q) => q.eq("userId", args.ownerUserId!))
+                .collect();
+        } else {
+            // Default to current user's personal pitches
+            pitches = await ctx.db
+                .query("pitches")
+                .withIndex("by_user", (q) => q.eq("userId", identity.subject))
+                .collect();
+        }
 
         if (args.search) {
             const searchTerm = args.search.trim().toLowerCase();
@@ -277,12 +292,20 @@ export const getFilteredPitches = query({
             );
         }
 
-        const favorites = await ctx.db
-            .query("userFavorites")
-            .withIndex("by_user_org_pitch", (q) =>
-                q.eq("userId", identity.subject).eq("orgId", args.orgId)
-            )
-            .collect();
+        let favorites: Doc<"userFavorites">[] = [] as any;
+        if (args.orgId) {
+            favorites = await ctx.db
+                .query("userFavorites")
+                .withIndex("by_user_org_pitch", (q) =>
+                    q.eq("userId", identity.subject).eq("orgId", args.orgId!)
+                )
+                .collect();
+        } else {
+            favorites = await ctx.db
+                .query("userFavorites")
+                .withIndex("by_user", (q) => q.eq("userId", identity.subject))
+                .collect();
+        }
 
         const favoritedIds = new Set(favorites.map((f) => f.pitchId));
 

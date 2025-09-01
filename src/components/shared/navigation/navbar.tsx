@@ -30,23 +30,23 @@ export function Navbar({ title = "Dashboard", rateLimit, searchValue, setSearchV
 
   return (
     <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="flex h-16 items-center gap-4 px-4 md:px-6 lg:px-8">
+      <div className="flex h-16 items-center gap-3 px-3 md:px-6 lg:px-8">
         {/* Left section */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 min-w-0">
           <SidebarTrigger className="-ml-1" />
-          <Separator orientation="vertical" className="h-5" />
-          <h1 className="text-xl font-bold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
+          <Separator orientation="vertical" className="h-5 hidden sm:block" />
+          <h1 className="hidden sm:block text-lg md:text-xl font-bold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent truncate">
             {title}
           </h1>
         </div>
 
         {/* Center section - Search (Miro-style) */}
         {searchValue !== undefined && setSearchValue && (
-          <div className="flex-1 flex justify-center max-w-xl mx-4">
+          <div className="flex flex-1 justify-center mx-2 md:mx-4 min-w-0 max-w-full md:max-w-2xl">
             <SearchForm
               value={searchValue}
               onChange={setSearchValue}
-              className="w-full max-w-md"
+              className="w-full"
               placeholder="Search pitches..."
               variant="standalone"
               autoFocus={false}
@@ -55,7 +55,7 @@ export function Navbar({ title = "Dashboard", rateLimit, searchValue, setSearchV
         )}
 
         {/* Right section */}
-        <div className="flex items-center gap-4 ml-auto">
+        <div className="flex items-center gap-2 sm:gap-3 ml-auto">
           {/* Rate Limit Display */}
           {rateLimit && (
             <div className="hidden sm:flex items-center gap-3 px-3 py-2 rounded-lg bg-muted/40 border border-border">

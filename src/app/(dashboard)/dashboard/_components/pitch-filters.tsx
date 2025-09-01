@@ -1,17 +1,13 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Filter, ArrowDownUp, List, GridIcon, PlusCircle, FileText } from "lucide-react";
-import { SearchForm } from "@/components/shared/forms/search-form";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Filter, ArrowDownUp, List, GridIcon, X } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
-import { useRouter } from "next/navigation";
 import { NewPitchButton } from "./new-pitch-button";
 import { useOrganization } from "@clerk/nextjs";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface PitchFiltersProps {
     searchValue: string;
@@ -23,6 +19,7 @@ interface PitchFiltersProps {
     sortBy: "newest" | "score" | "updated";
     setSortBy: (sort: "newest" | "score" | "updated") => void;
     handleSearch: (e: React.FormEvent) => void;
+    resultsCount?: number;
 }
 
 const SCORE_FILTER_LABELS: Record<string, string> = {
@@ -60,9 +57,12 @@ export const PitchFilters: React.FC<PitchFiltersProps> = ({
     setScoreFilter,
     sortBy,
     setSortBy,
+    handleSearch,
+    resultsCount,
 }) => {
-    const router = useRouter()
-    const { organization } = useOrganization()
+    const { organization } = useOrganization();
+    const [filtersOpen, setFiltersOpen] = useState(false);
+    const isMobile = useIsMobile();
     
     const handleViewModeToggle = useCallback(() => {
         setViewMode(viewMode === "grid" ? "list" : "grid");
@@ -73,143 +73,103 @@ export const PitchFilters: React.FC<PitchFiltersProps> = ({
         [scoreFilter]
     );
 
-    const scoreFilterLabelMobile = useMemo(
-        () => SCORE_FILTER_LABELS_MOBILE[scoreFilter] || SCORE_FILTER_LABELS_MOBILE.all,
-        [scoreFilter]
-    );
-
     const sortByLabel = useMemo(
         () => SORT_BY_LABELS[sortBy],
         [sortBy]
     );
 
-    const sortByLabelMobile = useMemo(
-        () => SORT_BY_LABELS_MOBILE[sortBy],
-        [sortBy]
-    );
+    const handleScoreChange = (v: string) => setScoreFilter(v);
+    const handleSortChange = (v: string) => setSortBy(v as 'newest' | 'score' | 'updated');
 
     return (
-        <div className="border-b bg-gradient-to-r from-muted/5 via-muted/10 to-muted/5 px-4 md:px-6 py-4">
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
-                {/* Left side - Filters (Beautiful Miro-style) */}
+        <div className="border-b bg-gradient-to-r from-muted/5 via-muted/10 to-muted/5 px-3 md:px-6 py-2.5 md:py-3.5">
+            <div className="flex items-center justify-between gap-2 md:gap-4">
                 <div className="flex items-center gap-2 sm:gap-3 md:gap-4 min-w-0">
-                    <span className="text-sm font-semibold text-foreground/80 hidden md:inline flex-shrink-0">Filter by</span>
-                    
-                    {/* Score Filter */}
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button 
-                                variant="outline"
-                                size="sm"
-                                className={`h-9 gap-2 px-3 sm:px-4 text-sm font-medium transition-all duration-200 shadow-sm hover:shadow-md flex-shrink-0 ${
-                                    scoreFilter !== "all" 
-                                        ? "bg-primary/10 text-primary border-primary/30 hover:bg-primary/15" 
-                                        : "hover:bg-background/80 border-border/60 hover:border-border"
-                                }`}
-                            >
-                                <Filter className="h-4 w-4 flex-shrink-0" />
-                                <span className="truncate max-w-20 sm:max-w-32 md:max-w-none">
-                                    <span className="sm:hidden">{scoreFilterLabelMobile}</span>
-                                    <span className="hidden sm:inline">{scoreFilterLabel}</span>
-                                </span>
-                                {scoreFilter !== "all" && (
-                                    <div className="w-2 h-2 rounded-full bg-primary animate-pulse flex-shrink-0" />
-                                )}
+                    <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
+                        <SheetTrigger asChild>
+                            <Button className="sm:hidden h-9 gap-2 px-3 text-sm font-medium" variant="outline">
+                                <Filter className="h-4 w-4" />
+                                Filters
                             </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="start" className="min-w-56 shadow-lg border-border/50">
-                            {Object.entries(SCORE_FILTER_LABELS).map(([key, label]) => (
-                                <DropdownMenuItem
-                                    key={key}
-                                    onClick={() => setScoreFilter(key)}
-                                    className={`font-medium transition-colors ${
-                                        scoreFilter === key 
-                                            ? "bg-primary/15 text-primary font-semibold" 
-                                            : "hover:bg-muted/60"
-                                    }`}
-                                >
-                                    {label}
-                                    {scoreFilter === key && (
-                                        <div className="ml-auto w-2 h-2 rounded-full bg-primary" />
-                                    )}
-                                </DropdownMenuItem>
-                            ))}
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                        </SheetTrigger>
+                        <SheetContent side={isMobile ? "bottom" : "right"} className="sm:max-w-sm w-full">
+                            <SheetHeader>
+                                <SheetTitle>Filters</SheetTitle>
+                            </SheetHeader>
+                            <div className="mt-4 space-y-4">
+                                <div>
+                                    <div className="text-sm font-medium mb-2">Score</div>
+                                    <Select value={scoreFilter} onValueChange={handleScoreChange}>
+                                        <SelectTrigger className="w-full">
+                                            <SelectValue placeholder="Score" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {Object.entries(SCORE_FILTER_LABELS_MOBILE).map(([key, label]) => (
+                                                <SelectItem key={key} value={key}>{label}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div>
+                                    <div className="text-sm font-medium mb-2">Sort by</div>
+                                    <Select value={sortBy} onValueChange={handleSortChange}>
+                                        <SelectTrigger className="w-full">
+                                            <SelectValue placeholder="Sort by" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {Object.entries(SORT_BY_LABELS_MOBILE).map(([key, label]) => (
+                                                <SelectItem key={key} value={key}>{label}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="flex items-center justify-between pt-2">
+                                    <Button variant="ghost" size="sm" onClick={() => { setScoreFilter("all"); setSortBy("newest"); }}>Clear all</Button>
+                                    <Button size="sm" onClick={() => setFiltersOpen(false)}>Done</Button>
+                                </div>
+                            </div>
+                        </SheetContent>
+                    </Sheet>
 
-                    <Separator orientation="vertical" className="h-5 bg-border/60 hidden md:block flex-shrink-0" />
-                    
-                    <span className="text-sm font-semibold text-foreground/80 hidden md:inline flex-shrink-0">Sort by</span>
-                    
-                    {/* Sort By */}
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button 
-                                variant="outline"
-                                size="sm"
-                                className={`h-9 gap-2 px-3 sm:px-4 text-sm font-medium transition-all duration-200 shadow-sm hover:shadow-md flex-shrink-0 ${
-                                    sortBy !== "newest" 
-                                        ? "bg-secondary/10 text-secondary-foreground border-secondary/30 hover:bg-secondary/15" 
-                                        : "hover:bg-background/80 border-border/60 hover:border-border"
-                                }`}
-                            >
-                                <ArrowDownUp className="h-4 w-4 flex-shrink-0" />
-                                <span className="truncate max-w-16 sm:max-w-24 md:max-w-none">
-                                    <span className="sm:hidden">{sortByLabelMobile}</span>
-                                    <span className="hidden sm:inline">{sortByLabel}</span>
-                                </span>
-                                {sortBy !== "newest" && (
-                                    <div className="w-2 h-2 rounded-full bg-secondary-foreground/60 animate-pulse flex-shrink-0" />
-                                )}
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="start" className="min-w-56 shadow-lg border-border/50">
-                            {Object.entries(SORT_BY_LABELS).map(([key, label]) => (
-                                <DropdownMenuItem
-                                    key={key}
-                                    onClick={() => setSortBy(key as PitchFiltersProps["sortBy"])}
-                                    className={`font-medium transition-colors ${
-                                        sortBy === key 
-                                            ? "bg-secondary/15 text-secondary-foreground font-semibold" 
-                                            : "hover:bg-muted/60"
-                                    }`}
-                                >
-                                    {label}
-                                    {sortBy === key && (
-                                        <div className="ml-auto w-2 h-2 rounded-full bg-secondary-foreground" />
-                                    )}
-                                </DropdownMenuItem>
-                            ))}
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setFiltersOpen(true)}
+                        className="h-9 gap-2 px-3 sm:px-4 text-sm font-medium hidden sm:inline-flex"
+                    >
+                        <Filter className="h-4 w-4" />
+                        <span>{scoreFilterLabel}</span>
+                    </Button>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setFiltersOpen(true)}
+                        className="h-9 gap-2 px-3 sm:px-4 text-sm font-medium hidden sm:inline-flex"
+                    >
+                        <ArrowDownUp className="h-4 w-4" />
+                        <span>{sortByLabel}</span>
+                    </Button>
                 </div>
 
-                {/* Right side - Actions and View Toggle */}
                 <div className="flex items-center gap-2 sm:gap-3 justify-end flex-shrink-0">
-                    {/* Action Buttons */}
                     {organization && (
                         <NewPitchButton
                             orgId={organization.id}
                             variant="default"
                             size="sm"
-                            className="h-9 gap-2 px-4 sm:px-4 text-sm font-semibold bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary/80 shadow-sm hover:shadow-md transition-all duration-200 flex-shrink-0"
+                            className="h-9 gap-2 px-4 text-sm font-semibold"
                             showIcon={true}
                             mobileIconOnly={true}
                         />
                     )}
 
-                    <Separator orientation="vertical" className="h-5 bg-border/60 hidden sm:block" />
+                    <Separator orientation="vertical" className="h-5 hidden sm:block" />
 
-                    {/* View Mode Toggle */}
-                    <div className="flex items-center bg-muted/40 border border-border/60 rounded-lg p-0.5 shadow-sm flex-shrink-0">
+                    <div className="hidden sm:flex items-center bg-muted rounded-lg p-0.5 flex-shrink-0">
                         <Button
                             variant={viewMode === "grid" ? "default" : "ghost"}
                             size="sm"
-                            className={`h-8 w-8 p-0 rounded-md border-0 transition-all duration-200 ${
-                                viewMode === "grid" 
-                                    ? "bg-background shadow-sm border border-border/30" 
-                                    : "hover:bg-background/60"
-                            }`}
+                            className="h-8 w-8 p-0"
                             onClick={() => setViewMode("grid")}
                         >
                             <GridIcon className="h-4 w-4" />
@@ -217,11 +177,7 @@ export const PitchFilters: React.FC<PitchFiltersProps> = ({
                         <Button
                             variant={viewMode === "list" ? "default" : "ghost"}
                             size="sm"
-                            className={`h-8 w-8 p-0 rounded-md border-0 transition-all duration-200 ${
-                                viewMode === "list" 
-                                    ? "bg-background shadow-sm border border-border/30" 
-                                    : "hover:bg-background/60"
-                            }`}
+                            className="h-8 w-8 p-0"
                             onClick={() => setViewMode("list")}
                         >
                             <List className="h-4 w-4" />
