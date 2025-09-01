@@ -6,10 +6,7 @@ import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
 import { NavUserNavbar } from "./nav-user-navbar"
 import { useWorkspace } from "@/hooks/use-workspace"
-import { useOrganizationList, CreateOrganization } from "@clerk/nextjs"
-import { dark } from "@clerk/themes"
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
+ 
 import { useTheme } from "next-themes"
 import { Progress } from "@/components/ui/progress"
 import { Clock } from "lucide-react"
@@ -30,8 +27,7 @@ export function Navbar({ title = "Dashboard", rateLimit, searchValue, setSearchV
   const { resolvedTheme } = useTheme()
   const isDark = resolvedTheme === "dark"
   const workspace = useWorkspace()
-  const { userMemberships } = useOrganizationList({ userMemberships: { infinite: true } })
-  const hasOrgs = (userMemberships?.data?.length || 0) > 0
+  
 
   const rateLimitPercentage = rateLimit ? (rateLimit.used / rateLimit.total) * 100 : 0
   const isNearLimit = rateLimitPercentage > 80
@@ -68,25 +64,7 @@ export function Navbar({ title = "Dashboard", rateLimit, searchValue, setSearchV
             <span className="inline-flex h-6 items-center rounded-md border px-2 bg-muted/40">
               {workspace.mode === 'org' ? 'Organization' : 'My Workspace'}
             </span>
-            {workspace.mode === 'user' && !hasOrgs && (
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button size="sm" className="h-6 px-2 text-xs">Create Team</Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-[860px] w-[95vw] p-4">
-                  <CreateOrganization
-                    routing="hash"
-                    appearance={{
-                      baseTheme: isDark ? dark : undefined,
-                      elements: {
-                        formButtonPrimary: "bg-primary text-primary-foreground hover:bg-primary/90",
-                        card: "bg-background",
-                      },
-                    }}
-                  />
-                </DialogContent>
-              </Dialog>
-            )}
+            
           </div>
           {/* Rate Limit Display */}
           {rateLimit && (

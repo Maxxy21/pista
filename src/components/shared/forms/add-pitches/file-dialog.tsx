@@ -56,7 +56,7 @@ interface StepsConfig {
 type Step = keyof StepsConfig;
 
 interface ModernEvaluationDialogProps {
-    orgId: string;
+    orgId?: string;
     children?: React.ReactNode;
     className?: string;
 }
@@ -216,7 +216,7 @@ export function FileDialog({
 
             // Create pitch in database
             const id = await createPitch({
-                orgId,
+                orgId: orgId ?? "",
                 title: pitchData.title,
                 text: pitchText,
                 type: pitchData.type,

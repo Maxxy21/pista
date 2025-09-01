@@ -28,7 +28,7 @@ const validateUser = async (ctx: { auth: any }) => {
 
 export const create = mutation({
     args: {
-        orgId: v.string(),
+        orgId: v.optional(v.string()),
         title: v.string(),
         text: v.string(),
         type: v.string(),
@@ -40,6 +40,7 @@ export const create = mutation({
         const identity = await validateUser(ctx);
         return ctx.db.insert("pitches", {
             ...args,
+            orgId: args.orgId ?? "",
             userId: identity.subject,
             authorName: identity.name!,
             createdAt: Date.now(),
@@ -278,15 +279,20 @@ export const getFilteredPitches = query({
                 .withIndex("by_org", (q) => q.eq("orgId", args.orgId!))
                 .collect();
         } else if (args.ownerUserId) {
+            // Personal workspace: only pitches with empty orgId
             pitches = await ctx.db
                 .query("pitches")
-                .withIndex("by_user", (q) => q.eq("userId", args.ownerUserId!))
+                .withIndex("by_user_org", (q) =>
+                    q.eq("userId", args.ownerUserId!).eq("orgId", "")
+                )
                 .collect();
         } else {
             // Default to current user's personal pitches
             pitches = await ctx.db
                 .query("pitches")
-                .withIndex("by_user", (q) => q.eq("userId", identity.subject))
+                .withIndex("by_user_org", (q) =>
+                    q.eq("userId", identity.subject).eq("orgId", "")
+                )
                 .collect();
         }
 
@@ -361,12 +367,16 @@ export const getPitchStats = query({
         } else if (args.ownerUserId) {
             pitches = await ctx.db
                 .query("pitches")
-                .withIndex("by_user", (q) => q.eq("userId", args.ownerUserId!))
+                .withIndex("by_user_org", (q) =>
+                    q.eq("userId", args.ownerUserId!).eq("orgId", "")
+                )
                 .collect();
         } else {
             pitches = await ctx.db
                 .query("pitches")
-                .withIndex("by_user", (q) => q.eq("userId", identity.subject))
+                .withIndex("by_user_org", (q) =>
+                    q.eq("userId", identity.subject).eq("orgId", "")
+                )
                 .collect();
         }
 

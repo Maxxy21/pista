@@ -164,8 +164,8 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
             <SidebarFooter className="p-2 space-y-2">
                 {/* Action Buttons */}
                 <SidebarMenu className="space-y-1">
-                    {organization && (
-                        <SidebarMenuItem>
+                    <SidebarMenuItem>
+                        {organization ? (
                             <FileDialog orgId={organization.id}>
                                 <SidebarMenuButton 
                                     className="bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary/80 text-primary-foreground font-medium shadow-sm transition-all duration-200"
@@ -175,11 +175,15 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
                                     <span>Create New</span>
                                 </SidebarMenuButton>
                             </FileDialog>
+                        ) : (
+                            <InviteButton isDark={isDark} />
+                        )}
+                    </SidebarMenuItem>
+                    {organization && (
+                        <SidebarMenuItem>
+                            <InviteButton isDark={isDark} />
                         </SidebarMenuItem>
                     )}
-                    <SidebarMenuItem>
-                        <InviteButton isDark={isDark} />
-                    </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarFooter>
             <SidebarRail />

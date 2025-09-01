@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { FileDialog } from "@/components/shared/forms/add-pitches/file-dialog";
 
 interface NewPitchButtonProps {
-    orgId: string;
+    orgId?: string;
     disabled?: boolean;
     className?: string;
     variant?: "default" | "gradient" | "outline";

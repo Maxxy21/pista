@@ -3,6 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Filter, ArrowDownUp, List, GridIcon, X } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { NewPitchButton } from "./new-pitch-button";
+import { useWorkspace } from "@/hooks/use-workspace";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { CreateOrganization } from "@clerk/nextjs";
+import { dark } from "@clerk/themes";
 import { useOrganization } from "@clerk/nextjs";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -63,6 +67,7 @@ export const PitchFilters: React.FC<PitchFiltersProps> = ({
     const { organization } = useOrganization();
     const [filtersOpen, setFiltersOpen] = useState(false);
     const isMobile = useIsMobile();
+    const workspace = useWorkspace();
     
     const handleViewModeToggle = useCallback(() => {
         setViewMode(viewMode === "grid" ? "list" : "grid");
@@ -152,7 +157,7 @@ export const PitchFilters: React.FC<PitchFiltersProps> = ({
                 </div>
 
                 <div className="flex items-center gap-2 sm:gap-3 justify-end flex-shrink-0">
-                    {organization && (
+                    {workspace.mode === 'org' && organization ? (
                         <NewPitchButton
                             orgId={organization.id}
                             variant="default"
@@ -161,6 +166,26 @@ export const PitchFilters: React.FC<PitchFiltersProps> = ({
                             showIcon={true}
                             mobileIconOnly={true}
                         />
+                    ) : (
+                        <Dialog>
+                            <DialogTrigger asChild>
+                                <Button
+                                    variant="default"
+                                    size="sm"
+                                    className="h-9 gap-2 px-4 text-sm font-semibold"
+                                >
+                                    Create Team
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent className="max-w-[860px] w-[95vw] p-4">
+                                <CreateOrganization
+                                    routing="hash"
+                                    appearance={{
+                                        baseTheme: dark,
+                                    }}
+                                />
+                            </DialogContent>
+                        </Dialog>
                     )}
 
                     <Separator orientation="vertical" className="h-5 hidden sm:block" />
