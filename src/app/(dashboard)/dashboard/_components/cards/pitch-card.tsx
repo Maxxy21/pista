@@ -11,6 +11,7 @@ import { useAuth } from "@clerk/nextjs";
 import { Badge } from "@/components/ui/badge";
 import { Actions } from "@/components/shared/common/actions";
 import { useToast } from "@/components/ui/use-toast";
+import { useWorkspace } from "@/hooks/use-workspace";
 
 interface PitchCardProps {
     id: string;
@@ -39,6 +40,7 @@ export function PitchCard({
 }: PitchCardProps) {
     const { userId } = useAuth();
     const { toast } = useToast();
+    const workspace = useWorkspace();
 
     const authorLabel = useMemo(
         () => (userId === authorId ? "You" : authorName),
@@ -65,7 +67,8 @@ export function PitchCard({
             e.preventDefault();
 
             const action = isFavorite ? onUnfavorite : onFavorite;
-            action({ id, orgId }).catch(() =>
+            const payload = workspace.mode === 'org' ? { id, orgId } : { id };
+            action(payload as any).catch(() =>
                 toast({
                     title: "Error",
                     description: `Failed to ${isFavorite ? "unfavorite" : "favorite"}`,
@@ -73,7 +76,7 @@ export function PitchCard({
                 })
             );
         },
-        [isFavorite, onFavorite, onUnfavorite, id, orgId, toast]
+        [isFavorite, onFavorite, onUnfavorite, id, orgId, toast, workspace.mode]
     );
 
     const getScoreColor = useCallback((score?: number) => {

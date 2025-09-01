@@ -5,6 +5,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar"
 import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
 import { NavUserNavbar } from "./nav-user-navbar"
+import { useWorkspace } from "@/hooks/use-workspace"
 import { useTheme } from "next-themes"
 import { Progress } from "@/components/ui/progress"
 import { Clock } from "lucide-react"
@@ -24,6 +25,7 @@ interface NavbarProps {
 export function Navbar({ title = "Dashboard", rateLimit, searchValue, setSearchValue }: NavbarProps) {
   const { resolvedTheme } = useTheme()
   const isDark = resolvedTheme === "dark"
+  const workspace = useWorkspace()
 
   const rateLimitPercentage = rateLimit ? (rateLimit.used / rateLimit.total) * 100 : 0
   const isNearLimit = rateLimitPercentage > 80
@@ -56,6 +58,11 @@ export function Navbar({ title = "Dashboard", rateLimit, searchValue, setSearchV
 
         {/* Right section */}
         <div className="flex items-center gap-2 sm:gap-3 ml-auto">
+          <div className="hidden sm:flex items-center gap-2 text-xs text-muted-foreground">
+            <span className="inline-flex h-6 items-center rounded-md border px-2 bg-muted/40">
+              {workspace.mode === 'org' ? 'Organization' : 'My Workspace'}
+            </span>
+          </div>
           {/* Rate Limit Display */}
           {rateLimit && (
             <div className="hidden sm:flex items-center gap-3 px-3 py-2 rounded-lg bg-muted/40 border border-border">

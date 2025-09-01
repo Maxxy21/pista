@@ -179,7 +179,7 @@ export const remove = mutation({
 export const favorite = mutation({
     args: {
         id: v.id("pitches"),
-        orgId: v.string(),
+        orgId: v.optional(v.string()),
     },
     handler: async (ctx, args) => {
         const identity = await validateUser(ctx);
@@ -187,43 +187,66 @@ export const favorite = mutation({
         const pitch = await ctx.db.get(args.id);
         if (!pitch) throw new ConvexError("Pitch not found");
 
-        const existing = await ctx.db
-            .query("userFavorites")
-            .withIndex("by_user_org_pitch", (q) =>
-                q
-                    .eq("userId", identity.subject)
-                    .eq("orgId", args.orgId)
-                    .eq("pitchId", args.id)
-            )
-            .unique();
-
-        if (existing) throw new ConvexError("Already favorited");
-
-        await ctx.db.insert("userFavorites", {
-            userId: identity.subject,
-            pitchId: args.id,
-            orgId: args.orgId,
-        });
+        if (args.orgId) {
+            const existing = await ctx.db
+                .query("userFavorites")
+                .withIndex("by_user_org_pitch", (q) =>
+                    q
+                        .eq("userId", identity.subject)
+                        .eq("orgId", args.orgId!)
+                        .eq("pitchId", args.id)
+                )
+                .unique();
+            if (existing) throw new ConvexError("Already favorited");
+            await ctx.db.insert("userFavorites", {
+                userId: identity.subject,
+                pitchId: args.id,
+                orgId: args.orgId!,
+            });
+        } else {
+            const existing = await ctx.db
+                .query("userFavorites")
+                .withIndex("by_user_pitch", (q) =>
+                    q.eq("userId", identity.subject).eq("pitchId", args.id)
+                )
+                .unique();
+            if (existing) throw new ConvexError("Already favorited");
+            await ctx.db.insert("userFavorites", {
+                userId: identity.subject,
+                pitchId: args.id,
+                orgId: "", // personal workspace marker
+            });
+        }
     },
 });
 
 export const unfavorite = mutation({
     args: {
         id: v.id("pitches"),
-        orgId: v.string(),
+        orgId: v.optional(v.string()),
     },
     handler: async (ctx, args) => {
         const identity = await validateUser(ctx);
 
-        const favorite = await ctx.db
-            .query("userFavorites")
-            .withIndex("by_user_org_pitch", (q) =>
-                q
-                    .eq("userId", identity.subject)
-                    .eq("orgId", args.orgId)
-                    .eq("pitchId", args.id)
-            )
-            .unique();
+        let favorite;
+        if (args.orgId) {
+            favorite = await ctx.db
+                .query("userFavorites")
+                .withIndex("by_user_org_pitch", (q) =>
+                    q
+                        .eq("userId", identity.subject)
+                        .eq("orgId", args.orgId!)
+                        .eq("pitchId", args.id)
+                )
+                .unique();
+        } else {
+            favorite = await ctx.db
+                .query("userFavorites")
+                .withIndex("by_user_pitch", (q) =>
+                    q.eq("userId", identity.subject).eq("pitchId", args.id)
+                )
+                .unique();
+        }
 
         if (!favorite) throw new ConvexError("Not favorited");
 
