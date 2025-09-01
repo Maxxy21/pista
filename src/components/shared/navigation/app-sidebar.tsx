@@ -28,7 +28,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 // Team switcher moved into user avatar menu for consistency
 import { InviteButton } from "../common/invite-button";
-import { FileDialog } from "@/components/shared/forms/add-pitches/file-dialog";
+import Link from "next/link";
 import LogoIcon from "@/components/ui/logo-icon";
 
 const NAVIGATION_ITEMS = [
@@ -165,25 +165,20 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
                 {/* Action Buttons */}
                 <SidebarMenu className="space-y-1">
                     <SidebarMenuItem>
-                        {organization ? (
-                            <FileDialog orgId={organization.id}>
-                                <SidebarMenuButton 
-                                    className="bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary/80 text-primary-foreground font-medium shadow-sm transition-all duration-200"
-                                    tooltip={state === "collapsed" ? "New Pitch" : undefined}
-                                >
-                                    <PlusCircle />
-                                    <span>New Pitch</span>
-                                </SidebarMenuButton>
-                            </FileDialog>
-                        ) : (
-                            <InviteButton isDark={isDark} />
-                        )}
+                        <SidebarMenuButton 
+                            asChild
+                            className="bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary/80 text-primary-foreground font-medium shadow-sm transition-all duration-200"
+                            tooltip={state === "collapsed" ? "New Pitch" : undefined}
+                        >
+                            <Link href="/pitch/new">
+                                <PlusCircle />
+                                <span>New Pitch</span>
+                            </Link>
+                        </SidebarMenuButton>
                     </SidebarMenuItem>
-                    {organization && (
-                        <SidebarMenuItem>
-                            <InviteButton isDark={isDark} />
-                        </SidebarMenuItem>
-                    )}
+                    <SidebarMenuItem>
+                        <InviteButton isDark={isDark} />
+                    </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarFooter>
             <SidebarRail />
