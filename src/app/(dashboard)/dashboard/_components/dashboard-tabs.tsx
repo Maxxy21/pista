@@ -10,6 +10,7 @@ const TAB_ITEMS = [
     { value: "all", label: "All Pitches" },
     { value: "recent", label: "Recent" },
     { value: "favorites", label: "Favorites" },
+    { value: "new", label: "New" },
 ];
 
 export const DashboardTabs: React.FC<DashboardTabsProps> = ({

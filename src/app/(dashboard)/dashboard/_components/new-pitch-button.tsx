@@ -3,7 +3,7 @@
 import { PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface NewPitchButtonProps {
     orgId?: string;
@@ -34,9 +34,18 @@ export function NewPitchButton({
     showIcon = true,
     mobileIconOnly = false,
 }: NewPitchButtonProps) {
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const onClick = () => {
+        const current = new URLSearchParams(Array.from(searchParams.entries()));
+        current.set('view','new');
+        const q = current.toString();
+        router.replace(`/dashboard${q ? `?${q}` : ''}`);
+    };
     return (
-        <Button asChild
-                type="button"
+        <Button
+            type="button"
+            onClick={onClick}
                 disabled={disabled}
                 variant={variant === "outline" ? "outline" : "default"}
                 size={size}
@@ -47,14 +56,14 @@ export function NewPitchButton({
                 )}
                 aria-label="New pitch"
         >
-            <Link href="/pitch/new">
+            
                 {showIcon && <PlusCircle className="h-4 w-4" aria-hidden="true" />}
                 {mobileIconOnly ? (
                     <span className="hidden sm:inline">New Pitch</span>
                 ) : (
                     size !== "icon" && <span>New Pitch</span>
                 )}
-            </Link>
+            
         </Button>
     );
 }

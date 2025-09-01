@@ -170,7 +170,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
                             className="bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary/80 text-primary-foreground font-medium shadow-sm transition-all duration-200"
                             tooltip={state === "collapsed" ? "New Pitch" : undefined}
                         >
-                            <Link href="/pitch/new">
+                            <Link href="/dashboard?view=new">
                                 <PlusCircle />
                                 <span>New Pitch</span>
                             </Link>

@@ -8,6 +8,7 @@ import { api } from "@/convex/_generated/api";
 import { Loading } from "@/components/shared/auth/loading";
 import { DashboardTabs } from "./_components/dashboard-tabs";
 import { PitchFilters } from "./_components/pitch-filters";
+import { NewPitchPanel } from "./_components/new-pitch-panel";
 import { useSearchParams } from "next/navigation";
 import { useDashboardState } from "./_hooks/use-dashboard-state";
 import { usePrefetchPitches } from "@/hooks/use-prefetch-pitches";
@@ -143,7 +144,9 @@ export default function Dashboard() {
                 />
 
                 <div className="flex-1 p-4 md:p-6 pt-0">
-                    {renderEmptyState() || (
+                    {viewParam === 'new' ? (
+                        <NewPitchPanel />
+                    ) : (renderEmptyState() || (
                         <ErrorBoundary fallback={<PitchesGridSkeleton />}>
                             <Suspense fallback={<PitchesGridSkeleton />}>
                                 {useVirtualizedGrid ? (
