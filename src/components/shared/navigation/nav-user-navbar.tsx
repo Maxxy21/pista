@@ -57,7 +57,6 @@ export function NavUserNavbar({isDark, className}: NavUserNavbarProps) {
       workspace.mode === 'org' && workspace.orgId ? { orgId: workspace.orgId } : (workspace.userId ? { ownerUserId: workspace.userId } : "skip")
     ) as any[] | "skip" | undefined
 
-    if (!user) return null
 
     const setCtx = (mode: 'user' | 'org') => {
         const current = new URLSearchParams(Array.from(searchParams.entries()))
@@ -133,6 +132,8 @@ export function NavUserNavbar({isDark, className}: NavUserNavbarProps) {
           setExportRequested(false)
         }
     }, [exportRequested, organization, pitches])
+
+    if (!user) return null
 
     return (
         <DropdownMenu>

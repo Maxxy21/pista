@@ -64,7 +64,6 @@ export function NavUser({isDark, className}: NavUserProps) {
       workspace.mode === 'org' && workspace.orgId ? { orgId: workspace.orgId } : (workspace.userId ? { ownerUserId: workspace.userId } : "skip")
     ) as any[] | "skip" | undefined
 
-    if (!user) return null
 
     const setCtx = (mode: 'user' | 'org') => {
         const current = new URLSearchParams(Array.from(searchParams.entries()))
@@ -140,6 +139,8 @@ export function NavUser({isDark, className}: NavUserProps) {
           setExportRequested(false)
         }
     }, [exportRequested, organization, pitches])
+
+    if (!user) return null
 
     return (
         <SidebarMenu>
