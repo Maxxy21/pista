@@ -36,6 +36,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { format } from "date-fns";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
+import Image from "next/image";
 import { useApiMutation } from "@/hooks/use-api-mutation";
 
 // Using shared pitch type from lib/types
@@ -291,9 +292,14 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
                         {organization && (
                           <div className="flex items-center gap-2 text-sm text-muted-foreground/90 px-1">
                             <div className="flex h-6 w-6 items-center justify-center rounded-md border border-border bg-muted overflow-hidden">
-                              {/* eslint-disable-next-line @next/next/no-img-element */}
                               {organization.imageUrl ? (
-                                <img src={organization.imageUrl} alt={organization.name} className="h-full w-full object-cover" />
+                                <Image
+                                  src={organization.imageUrl}
+                                  alt={organization.name}
+                                  width={24}
+                                  height={24}
+                                  className="object-cover"
+                                />
                               ) : null}
                             </div>
                             <span className="truncate" title={organization.name}>{organization.name}</span>

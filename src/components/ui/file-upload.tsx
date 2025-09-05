@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 import React, { useRef, useState } from "react";
 import { motion } from "motion/react";
 import { IconUpload } from "@tabler/icons-react";
-import { useDropzone } from "react-dropzone";
+import { useDropzone, type Accept } from "react-dropzone";
 import { toast } from "sonner";
 
 const mainVariant = {
@@ -57,12 +57,17 @@ export const FileUpload = ({
     fileInputRef.current?.click();
   };
 
-  const toDropzoneAccept = (s?: string) => {
+  const toDropzoneAccept = (s?: string): Accept | undefined => {
     if (!s) return undefined;
     const lower = s.toLowerCase();
-    if (lower.includes("audio/")) return { "audio/*": [] } as const;
-    if (lower.includes("text/plain") || lower.includes(".txt")) return { "text/plain": [".txt"] } as const;
-    return undefined;
+    const map: Accept = {};
+    if (lower.includes("audio/")) {
+      map["audio/*"] = [];
+    }
+    if (lower.includes("text/plain") || lower.includes(".txt")) {
+      map["text/plain"] = [".txt"];
+    }
+    return Object.keys(map).length ? map : undefined;
   };
 
   const { getRootProps, isDragActive } = useDropzone({
