@@ -59,6 +59,7 @@ interface ModernEvaluationDialogProps {
     orgId?: string;
     children?: React.ReactNode;
     className?: string;
+    enableQuestions?: boolean; // when true, run Q&A step
 }
 
 const steps: StepsConfig = {
@@ -89,6 +90,7 @@ export function FileDialog({
     orgId,
     children,
     className,
+    enableQuestions = false,
 }: ModernEvaluationDialogProps) {
     const router = useRouter();
     const [isOpen, setIsOpen] = useState(false);
@@ -171,33 +173,44 @@ export function FileDialog({
             const text = await processContent();
             setPitchText(text);
 
-            // Skip Q&A generation for testing with external pitches
-            // const response = await fetch("/api/generate-questions", {
-            //     method: "POST",
-            //     headers: { "Content-Type": "application/json" },
-            //     body: JSON.stringify({ text }),
-            // });
+            if (enableQuestions) {
+                try {
+                    const response = await fetch("/api/generate-questions", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ text }),
+                    });
 
-            // if (!response.ok) throw new Error("Failed to generate questions");
-            // const data = await response.json();
+                    if (!response.ok) throw new Error("Failed to generate questions");
+                    const data = await response.json();
 
-            // setQuestions(
-            //     data.questions.map((q: string) => ({
-            //         text: q,
-            //         answer: "",
-            //     }))
-            // );
-            
-            // Skip questions step and go directly to review
-            setQuestions([]);
-            setCurrentStep("review");
+                    const qs = Array.isArray(data?.questions) ? data.questions : [];
+                    if (qs.length > 0) {
+                        setQuestions(
+                            qs.map((q: string) => ({ text: q, answer: "" }))
+                        );
+                        setCurrentStep("questions");
+                    } else {
+                        setQuestions([]);
+                        setCurrentStep("review");
+                    }
+                } catch (e) {
+                    // On any error, gracefully skip Q&A
+                    setQuestions([]);
+                    setCurrentStep("review");
+                }
+            } else {
+                // Skip questions step and go directly to review
+                setQuestions([]);
+                setCurrentStep("review");
+            }
         } catch (error) {
             toast.error("Failed to process pitch");
         } finally {
             setIsProcessing(false);
             setUploadProgress(0);
         }
-    }, [processContent]);
+    }, [processContent, enableQuestions]);
 
     const handleSubmit = useCallback(async () => {
         setIsProcessing(true);

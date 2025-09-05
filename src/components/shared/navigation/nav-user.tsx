@@ -1,6 +1,6 @@
 "use client"
 
-import {ChevronsUpDown, LogOut, Sun, Moon, Laptop, User, Download, Check, Building2, Plus} from 'lucide-react'
+import {ChevronsUpDown, LogOut, User, Download, Check, Building2, Plus} from 'lucide-react'
 import { toast } from "sonner";
 import {useClerk, useUser, useOrganization, useOrganizationList, CreateOrganization, OrganizationProfile} from "@clerk/nextjs"
 import {useTheme} from "next-themes"
@@ -40,6 +40,7 @@ import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { useWorkspace } from "@/hooks/use-workspace";
+import { ThemeMenu } from "./theme-menu";
 
 interface NavUserProps {
     isDark?: boolean
@@ -49,9 +50,8 @@ interface NavUserProps {
 export function NavUser({isDark, className}: NavUserProps) {
     const {isMobile} = useSidebar()
     const {user} = useUser()
-    const {signOut} = useClerk()
+    const {signOut, openUserProfile} = useClerk()
     const {setTheme, theme} = useTheme()
-    const {openUserProfile} = useClerk();
     const router = useRouter()
     const pathname = usePathname()
     const searchParams = useSearchParams()
@@ -246,14 +246,6 @@ export function NavUser({isDark, className}: NavUserProps) {
                                 <span>Organization</span>
                             </DropdownMenuSubTrigger>
                             <DropdownMenuSubContent>
-                                <DropdownMenuItem onClick={() => setCtx('user')} className="gap-2">
-                                    <span className="mr-2 inline-flex h-4 w-4 items-center justify-center">🏠</span>
-                                    <span>My Workspace</span>
-                                    {workspace.mode === 'user' && (
-                                        <Check className="ml-auto h-4 w-4 text-primary" />
-                                    )}
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator />
                                 {userMemberships?.data?.map((m) => (
                                     <DropdownMenuItem
                                         key={m.organization.id}
@@ -339,28 +331,7 @@ export function NavUser({isDark, className}: NavUserProps) {
                         </DropdownMenuItem>
                         <DropdownMenuSeparator/>
                         <DropdownMenuGroup>
-                            <DropdownMenuSub>
-                                <DropdownMenuSubTrigger className="gap-2">
-                                    {theme === "light" && <Sun className="mr-2 h-4 w-4 text-muted-foreground"/>}
-                                    {theme === "dark" && <Moon className="mr-2 h-4 w-4 text-muted-foreground"/>}
-                                    {theme === "system" && <Laptop className="mr-2 h-4 w-4 text-muted-foreground"/>}
-                                    <span>Theme</span>
-                                </DropdownMenuSubTrigger>
-                                <DropdownMenuSubContent>
-                                    <DropdownMenuItem onClick={() => setTheme("light")} className="gap-2">
-                                        <Sun className="mr-2 h-4 w-4"/>
-                                        Light
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => setTheme("dark")} className="gap-2">
-                                        <Moon className="mr-2 h-4 w-4"/>
-                                        Dark
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => setTheme("system")} className="gap-2">
-                                        <Laptop className="mr-2 h-4 w-4"/>
-                                        System
-                                    </DropdownMenuItem>
-                                </DropdownMenuSubContent>
-                            </DropdownMenuSub>
+                          <ThemeMenu theme={theme} setTheme={setTheme} />
                         </DropdownMenuGroup>
                         <DropdownMenuSeparator/>
                         <DropdownMenuItem onClick={handleSignOut} className="gap-2 text-red-500 focus:text-red-500">

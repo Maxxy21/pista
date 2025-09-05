@@ -11,7 +11,8 @@ export function useWorkspace() {
   const params = useSearchParams()
 
   const forced = params.get("ctx") as WorkspaceMode | null
-  const mode: WorkspaceMode = forced ?? "user"
+  // Default to org mode if a Clerk organization is active and no explicit ctx override is present.
+  const mode: WorkspaceMode = forced ?? (organization ? "org" as const : "user")
 
   return {
     mode,
@@ -19,4 +20,3 @@ export function useWorkspace() {
     orgId: organization?.id || null,
   }
 }
-

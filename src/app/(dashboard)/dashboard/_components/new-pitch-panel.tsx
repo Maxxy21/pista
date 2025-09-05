@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useCallback, useMemo, useState } from "react"
+import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useOrganization } from "@clerk/nextjs"
 import { useWorkspace } from "@/hooks/use-workspace"
@@ -16,6 +16,8 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Progress } from "@/components/ui/progress"
 import { FileAudio2, FileText as FileTextIcon } from "lucide-react"
 import { FileUpload as PrettyFileUpload } from "@/components/ui/file-upload"
+import { AudioPreview } from "@/components/ui/previews/audio-preview"
+import { FilePreview } from "@/components/ui/previews/file-preview"
 
 type PitchType = "text" | "textFile" | "audio"
 
@@ -29,6 +31,7 @@ export function NewPitchPanel() {
   const [type, setType] = useState<PitchType>("text")
   const [text, setText] = useState("")
   const [file, setFile] = useState<File | null>(null)
+  const [preview, setPreview] = useState<{ url?: string; text?: string } | null>(null)
   const [processing, setProcessing] = useState(false)
   const [progress, setProgress] = useState(0)
 
@@ -56,6 +59,32 @@ export function NewPitchPanel() {
     }
     setFile(f)
   }
+
+  // Build a simple preview for audio/text files and normalize content height
+  useEffect(() => {
+    let revokedUrl: string | undefined
+    const run = async () => {
+      if (!file) return setPreview(null)
+      if (type === "audio") {
+        const url = URL.createObjectURL(file)
+        revokedUrl = url
+        setPreview({ url })
+      } else if (type === "textFile") {
+        try {
+          const t = await file.text()
+          setPreview({ text: t.slice(0, 800) })
+        } catch {
+          setPreview(null)
+        }
+      } else {
+        setPreview(null)
+      }
+    }
+    run()
+    return () => {
+      if (revokedUrl) URL.revokeObjectURL(revokedUrl)
+    }
+  }, [file, type])
 
   const transcribeAudio = async (audioFile: File) => {
     const formData = new FormData()
@@ -122,9 +151,11 @@ export function NewPitchPanel() {
         <div className="px-4 md:px-6 pt-4 md:pt-6 pb-2 border-b bg-muted/20">
           <div className="flex items-center justify-between">
             <h2 className="text-lg md:text-xl font-semibold">Create a New Pitch</h2>
-            <span className="text-xs text-muted-foreground">
-              Creating in {workspace.mode === "org" ? (organization?.name || "Organization") : "My Workspace"}
-            </span>
+            {workspace.mode === "org" && (
+              <span className="text-xs text-muted-foreground">
+                Creating in {organization?.name || "Organization"}
+              </span>
+            )}
           </div>
         </div>
         <CardContent className="p-4 md:p-6 space-y-5">
@@ -141,27 +172,44 @@ export function NewPitchPanel() {
             </TabsList>
             <TabsContent value="text" className="space-y-2">
               <Label htmlFor="pitch-text">Pitch</Label>
-              <Textarea id="pitch-text" rows={10} value={text} onChange={(e) => setText(e.target.value)} placeholder="Paste or write your pitch..." />
+              <div className="min-h-96 border border-dashed bg-background rounded-lg p-2">
+                <Textarea 
+                  id="pitch-text" 
+                  value={text} 
+                  onChange={(e) => setText(e.target.value)} 
+                  placeholder="Paste or write your pitch..." 
+                  className="h-96 resize-vertical"
+                />
+              </div>
             </TabsContent>
             <TabsContent value="textFile" className="space-y-2">
               <Label>Upload .txt</Label>
-              <PrettyFileUpload accept="text/plain,.txt" maxSize={5 * 1024 * 1024} onChange={handleFilesSelected} showList={false} />
+              <div className="min-h-96 border border-dashed bg-background rounded-lg">
+                <PrettyFileUpload accept="text/plain,.txt" maxSize={5 * 1024 * 1024} onChange={handleFilesSelected} showList={false} />
+              </div>
               {file && (
-                <div className="mt-2 inline-flex items-center gap-2 text-xs">
-                  <FileTextIcon className="h-4 w-4" />
-                  <span className="font-medium">{file.name}</span>
-                  <Button variant="ghost" size="sm" className="h-6 px-2" onClick={() => setFile(null)}>Remove</Button>
+                <div className="mt-3 rounded-lg border bg-muted/20 p-3">
+                  <FilePreview file={file} />
+                  {preview?.text && (
+                    <pre className="mt-2 max-h-48 overflow-auto whitespace-pre-wrap rounded bg-background p-2 text-xs border">
+                      {preview.text}
+                      {file.size > 800 && "\n..."}
+                    </pre>
+                  )}
+                  <div className="mt-2 flex justify-end">
+                    <Button variant="ghost" size="sm" className="h-7 px-2" onClick={() => setFile(null)}>Remove</Button>
+                  </div>
                 </div>
               )}
             </TabsContent>
             <TabsContent value="audio" className="space-y-2">
               <Label>Upload audio</Label>
-              <PrettyFileUpload accept="audio/*" maxSize={25 * 1024 * 1024} onChange={handleFilesSelected} showList={false} />
+              <div className="min-h-96 border border-dashed bg-background rounded-lg">
+                <PrettyFileUpload accept="audio/*" maxSize={25 * 1024 * 1024} onChange={handleFilesSelected} showList={false} />
+              </div>
               {file && (
-                <div className="mt-2 inline-flex items-center gap-2 text-xs">
-                  <FileAudio2 className="h-4 w-4" />
-                  <span className="font-medium">{file.name}</span>
-                  <Button variant="ghost" size="sm" className="h-6 px-2" onClick={() => setFile(null)}>Remove</Button>
+                <div className="mt-3 rounded-lg border bg-muted/20 p-3">
+                  <AudioPreview file={file} onRemove={() => setFile(null)} />
                 </div>
               )}
             </TabsContent>

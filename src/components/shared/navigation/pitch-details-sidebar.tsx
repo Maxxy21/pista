@@ -35,6 +35,8 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { format } from "date-fns";
 import { Separator } from "@/components/ui/separator";
+import { toast } from "sonner";
+import { useApiMutation } from "@/hooks/use-api-mutation";
 
 // Using shared pitch type from lib/types
 
@@ -94,6 +96,91 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
               }
             : "skip"
     );
+
+    const { mutate: updatePitch, pending: updating } = useApiMutation(api.pitches.update);
+    const { mutate: createPitch, pending: duplicating } = useApiMutation(api.pitches.create);
+
+    const onReevaluate = React.useCallback(async () => {
+        try {
+            if (!currentPitch) return;
+            toast.loading("Re-evaluating…", { id: "reeval" });
+            const res = await fetch("/api/evaluate", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ text: currentPitch.text, questions: currentPitch.questions ?? [] }),
+            });
+            if (!res.ok) throw new Error("Evaluation failed");
+            const evaluation = await res.json();
+            await updatePitch({ id: currentPitch._id, evaluation, status: "evaluated" });
+            toast.success("Pitch re-evaluated", { id: "reeval" });
+        } catch (e: any) {
+            toast.error(e?.message || "Failed to re-evaluate", { id: "reeval" });
+        }
+    }, [currentPitch, updatePitch]);
+
+    const onDuplicate = React.useCallback(async () => {
+        try {
+            if (!currentPitch) return;
+            toast.loading("Duplicating…", { id: "dup" });
+            const newId = await createPitch({
+                orgId: currentPitch.orgId || undefined,
+                title: `${currentPitch.title} (Copy)`,
+                text: currentPitch.text,
+                type: currentPitch.type,
+                status: currentPitch.status,
+                evaluation: currentPitch.evaluation,
+                questions: currentPitch.questions || [],
+            });
+            toast.success("Pitch duplicated", { id: "dup" });
+            router.push(`/pitch/${newId}`);
+        } catch (e: any) {
+            toast.error(e?.message || "Failed to duplicate", { id: "dup" });
+        }
+    }, [currentPitch, createPitch, router]);
+
+    const onExport = React.useCallback(() => {
+        try {
+            if (!currentPitch) return;
+            const headers = [
+                "id",
+                "title",
+                "type",
+                "author",
+                "createdAt",
+                "overallScore",
+                "evaluatedAt",
+                "modelVersion",
+                "promptVersion",
+                "policyVersion",
+            ];
+            const ev: any = currentPitch.evaluation || {};
+            const meta: any = ev.metadata || {};
+            const row = [
+                String(currentPitch._id),
+                JSON.stringify(currentPitch.title ?? ""),
+                JSON.stringify(currentPitch.type ?? ""),
+                JSON.stringify(currentPitch.authorName ?? ""),
+                new Date(currentPitch.createdAt).toISOString(),
+                String(ev.overallScore ?? ""),
+                meta.evaluatedAt ?? "",
+                JSON.stringify(meta.modelVersion ?? ""),
+                JSON.stringify(meta.promptVersion ?? ""),
+                JSON.stringify(meta.policyVersion ?? ""),
+            ];
+            const csv = [headers.join(","), row.join(",")].join("\n");
+            const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `pitch-${String(currentPitch._id)}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        } catch (e) {
+            toast.error("Failed to export");
+        }
+    }, [currentPitch]);
 
     const displayPitches = React.useMemo(() => {
         if (!pitches) {
@@ -256,9 +343,21 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
                                         animate={{ opacity: 1, y: 0 }}
                                         className="relative"
                                     >
-                                        <div className="bg-gradient-to-br from-primary/8 via-primary/5 to-primary/3 p-5 rounded-2xl border border-primary/15 shadow-sm hover:shadow-md transition-all duration-300 relative overflow-hidden">
+                                        <div className="bg-gradient-to-br from-primary/8 via-primary/5 to-primary/3 p-5 rounded-2xl border border-primary/15 shadow-sm hover:shadow-md transition-all duration-300 relative overflow-hidden w-full">
                                             <div className="absolute top-0 right-0 w-20 h-20 bg-primary/5 rounded-full -translate-y-10 translate-x-10" />
                                             <div className="relative">
+                                                {/* Context banner if workspace and pitch org differ */}
+                                                {(() => {
+                                                    const pitchOrg = currentPitch.orgId;
+                                                    const inOrg = workspace.mode === 'org' && !!workspace.orgId;
+                                                    const mismatch = (inOrg && !pitchOrg) || (!inOrg && !!pitchOrg);
+                                                    if (!mismatch) return null;
+                                                    return (
+                                                        <div className="mb-3 text-[11px] rounded-md border border-amber-300/40 bg-amber-100/40 text-amber-900 px-2 py-1">
+                                                            Viewing a {pitchOrg ? 'team' : 'personal'} pitch in {inOrg ? 'organization' : 'personal'} context.
+                                                        </div>
+                                                    );
+                                                })()}
                                                 <h2 className="font-bold text-base line-clamp-2 mb-3 text-foreground/90">
                                                     {currentPitch.title}
                                                 </h2>
@@ -277,6 +376,7 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
                                                     </Badge>
                                                     {renderTypeBadge(currentPitch.type)}
                                                 </div>
+                                                {/* Quick actions removed from banner to avoid layout issues in collapsed mode */}
                                                 <Separator className="my-3 bg-primary/10" />
                                                 <div className="flex items-center gap-2">
                                                     <Avatar className="h-7 w-7 border-2 border-primary/20">
