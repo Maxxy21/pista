@@ -89,8 +89,7 @@ export function NewPitchPanel() {
     }
   }, [file, type])
 
-  const transcribeAudio = async (audioFile: File) => {
-    // Show overlay and drive upload progress
+  const transcribeAudio = React.useCallback(async (audioFile: File) => {
     evalProg.setStep('uploading', 'Uploading audio...')
     setProgress(0)
     const res = await streamUpload('/api/transcribe', audioFile, (p) => {
@@ -102,7 +101,7 @@ export function NewPitchPanel() {
     const data = await res.json()
     evalProg.setProgress(100)
     return data.text as string
-  }
+  }, [evalProg])
 
   const readTextFile = async (f: File) => await f.text()
 
