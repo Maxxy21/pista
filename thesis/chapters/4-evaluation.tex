@@ -20,7 +20,16 @@ The comparison addressed three key questions:
 \section{Methodology and Experimental Design}
 \label{sec:methodology}
 
-All results in this chapter use the calibrated scoring prompt (\texttt{PROMPT\_VERSION = criteria\textrm{-}v1.2}) with rubric anchors, evidence gating, aspect first scoring, and a lower sampling temperature for scoring.
+All results in this chapter use the calibrated scoring prompt (\texttt{PROMPT\_VERSION = criteria\textrm{-}v1.2}) with rubric anchors, evidence gating, aspect first scoring, and a lower sampling temperature for scoring. When Q\&A is enabled, the question generator asks for 1--3 structured, evidence seeking questions and accepts JSON or a numbered list fallback.
+
+\subsection{Metrics}
+To evaluate distribution quality and alignment, the analysis reports:
+\begin{itemize}
+  \item \textbf{Score concentration}: share of exact 7.0 scores before/after calibration
+  \item \textbf{Dispersion}: variance or IQR per criterion
+  \item \textbf{Rank alignment}: Kendall's $\tau$ with baseline/commercial assessments
+  \item \textbf{Evidence sensitivity}: proportion of scores $\leq 4$ when specific evidence is missing
+\end{itemize}
 
 \subsection{Dataset Selection and Characteristics}
 \label{subsec:dataset}

@@ -101,6 +101,20 @@ src/app/api/
 └── transcribe/           # Audio transcription
 ```
 
+### Responsibility Split: Convex vs Next.js API
+
+- Convex
+  - Owns all persistent data, real-time queries, and user/org scoping.
+  - Mutations/queries implement business rules close to the data model.
+  - Example: `convex/pitches.ts` handles create/update/remove/favorite and filtered reads.
+
+- Next.js API routes
+  - Stateless service adapters for external AI workloads and browser uploads.
+  - Keep OpenAI calls, transcription, and prompt orchestration out of Convex to avoid long-running work in data functions.
+  - Examples: `/api/evaluate`, `/api/generate-questions`, `/api/transcribe`.
+
+This separation keeps the data plane (Convex) simple and reliable while the control plane (Next.js API) integrates external services. Next.js routes may call Convex via the client when needed, but most write operations happen through Convex mutations on the client after API responses.
+
 ### Authentication & Authorization
 
 **Clerk Integration**

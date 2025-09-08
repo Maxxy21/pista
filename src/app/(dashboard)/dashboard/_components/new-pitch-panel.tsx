@@ -14,6 +14,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Progress } from "@/components/ui/progress"
+import { useEvaluationProgress } from "@/hooks/use-evaluation-progress"
+import { streamUpload } from "@/lib/utils"
 import { FileAudio2, FileText as FileTextIcon } from "lucide-react"
 import { FileUpload as PrettyFileUpload } from "@/components/ui/file-upload"
 import { AudioPreview } from "@/components/ui/previews/audio-preview"
@@ -34,6 +36,7 @@ export function NewPitchPanel() {
   const [preview, setPreview] = useState<{ url?: string; text?: string } | null>(null)
   const [processing, setProcessing] = useState(false)
   const [progress, setProgress] = useState(0)
+  const evalProg = useEvaluationProgress()
 
   const canSubmit = useMemo(() => {
     if (!title.trim()) return false
@@ -87,20 +90,18 @@ export function NewPitchPanel() {
   }, [file, type])
 
   const transcribeAudio = async (audioFile: File) => {
-    const formData = new FormData()
-    formData.append("file", audioFile)
-    setProgress(10)
-    const interval = setInterval(() => setProgress(p => Math.min(p + 8, 85)), 200)
-    try {
-      const res = await fetch("/api/transcribe", { method: "POST", body: formData })
-      clearInterval(interval)
-      setProgress(100)
-      if (!res.ok) throw new Error("Transcription failed")
-      const data = await res.json()
-      return data.text as string
-    } catch (e) {
-      throw e
-    }
+    // Show overlay and drive upload progress
+    evalProg.setStep('uploading', 'Uploading audio...')
+    setProgress(0)
+    const res = await streamUpload('/api/transcribe', audioFile, (p) => {
+      setProgress(p)
+      evalProg.setProgress(p)
+    })
+    if (!res.ok) throw new Error('Transcription failed')
+    evalProg.setStep('transcribing', 'Transcribing audio...')
+    const data = await res.json()
+    evalProg.setProgress(100)
+    return data.text as string
   }
 
   const readTextFile = async (f: File) => await f.text()
@@ -119,10 +120,16 @@ export function NewPitchPanel() {
     if (!canSubmit || processing) return
     setProcessing(true)
     try {
+      // Initialize global progress overlay
+      evalProg.start()
       let sourceText = text
-      if (type === "audio" && file) sourceText = await transcribeAudio(file)
-      else if (type === "textFile" && file) sourceText = await readTextFile(file)
+      if (type === "audio" && file) {
+        sourceText = await transcribeAudio(file)
+      } else if (type === "textFile" && file) {
+        sourceText = await readTextFile(file)
+      }
 
+      evalProg.setStep('analyzing', 'Analyzing content...')
       const evaluation = await evaluateText(sourceText)
 
       const id = await createPitch({
@@ -136,9 +143,12 @@ export function NewPitchPanel() {
       })
 
       toast.success("Pitch created")
+      evalProg.done()
       router.replace(`/pitch/${id}`)
     } catch (e: any) {
-      toast.error(e?.message || "Failed to create pitch")
+      const msg = e?.message || 'Failed to create pitch'
+      toast.error(msg)
+      evalProg.fail(msg)
     } finally {
       setProcessing(false)
       setProgress(0)

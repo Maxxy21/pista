@@ -113,6 +113,8 @@ Convex stores pitches and user favorites with schema validation and indexed acce
   \item Queries: \texttt{get}, \texttt{getPitch}, \texttt{getFilteredPitches}, \texttt{getPitchStats}, \texttt{exportCSV}
 \end{itemize}
 
+\paragraph{Q\&A generation design} The question generator asks for 1--3 high priority, evidence seeking questions and returns a structured JSON list tagged to an evaluation dimension. The route uses a lower sampling temperature for stability. If the model returns plain text, a numbered list fallback parser extracts up to three items. This improves evidence capture for the calibrated rubric without modifying the original pitch content.
+
 \section{Authentication and Authorization Implementation}
 Clerk handles sign in, session management, and organization contexts. Middleware protects routes and injects identity on the server. All Convex reads and writes are scoped by \texttt{userId} and \texttt{orgId}, which provides row level isolation without custom role tables.
 

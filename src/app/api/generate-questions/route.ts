@@ -21,50 +21,51 @@ export async function POST(req: Request) {
     const openai = getOpenAI();
 
     const prompt = [
-      `Analyze the following startup pitch and identify up to 3 important aspects that are missing or unclear such as 
-       problem definition, business model, team, market, etc.`,
-      `Pitch: "${truncate(text, MAX_PROMPT_CHARS)}"`,
-      "",
-      `For each missing or unclear aspect, generate a specific follow-up question that would help clarify or complete the pitch.`,
-      "",
-      `If there are fewer than 3 gaps, generate additional insightful questions about the pitch to reach a total of 3.`,
-      "",
-      `If there are no major gaps, generate 3 insightful questions that would help an investor better understand or challenge the pitch.`,
-      "",
-      `Return only the questions in a numbered list format (1-3).`,
-    ].join("\n");
+      `Analyze the following pitch and identify the most important gaps that prevent a confident evaluation. Select up to 3 questions that, if answered, would materially improve the assessment.`,
+      `Pitch:\n"${truncate(text, MAX_PROMPT_CHARS)}"`,
+      `\nReturn valid JSON only with this schema:\n{\n  "items": [\n    {\n      "dimension": "Problem-Solution Fit" | "Business Model & Market" | "Team & Execution" | "Pitch Quality",\n      "question": "one specific question, no multi-part prompts",\n      "why_needed": "why this matters for evaluation",\n      "suggested_format": "how to answer: numbers, metrics, bullets, examples",\n      "priority": "Critical" | "Important"\n    }\n  ]\n}\n\nConstraints:\n- Ask 1–3 questions total.\n- Make each question specific and evidence-seeking.\n- Do not request sensitive data (PII, secrets, internal docs).\n- Avoid duplicates and multi-part questions.`,
+    ].join("\n\n");
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4",
       messages: [
         {
           role: "system",
-          content: `You are an experienced venture capitalist known for your thorough and insightful evaluations of startup pitches. 
-          Your goal is to critically analyze each pitch, identify any missing or unclear aspects, and ask probing, constructive questions that help founders clarify and strengthen their ideas. 
-          Be concise, professional, and focus on what would matter most to an investor making a funding decision.`,
+          content: `You are an experienced venture capitalist. Ask only the highest-priority follow-up questions that close information gaps. Questions must be specific, evidence-seeking, and answerable by a typical pitch. Return valid JSON only.`,
         },
         {
           role: "user",
           content: prompt,
         },
       ],
-      temperature: 0.7,
+      temperature: 0.3,
     });
 
     const responseContent = completion.choices?.[0]?.message?.content ?? "";
-    const questions = responseContent
-      .split("\n")
-      .map((line) => line.trim())
-      .filter((line) => /^\d+\./.test(line))
-      .map((line) => line.replace(/^\d+\.\s*/, ""))
-      .filter(Boolean);
 
-    if (questions.length !== 3) {
-      return NextResponse.json(
-        { error: "Failed to generate the expected number of questions" },
-        { status: 502 }
-      );
+    let questions: string[] = [];
+    // Try JSON first
+    try {
+      const data = JSON.parse(responseContent);
+      if (Array.isArray(data?.items)) {
+        questions = data.items
+          .map((it: any) => (typeof it?.question === 'string' ? it.question.trim() : ''))
+          .filter(Boolean);
+      }
+    } catch {
+      // Fallback to numbered list
+      const lines = responseContent
+        .split("\n")
+        .map((l) => l.trim())
+        .filter(Boolean);
+      questions = lines
+        .filter((line) => /^\d+\./.test(line))
+        .map((line) => line.replace(/^\d+\.\s*/, ""))
+        .filter(Boolean);
     }
+
+    // Normalize: 1–3 items max; trim extras
+    questions = questions.slice(0, 3);
 
     return NextResponse.json({ questions });
   } catch (error) {

@@ -10,6 +10,7 @@ import React, {Suspense} from "react";
 import {Loading} from "@/components/shared/auth/loading";
 import {Toaster} from "@/components/ui/sonner";
 import {ModalProvider} from "@/providers/modal-provider";
+import { EvaluationProgressOverlay } from "@/components/shared/progress/evaluation-progress";
 
 
 const defaultFont = Noto_Sans_Georgian({subsets: ["latin"]});
@@ -47,6 +48,7 @@ export default function RootLayout({
                 <ConvexClientProvider>
                     <Toaster/>
                     <ModalProvider/>
+                    <EvaluationProgressOverlay />
                     {children}
                     <SpeedInsights />
                     <Analytics />

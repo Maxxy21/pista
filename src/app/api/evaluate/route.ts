@@ -6,7 +6,19 @@ import {
   StructuredEvaluation, 
   StructuredFeedback 
 } from "@/lib/types/evaluation";
-import { MODEL_VERSION, PROMPT_VERSION, POLICY_VERSION, CONTENT_LIMITS } from "@/lib/constants/eval";
+import { parseStructuredEvaluationResponse, parseTextEvaluationResponse } from '@/lib/eval/parse'
+import {
+  MODEL_VERSION,
+  PROMPT_VERSION,
+  POLICY_VERSION,
+  CONTENT_LIMITS,
+  MODEL_NAME,
+  SCORING_TEMPERATURE,
+  FEEDBACK_TEMPERATURE,
+  RUBRIC_ANCHORS,
+  SCORING_RULES,
+  SCORING_SYSTEM_PROMPT,
+} from "@/lib/constants/eval";
 
 export const runtime = "edge";
 export const maxDuration = 300;
@@ -67,114 +79,19 @@ type Question = {
   answer: string;
 };
 
-function parseStructuredEvaluationResponse(
-  response: string,
-  criteriaName: string,
-  aspects: string[]
-): StructuredEvaluation {
-  try {
-    const parsed = JSON.parse(response);
-    const numericAspectScores = Array.isArray(parsed.aspectScores)
-      ? parsed.aspectScores
-          .map((s: any) => Number(s?.score))
-          .filter((n: any) => Number.isFinite(n))
-      : [];
-    const baseScore = Number(parsed.score);
-    const clamped = (n: number) => Math.min(Math.max(n, 1), 10);
-    const aspectAvg = numericAspectScores.length
-      ? numericAspectScores.reduce((a: number, b: number) => a + b, 0) / numericAspectScores.length
-      : NaN;
-    const criterionScore = Number.isFinite(aspectAvg)
-      ? clamped(aspectAvg)
-      : clamped(Number.isFinite(baseScore) ? baseScore : 5);
-    
-    return {
-      criteria: criteriaName,
-      score: criterionScore,
-      breakdown: {
-        strengths: (parsed.strengths || []).map((s: any) => ({
-          point: typeof s === 'string' ? s : s.point || '',
-          impact: s.impact || "Medium"
-        })),
-        improvements: (parsed.improvements || []).map((i: any) => ({
-          area: typeof i === 'string' ? i : i.area || '',
-          priority: i.priority || "Important",
-          actionable: i.actionable || i.area || ''
-        })),
-        aspectScores: aspects.map((aspect, index) => ({
-          aspect,
-          score: parsed.aspectScores?.[index]?.score || parsed.score || 5,
-          rationale: parsed.aspectScores?.[index]?.rationale || 'No specific rationale provided'
-        }))
-      },
-      summary: parsed.summary || parsed.analysis || '',
-      recommendations: parsed.recommendations || []
-    };
-  } catch (error) {
-    return parseTextEvaluationResponse(response, criteriaName, aspects);
-  }
-}
+// Parsing moved to '@/lib/eval/parse' for testability
 
-function parseTextEvaluationResponse(
-  response: string,
-  criteriaName: string,
-  aspects: string[]
-): StructuredEvaluation {
-  const scoreMatch = response.match(/SCORE:\s*(\d+(\.\d+)?)/i);
-  const strengthsMatch = response.match(/STRENGTHS:([\s\S]*?)(?=IMPROVEMENTS:|$)/i);
-  const improvementsMatch = response.match(/IMPROVEMENTS:([\s\S]*?)(?=ANALYSIS:|$)/i);
-  const analysisMatch = response.match(/ANALYSIS:([\s\S]*?)$/i);
-
-  const strengths = strengthsMatch
-    ? strengthsMatch[1]
-        .split("\n")
-        .filter((s) => s.trim().startsWith("-"))
-        .map((s) => s.replace("-", "").trim())
-    : [];
-
-  const improvements = improvementsMatch
-    ? improvementsMatch[1]
-        .split("\n")
-        .filter((s) => s.trim().startsWith("-"))
-        .map((s) => s.replace("-", "").trim())
-    : [];
-
-  const score = scoreMatch
-    ? Math.min(Math.max(parseFloat(scoreMatch[1]), 1), 10)
-    : 5;
-
-  return {
-    criteria: criteriaName,
-    score,
-    breakdown: {
-      strengths: strengths.map(point => ({ point, impact: "Medium" as const })),
-      improvements: improvements.map(area => ({
-        area,
-        priority: "Important" as const,
-        actionable: area
-      })),
-      aspectScores: aspects.map(aspect => ({
-        aspect,
-        score,
-        rationale: 'Based on overall evaluation'
-      }))
-    },
-    summary: analysisMatch ? analysisMatch[1].trim() : "",
-    recommendations: []
-  };
-}
-
-async function makeOpenAIRequest(prompt: string, temperature = 0.2) {
+async function makeOpenAIRequest(prompt: string, temperature = SCORING_TEMPERATURE) {
   const openai = getOpenAI();
   try {
     return await backOff(
       () =>
         openai.chat.completions.create({
-          model: "gpt-4",
+          model: MODEL_NAME,
           messages: [
             {
               role: "system",
-              content: `You are an experienced venture capitalist. Follow the rubric strictly, return valid JSON only, and avoid unsupported claims. Use the full 1-10 scale based on evidence.`,
+              content: SCORING_SYSTEM_PROMPT,
             },
             {
               role: "user",
@@ -232,12 +149,7 @@ ${aspects.map((aspect) => `- ${aspect}`).join("\n")}
 Content to evaluate (pitch + Q&A):
 ${fullContent}
 
-Rubric anchors (apply to every aspect):
-1-2: no concrete evidence; claims only
-3-4: weak/indirect evidence; plan not validated
-5-6: mixed evidence; partial validation or unclear metrics
-7-8: strong evidence; credible metrics; risks addressed
-9-10: exceptional evidence; repeated traction; benchmarks exceeded
+${RUBRIC_ANCHORS}
 
 JSON response schema (valid JSON only):
 {
@@ -255,10 +167,7 @@ JSON response schema (valid JSON only):
   "recommendations": ["actionable step 1", "actionable step 2"]
 }
 
-Scoring rules:
-- Start with aspect scoring; compute the criterion "score" as the rounded average of aspect scores.
-- If there are no numbers or specific evidence for an aspect, cap it at 4 and list the gap in the rationale.
-- Avoid mid-scale defaults; justify any mid-scale scores against the rubric anchors.
+${SCORING_RULES}
 `;
 }
 
