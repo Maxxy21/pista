@@ -52,8 +52,41 @@ const getExecutionColor = (capability: string) => {
 };
 
 export const StructuredEvaluationSummary: FC<StructuredEvaluationSummaryProps> = ({ data }) => {
-  const feedback = getOverallFeedback(data.evaluation);
+  const rawFeedback = getOverallFeedback(data.evaluation);
   const metadata = hasMetadata(data.evaluation) ? data.evaluation.metadata : null;
+
+  // Normalize legacy string feedback into structured shape for rendering
+  const feedback = typeof rawFeedback === 'string' ? {
+    overallAssessment: {
+      summary: rawFeedback,
+      keyHighlights: [],
+      primaryConcerns: [],
+    },
+    investmentThesis: {
+      viability: 'Not Applicable' as const,
+      reasoning: '',
+      potentialReturns: '',
+    },
+    riskAssessment: {
+      majorRisks: [],
+      riskScore: 5,
+    },
+    nextSteps: {
+      immediateActions: [],
+      longTermRecommendations: [],
+      followUpQuestions: [],
+    },
+    competitivePosition: {
+      strengths: [],
+      weaknesses: [],
+      marketOpportunity: '',
+    },
+    foundersAssessment: {
+      teamStrengths: [],
+      experienceGaps: [],
+      executionCapability: 'Good' as const,
+    },
+  } : rawFeedback;
 
   const copyText = `
 EVALUATION SUMMARY

@@ -153,7 +153,7 @@ export function NewPitchPanel() {
       setProcessing(false)
       setProgress(0)
     }
-  }, [canSubmit, processing, type, file, text, title, workspace.mode, organization?.id, createPitch, router])
+  }, [canSubmit, processing, type, file, text, title, workspace.mode, organization?.id, createPitch, router, evalProg, transcribeAudio])
 
   return (
     <div className="max-w-4xl mx-auto p-0 md:p-2">

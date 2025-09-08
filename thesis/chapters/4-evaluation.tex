@@ -31,6 +31,17 @@ To evaluate distribution quality and alignment, the analysis reports:
   \item \textbf{Evidence sensitivity}: proportion of scores $\leq 4$ when specific evidence is missing
 \end{itemize}
 
+\section{Future Work: Ensemble Evaluation}
+The current implementation uses a single provider (GPT\,4) with rubric anchored prompts. A practical extension is an ensemble across multiple models to improve stability and evidence coverage:
+\begin{itemize}
+  \item \textbf{Providers}: Add adapters for OpenAI, Anthropic, and Google; run all providers per criterion in parallel.
+  \item \textbf{Aggregation Policy}: Aggregate aspect scores via trimmed mean (e.g., 20\% trim if $\geq$3 providers), then average to the criterion score; record provenance.\footnote{Bump \texttt{POLICY\_VERSION} to \texttt{scoring-policy-v3}.}
+  \item \textbf{Disagreement Flags}: If interquartile range across provider scores exceeds a threshold, mark the criterion as low confidence.
+  \item \textbf{Adjudication (Optional)}: For flagged criteria, use an adjudicator prompt to merge rationales into the final JSON.
+  \item \textbf{Disagreement-Driven Q\&A}: When flagged, generate 1--3 targeted questions for the highest-variance aspects and re-score on answers.
+  \item \textbf{Reporting}: Compare ensemble vs. single provider on score dispersion and Kendall's $\tau$ against the baseline (W2V), and document cost/latency trade-offs.
+\end{itemize}
+
 \subsection{Dataset Selection and Characteristics}
 \label{subsec:dataset}
 
