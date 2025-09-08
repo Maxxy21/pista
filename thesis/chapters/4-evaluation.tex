@@ -20,6 +20,8 @@ The comparison addressed three key questions:
 \section{Methodology and Experimental Design}
 \label{sec:methodology}
 
+All results in this chapter use the calibrated scoring prompt (\texttt{PROMPT\_VERSION = criteria\textrm{-}v1.2}) with rubric anchors, evidence gating, aspect first scoring, and a lower sampling temperature for scoring.
+
 \subsection{Dataset Selection and Characteristics}
 \label{subsec:dataset}
 
@@ -107,7 +109,7 @@ Across all 22 evaluated pitches, Pista consistently generated higher scores than
 
 Analysis of scoring distributions revealed significant differences in discrimination capabilities between the evaluation systems.
 
-Pista scores demonstrated clustering within a relatively narrow 6.0-8.0 range, producing a standard deviation of 0.50. In contrast, W2V scores exhibited broader distribution spanning 4.3-6.4 points with higher variance (σ = 0.63). These distribution patterns suggest different approaches to quality discrimination, with W2V demonstrating greater sensitivity to quality variations across evaluated pitches.
+Pista scores demonstrated clustering within a relatively narrow 6.0-8.0 range, producing a standard deviation of 0.50. In contrast, W2V scores exhibited broader distribution spanning 4.3-6.4 points with higher variance ( = 0.63). These distribution patterns suggest different approaches to quality discrimination, with W2V demonstrating greater sensitivity to quality variations across evaluated pitches.
 
 \subsection{Systematic Bias Identification}
 \label{subsec:bias}

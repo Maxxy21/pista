@@ -164,7 +164,7 @@ function parseTextEvaluationResponse(
   };
 }
 
-async function makeOpenAIRequest(prompt: string) {
+async function makeOpenAIRequest(prompt: string, temperature = 0.2) {
   const openai = getOpenAI();
   try {
     return await backOff(
@@ -174,17 +174,14 @@ async function makeOpenAIRequest(prompt: string) {
           messages: [
             {
               role: "system",
-              content: `You are an experienced venture capitalist known for your thorough, critical, and insightful evaluations of startup pitches. 
-                        You have deep expertise in startups, business models, and market analysis. 
-                        Your goal is to provide clear, actionable, and investor-focused feedback—identifying both key strengths and areas for improvement. 
-                        Be concise, professional, and ensure your analysis helps founders understand how to strengthen their pitch for real-world investment decisions.`,
+              content: `You are an experienced venture capitalist. Follow the rubric strictly, return valid JSON only, and avoid unsupported claims. Use the full 1-10 scale based on evidence.`,
             },
             {
               role: "user",
               content: prompt,
             },
           ],
-          temperature: 0.7,
+          temperature,
         }),
       {
         numOfAttempts: 3,
@@ -225,42 +222,43 @@ function buildStructuredPrompt(
   fullContent: string
 ): string {
   return `
-As an expert startup evaluator, analyze this pitch focusing on ${criteriaName}.
+As an expert evaluator, score ONLY the criterion: ${criteriaName}.
 
-Consider these specific aspects:
+Work from the content below without inventing facts. If evidence is missing for an aspect, score that aspect \u22644 and note what is missing.
+
+Aspects to score (each 1-10 with a one sentence rationale):
 ${aspects.map((aspect) => `- ${aspect}`).join("\n")}
 
-Content to evaluate:
+Content to evaluate (pitch + Q&A):
 ${fullContent}
 
-Respond with a JSON object containing:
+Rubric anchors (apply to every aspect):
+1-2: no concrete evidence; claims only
+3-4: weak/indirect evidence; plan not validated
+5-6: mixed evidence; partial validation or unclear metrics
+7-8: strong evidence; credible metrics; risks addressed
+9-10: exceptional evidence; repeated traction; benchmarks exceeded
+
+JSON response schema (valid JSON only):
 {
-  "score": number (1-10),
-  "strengths": [
-    {
-      "point": "specific strength",
-      "impact": "High" | "Medium" | "Low"
-    }
-  ],
-  "improvements": [
-    {
-      "area": "improvement area",
-      "priority": "Critical" | "Important" | "Nice to Have",
-      "actionable": "specific actionable recommendation"
-    }
-  ],
+  "score": 1-10, // criterion score = rounded average of aspectScores[].score
+  "strengths": [{ "point": "...", "impact": "High"|"Medium"|"Low"}],
+  "improvements": [{ "area": "...", "priority": "Critical"|"Important"|"Nice to Have", "actionable": "..."}],
   "aspectScores": [
-    {
-      "aspect": "aspect name",
-      "score": number (1-10),
-      "rationale": "specific reasoning for this score"
-    }
+    { "aspect": "${aspects[0]}", "score": 1-10, "rationale": "..." },
+    { "aspect": "${aspects[1]}", "score": 1-10, "rationale": "..." },
+    { "aspect": "${aspects[2]}", "score": 1-10, "rationale": "..." },
+    { "aspect": "${aspects[3]}", "score": 1-10, "rationale": "..." },
+    { "aspect": "${aspects[4]}", "score": 1-10, "rationale": "..." }
   ],
-  "summary": "detailed analysis and insights",
-  "recommendations": ["actionable recommendation 1", "actionable recommendation 2"]
+  "summary": "2-3 sentence synthesis",
+  "recommendations": ["actionable step 1", "actionable step 2"]
 }
 
-Ensure the response is valid JSON. Use the full 1-10 scale when evidence supports it (avoid central tendency). Focus on actionable, specific insights that help founders improve their pitch.
+Scoring rules:
+- Start with aspect scoring; compute the criterion "score" as the rounded average of aspect scores.
+- If there are no numbers or specific evidence for an aspect, cap it at 4 and list the gap in the rationale.
+- Avoid mid-scale defaults; justify any mid-scale scores against the rubric anchors.
 `;
 }
 
@@ -333,7 +331,7 @@ Respond with this JSON structure:
 }`;
 
   const completion = await openai.chat.completions.create({
-    model: "gpt-4",
+    model: MODEL_NAME,
     messages: [
       {
         role: "system",
@@ -344,7 +342,7 @@ Respond with this JSON structure:
         content: feedbackPrompt,
       },
     ],
-    temperature: 0.7,
+    temperature: FEEDBACK_TEMPERATURE,
   });
 
   try {
@@ -403,7 +401,7 @@ export async function POST(req: Request) {
           Array.from(criteria.aspects),
           fullContent
         );
-        const completion = await makeOpenAIRequest(prompt);
+        const completion = await makeOpenAIRequest(prompt, SCORING_TEMPERATURE);
         const response = completion.choices[0].message.content || "";
         return parseStructuredEvaluationResponse(
           response,
