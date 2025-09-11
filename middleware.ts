@@ -1,4 +1,6 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
+import { NextResponse } from 'next/server'
+import { addSecurityHeaders } from '@/lib/security/headers'
 
 const isProtectedRoute = createRouteMatcher(['/dashboard(.*)'])
 
@@ -8,6 +10,10 @@ export default clerkMiddleware(async (auth, req) => {
     if (!userId && isProtectedRoute(req)) {
         return redirectToSignIn()
     }
+
+    // Add security headers to all responses
+    const response = NextResponse.next()
+    return addSecurityHeaders(response)
 })
 
 export const config = {

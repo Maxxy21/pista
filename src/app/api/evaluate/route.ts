@@ -1,5 +1,8 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getOpenAI } from "@/lib/utils";
+import { withAuth, AuthenticatedRequest } from "@/lib/auth/api-auth";
+import { withRateLimit, evaluationRateLimiter } from "@/lib/rate-limit/rate-limiter";
+import { z } from "zod";
 import { backOff } from "exponential-backoff";
 import { 
   StructuredEvaluationData, 
@@ -291,15 +294,22 @@ Respond with this JSON structure:
   }
 }
 
-export async function POST(req: Request) {
+// Input validation schema
+const evaluateSchema = z.object({
+  text: z.string().min(1, "Text is required").max(50000, "Text too long"),
+  questions: z.array(z.object({
+    text: z.string(),
+    answer: z.string()
+  })).optional().default([])
+});
+
+export const POST = withRateLimit(evaluationRateLimiter)(withAuth(async (req: AuthenticatedRequest) => {
   const startTime = Date.now();
   
   try {
-    const { text, questions } = await req.json();
+    const body = await req.json();
+    const { text, questions } = evaluateSchema.parse(body);
 
-    if (!text) {
-      return NextResponse.json({ error: "No text provided" }, { status: 400 });
-    }
 
     const fullContent = buildFullContent(text, questions);
 
@@ -342,6 +352,18 @@ export async function POST(req: Request) {
     return NextResponse.json(result);
   } catch (error) {
     console.error("Evaluation error:", error);
-    return NextResponse.json({ error: "Evaluation failed" }, { status: 500 });
+    
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ 
+        error: "Invalid request data",
+        code: "VALIDATION_ERROR",
+        details: error.errors 
+      }, { status: 400 });
+    }
+    
+    return NextResponse.json({ 
+      error: "Evaluation processing failed",
+      code: "EVALUATION_ERROR" 
+    }, { status: 500 });
   }
-}
+}));

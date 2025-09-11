@@ -1,6 +1,9 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getOpenAI } from "@/lib/utils";
 import { PROMPT_VERSION, POLICY_VERSION } from "@/lib/constants/eval";
+import { withAuth, AuthenticatedRequest } from "@/lib/auth/api-auth";
+import { withRateLimit, apiRateLimiter } from "@/lib/rate-limit/rate-limiter";
+import { z } from "zod";
 
 export const runtime = "edge";
 
@@ -29,17 +32,18 @@ interface EvaluationResponse {
     }
 }
 
-export async function POST(req: Request) {
+const answerSchema = z.object({
+    pitchText: z.string().min(1, "Pitch text is required").max(50000, "Pitch text too long"),
+    answers: z.array(z.object({
+        question: z.string(),
+        answer: z.string()
+    }))
+});
+
+export const POST = withRateLimit(apiRateLimiter)(withAuth(async (req: AuthenticatedRequest) => {
     try {
         const body = await req.json();
-        const { pitchText, answers } = body;
-
-        if (typeof pitchText !== "string" || !Array.isArray(answers)) {
-            return NextResponse.json(
-                { error: "Missing or invalid required data" },
-                { status: 400 }
-            );
-        }
+        const { pitchText, answers } = answerSchema.parse(body);
 
         const prompt = buildPrompt(pitchText, answers);
 
@@ -92,12 +96,21 @@ export async function POST(req: Request) {
         return NextResponse.json(result);
     } catch (error) {
         console.error("Answer evaluation error:", error);
-        return NextResponse.json(
-            { error: "Failed to evaluate answers" },
-            { status: 500 }
-        );
+        
+        if (error instanceof z.ZodError) {
+            return NextResponse.json({ 
+                error: "Invalid request data",
+                code: "VALIDATION_ERROR",
+                details: error.errors 
+            }, { status: 400 });
+        }
+        
+        return NextResponse.json({ 
+            error: "Answer evaluation failed",
+            code: "EVALUATION_ERROR" 
+        }, { status: 500 });
     }
-}
+}));
 
 const MAX_PROMPT_CHARS = 6000;
 

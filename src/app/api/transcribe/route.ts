@@ -1,9 +1,13 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getOpenAI } from '@/lib/utils';
+import { withAuth, AuthenticatedRequest } from '@/lib/auth/api-auth';
+import { withRateLimit, transcriptionRateLimiter } from '@/lib/rate-limit/rate-limiter';
+import { validateFile, FILE_VALIDATION_CONFIGS } from '@/lib/validation/file-validator';
+import { z } from 'zod';
 
 export const runtime = 'edge';
 
-export async function POST(req: Request) {
+export const POST = withRateLimit(transcriptionRateLimiter)(withAuth(async (req: AuthenticatedRequest) => {
     let formData: FormData | null = null;
     let audioFile: File | null = null;
 
@@ -13,6 +17,15 @@ export async function POST(req: Request) {
 
         if (!audioFile) {
             return NextResponse.json({ error: 'No audio file provided' }, { status: 400 });
+        }
+
+        // Comprehensive file validation
+        const validationResult = validateFile(audioFile, FILE_VALIDATION_CONFIGS.AUDIO);
+        if (!validationResult.valid) {
+            return NextResponse.json({ 
+                error: validationResult.error,
+                code: validationResult.code 
+            }, { status: 400 });
         }
 
         const arrayBuffer = await audioFile.arrayBuffer();
@@ -31,12 +44,10 @@ export async function POST(req: Request) {
     } catch (error: any) {
         console.error('Transcription error:', error);
 
-        const isOpenAIError = error?.response?.status || error?.name === 'OpenAIError';
-        const status = isOpenAIError ? 503 : 500;
-        const message = isOpenAIError
-            ? 'OpenAI transcription failed'
-            : 'Transcription processing failed';
-
-        return NextResponse.json({ error: message }, { status });
+        // Sanitized error messages for production
+        return NextResponse.json({ 
+            error: 'Transcription processing failed',
+            code: 'TRANSCRIPTION_ERROR' 
+        }, { status: 500 });
     }
-}
+}));

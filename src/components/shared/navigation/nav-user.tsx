@@ -101,6 +101,7 @@ export function NavUser({isDark, className}: NavUserProps) {
     if (!user) return null
 
     return (
+        <>
         <SidebarMenu>
             <SidebarMenuItem>
                 <DropdownMenu>
@@ -285,5 +286,6 @@ export function NavUser({isDark, className}: NavUserProps) {
             </SidebarMenuItem>
         </SidebarMenu>
         <CreateOrganizationModal open={createOpen} onOpenChange={setCreateOpen} isDark={isDark} />
+        </>
     )
 }

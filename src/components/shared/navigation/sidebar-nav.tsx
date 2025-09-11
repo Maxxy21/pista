@@ -10,8 +10,8 @@ import {
 } from "@/components/ui/sidebar";
 
 export const NAVIGATION_ITEMS = [
-  { title: "All Pitches", url: "/dashboard", icon: Home, value: "all" },
-  { title: "Recent", url: "/dashboard?view=recent", icon: Clock, value: "recent" },
+  { title: "All Pitches", url: "/dashboard", icon: Home, value: "all", badge: undefined },
+  { title: "Recent", url: "/dashboard?view=recent", icon: Clock, value: "recent", badge: undefined },
   { title: "Favorites", url: "/dashboard?view=favorites", icon: Star, value: "favorites", badge: "New" },
 ] as const;
 

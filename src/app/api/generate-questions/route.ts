@@ -1,22 +1,22 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getOpenAI } from "@/lib/utils";
+import { withAuth, AuthenticatedRequest } from "@/lib/auth/api-auth";
+import { withRateLimit, apiRateLimiter } from "@/lib/rate-limit/rate-limiter";
+import { z } from "zod";
 
 export const runtime = "edge";
 const MAX_PROMPT_CHARS = 4000;
 const truncate = (text: string, max: number) =>
   text.length <= max ? text : `${text.slice(0, Math.floor(max / 2))}\n...\n${text.slice(-Math.floor(max / 2))}`;
 
-export async function POST(req: Request) {
+const questionSchema = z.object({
+  text: z.string().min(1, "Text is required").max(10000, "Text too long")
+});
+
+export const POST = withRateLimit(apiRateLimiter)(withAuth(async (req: AuthenticatedRequest) => {
   try {
     const body = await req.json();
-    const text = typeof body.text === "string" ? body.text.trim() : "";
-
-    if (!text) {
-      return NextResponse.json(
-        { error: "No pitch text provided" },
-        { status: 400 }
-      );
-    }
+    const { text } = questionSchema.parse(body);
 
     const openai = getOpenAI();
 
@@ -70,9 +70,18 @@ export async function POST(req: Request) {
     return NextResponse.json({ questions });
   } catch (error) {
     console.error("Question generation error:", error);
-    return NextResponse.json(
-      { error: "Failed to generate questions" },
-      { status: 500 }
-    );
+    
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ 
+        error: "Invalid request data",
+        code: "VALIDATION_ERROR",
+        details: error.errors 
+      }, { status: 400 });
+    }
+    
+    return NextResponse.json({ 
+      error: "Question generation failed",
+      code: "GENERATION_ERROR" 
+    }, { status: 500 });
   }
-}
+}));
