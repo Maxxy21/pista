@@ -2,7 +2,7 @@
 \chapter{Evaluation and Results}
 \label{ch:evaluation}
 
-This chapter evaluates the Pista system by comparing it with Winds2Ventures (W2V)\footnote{\url{https://w2v.network/}}, an existing pitch evaluation platform. The comparison examines differences in scoring patterns and evaluation approaches between the GenAI-powered system and the established platform.
+This chapter evaluates the Pista system by comparing it with Winds2Ventures (W2V)\footnote{\url{https://w2v.network/}}, the partner evaluation system introduced in Chapter~\ref{ch:introduction}. The comparison examines differences in scoring patterns and evaluation approaches between the GenAI-powered system and the partner platform.
 
 Evaluating startup pitches involves subjective judgment and domain expertise. To validate the Pista system, comparison with an existing evaluation platform provides insights into how GenAI approaches differ from human-driven assessment methods.
 
@@ -77,7 +77,7 @@ Quantitative scores are generated on a standardized 1-10 scale for each dimensio
 
 \subsubsection{Winds2Ventures Evaluation Framework}
 
-The Winds2Ventures platform operates through a nine-criteria assessment methodology focused on investment readiness and commercial viability indicators. Each evaluation criterion contributes to an aggregate "Investibility" rating that reflects overall investment attractiveness from a professional investor perspective.
+The platform operates through a nine-criteria assessment methodology focused on investment readiness and commercial viability indicators. Each evaluation criterion contributes to an aggregate "Investibility" rating that reflects overall investment attractiveness from a professional investor perspective.
 
 The evaluation criteria encompass:
 \begin{enumerate}
@@ -138,7 +138,7 @@ Detailed pattern analysis exposed several consistent systematic biases that sign
 
 \subsubsection{Systematic Optimism Bias}
 
-The most prominent bias emerged as universal optimism in GenAI scoring patterns. Across all 22 evaluated pitches, Pista consistently generated higher scores than W2V without exception. This universal directional bias transcended pitch quality variations and industry sectors, suggesting systematic rather than circumstantial influences.
+The most prominent pattern is optimism in GenAI scoring. As noted above, Pista scored higher in all 22 cases (+1.70 average difference). This directional bias spans pitch quality and industry sectors, which suggests systematic rather than circumstantial influences.
 
 Several factors likely contribute to this optimism bias. Training data composition may overrepresent successful startup examples, creating algorithmic tendencies toward positive assessment. Additionally, GenAI systems may lack the sophisticated risk evaluation capabilities that characterize experienced human evaluators, who integrate market realities and execution challenges developed through practical investment experience.
 
@@ -184,7 +184,7 @@ Such limited discrimination presents significant challenges for practical invest
 
 Dimensional analysis exposed systematic performance variations across evaluation categories, revealing specific algorithmic strengths and limitations. Problem-Solution Fit achieved the highest average scores (7.1/10), suggesting that GenAI systems demonstrate particular effectiveness in analyzing business logic structures and solution viability assessments.
 
-Conversely, Team \& Execution consistently received the lowest dimensional scores (6.6/10), indicating algorithmic challenges in assessing human capital factors. This performance gap likely reflects GenAI limitations in evaluating intangible elements such as leadership depth, team dynamics, and execution track records—factors that human evaluators assess through experience-based pattern recognition and interpersonal judgment.
+Conversely, Team \& Execution consistently received the lowest dimensional scores (6.6/10), indicating algorithmic challenges in assessing human capital factors. This performance gap likely reflects GenAI limitations in evaluating intangible elements such as leadership depth, team dynamics, and execution track records. These are factors that human evaluators often assess through experience based pattern recognition and interpersonal judgment.
 
 \section{Case Study Analysis}
 
@@ -211,9 +211,7 @@ Case study analysis across diverse industry sectors revealed three distinct patt
 
 \section{Discussion and Deployment Implications}
 
-The comparison revealed consistent differences between Pista and W2V scoring approaches. Pista scored higher in all cases (100\% of cases, +1.70 average difference), suggesting the GenAI system tends toward more optimistic assessments than the W2V platform.
-
-A notable finding is the limited score variation in Pista: 66.7\% of evaluations received identical 7.0/10 scores, while W2V showed more varied scoring across a 2.1-point range. This suggests the GenAI system tends toward consistent scoring rather than discriminating between different quality levels.
+The comparison revealed consistent differences between Pista and W2V scoring approaches. As shown above, Pista scores were higher on average, which suggests a tendency toward optimistic assessment. The following sections discuss practical implications and use cases.
 
 \subsection{Systematic Bias Analysis}
 \label{sec:bias-analysis}
@@ -290,7 +288,7 @@ The operational efficiency enables applications such as real-time pitch feedback
 \subsubsection{Quality Limitations}
 \label{subsec:limitations}
 
-The 66.7\% score convergence and systematic optimism bias severely limit GenAI utility for contexts requiring discriminative assessment or realistic risk evaluation. These limitations constrain professional deployment opportunities where quality assessment is critical.
+Score convergence and optimism bias severely limit GenAI utility for contexts requiring discriminative assessment or realistic risk evaluation. These limitations constrain professional deployment opportunities where quality assessment is critical.
 
 The quality limitations become particularly problematic when AI evaluation results influence significant decisions. Investment contexts require accurate risk assessment and quality discrimination that current GenAI systems cannot provide reliably. This constrains professional deployment until these limitations are addressed.
 
@@ -300,6 +298,23 @@ The quality limitations become particularly problematic when AI evaluation resul
 These differences suggest GenAI evaluation and traditional platforms serve different purposes, with each being more suitable for specific use cases rather than directly competing.
 
 Successful deployment requires matching GenAI capabilities with appropriate use cases while using commercial evaluation where quality requirements exceed GenAI capabilities. This strategic approach enables value creation through GenAI advantages while maintaining quality standards where needed.
+
+\section{Threats to Validity}
+\label{sec:threats}
+
+This section reflects on limitations that may affect interpretation of results.
+
+\subsection{Internal Validity}
+The evaluation uses identical pitch content across systems, but prompts and calibration choices may influence outcomes. We reduced this risk with rubric anchors, evidence gating, and a fixed temperature, yet residual effects may remain. Future work can ablate each calibration component to measure its impact.
+
+\subsection{Construct Validity}
+The four-dimension rubric approximates startup quality but cannot capture all factors. Some human judgments, such as leadership depth and execution history, are hard to encode. We mitigated this by adding a required Q\&A step to collect missing evidence before scoring.
+
+\subsection{External Validity}
+The dataset contains 22 university competition pitches. Results may not generalize to all sectors or later-stage ventures. Expanding the dataset and including investor-written memos would improve generalizability.
+
+\subsection{Conclusion Validity}
+We report descriptive statistics and qualitative patterns. Larger samples and rank-correlation tests would strengthen claims about dispersion and agreement. We recommend Kendall's $\tau$ for future studies.
 
 \section{Summary}
 \label{sec:summary}

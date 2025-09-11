@@ -2,25 +2,43 @@
 
 \label{ch:introduction}
 
-Communicating business ideas effectively can determine the success or failure of a startup. The startup pitch, as a primary vehicle for communicating visions, business models, and potential to investors and stakeholders, is traditionally evaluated through in-person presentations and expert judgment.  Research shows that investment decisions depend heavily on the quality of pitch presentations, which play a major role in securing financial support\cite{masterpresentat}. Many business functions have changed substantially through technological improvements. However, traditional pitch evaluation has not evolved much, still relying heavily on in-person presentations and individual expert judgment.
+Communicating business ideas effectively can determine the success or failure of a startup. The startup pitch, as a primary format for communicating visions, business models, and potential to investors and stakeholders, is traditionally evaluated through in-person presentations and expert judgment. Research shows that investment decisions depend heavily on the quality of pitch presentations, which play a major role in securing financial support\cite{masterpresentat}. Many business functions have changed through technology. Traditional pitch evaluation has not evolved much and still relies on in-person presentations and individual expert judgment.
 
 
 
-In recent years, GenAI, particularly large language models, has emerged as a powerful tool in business analysis. They have shown incredible abilities in natural language understanding, context, and structured evaluations in various domains \cite{Ozince2024}. Models such as GPT-4 represent the latest stage of large language models. They perform at levels comparable to humans in complex analytic tasks.This suggests a large potential to improve pitch evaluation processes through innovative approaches. \cite{gpt}.
+In recent years, GenAI, particularly large language models, has become a useful tool for analysis. These models handle language, context, and structure well across many domains \cite{Ozince2024}. GPT-4 represents the latest stage in this line and performs at levels similar to humans on complex analytic tasks. This suggests clear potential to improve pitch evaluation processes through new approaches \cite{gpt}.
 
 
 
-However, pitch evaluation in the startup community continues to face several obstacles. Many evaluation processes use inconsistent standards. Quality feedback is hard to access, and evaluations take too long \cite{StartupEvaluati, Kalvapalle2024}. Current evaluation methods require significant time for each pitch and often yield vastly different interpretations among evaluators.These issues are especially experienced by entrepreneurs from emerging markets and other underrepresented groups, who have limited access to expert feedback networks. Expert feedback networks are limited in these areas \cite{BreakingBarrier}.
+However, pitch evaluation in the startup community faces several obstacles. Many processes use inconsistent standards. Quality feedback is hard to access and evaluations take too long \cite{StartupEvaluati, Kalvapalle2024}. Current methods require significant time for each pitch and often yield very different interpretations among evaluators. These issues are common for entrepreneurs from emerging markets and other underrepresented groups, who have limited access to expert feedback networks \cite{BreakingBarrier}.
 
 
 
-To address these challenges, this thesis develops Pista, a GenAI-based pitch evaluation system\footnote{Project Website, \url{https://startup-pitches.vercel.app}}, and compares it with an existing evaluation platform to understand the differences in their approaches.
+This thesis develops Pista, a GenAI-based pitch evaluation system, and compares it with Winds2Ventures (W2V), a research partner’s startup evaluation system used in practice. The system processes pitches in multiple formats such as text, files, and audio\footnote{Project Website, \url{https://pista-app.vercel.app}}. It provides feedback across four dimensions: problem-solution fit, business model viability, team execution capability, and pitch quality. The GenAI system focuses on textual content analysis and aims to provide fast and consistent evaluation. The comparison explores where GenAI evaluation works well and where traditional methods may be more suitable \cite{TheFutureofAIEv}.
 
-The system processes pitches in multiple formats (text, files, audio recordings) and provides feedback across four dimensions: problem-solution fit, business model viability, team execution capability, and pitch quality. The comparison with Winds2Ventures reveals differences in scoring patterns and evaluation approaches.
+\subsection{Motivation}
+Traditional pitch evaluation depends on expert judgment and live presentations. This limits access and creates variability across evaluators. Founders outside major hubs often lack timely, structured feedback. A GenAI system that applies a clear rubric can provide consistent guidance at low cost and support early iteration.
 
-The GenAI system focuses on textual content analysis, providing fast and consistent evaluation that can address accessibility barriers for entrepreneurs seeking feedback. The comparison reveals where GenAI evaluation works well and where traditional methods may be more suitable \cite{TheFutureofAIEv}.
+\subsection{Objectives}
+This thesis aims to design and implement a practical evaluation tool for startup pitches and to compare it with a practitioner platform. The objectives are to deliver a working system, apply a transparent four-dimension rubric, and study how scores differ from a partner platform used in practice.
 
+\subsection{Approach}
+We implement Pista using Next.js, Clerk, and Convex, with GPT\,4 for evaluation. The system accepts text or audio, generates follow-up questions, and scores the pitch once answers are provided. We then compare Pista’s results with W2V on the same pitches to analyze dispersion, bias, and dimensional differences.
 
-In summary, this thesis develops a GenAI pitch evaluation system and compares it with an existing platform to understand their different strengths. The findings show how GenAI evaluation can provide accessible feedback for entrepreneurs while highlighting areas where traditional methods may be more appropriate \cite{Ozkazanc2022}.
+\subsection{Structure of the thesis}
+Chapter~\ref{ch:soa} reviews related work. Chapter~\ref{ch:problem-solution} describes the system. Chapter~\ref{ch:evaluation} presents the comparative evaluation and discusses findings. The conclusion summarizes implications and future work.
 
-% In summary, this project evaluates startup pitches by integrating Generative AI with human expert judgment. It aims to combine AI's rapid information evaluation capabilities with the nuanced insights of human evaluators. The GenAI system aims to support access and consistency for all founders, particularly those outside the main startup or entrepreneurial networks \cite{Ozkazanc2022}.
+\subsection{Contributions}
+\begin{itemize}
+  \item A working GenAI-based evaluation system (Pista) with a four-dimension rubric and Q\&A step before scoring.
+  \item An implementation aligned with a simple, reproducible stack (Next.js, Clerk, Convex, GPT-4) suitable for study.
+  \item A comparative evaluation setup against a practitioner system (W2V) to analyze scoring patterns and bias.
+\end{itemize}
+
+\subsection{Research Questions}
+\begin{itemize}
+  \item RQ1: How do Pista’s scores compare with W2V assessments across identical pitches?
+  \item RQ2: Does prompt calibration reduce score convergence and improve discrimination?
+  \item RQ3: Which evaluation dimensions show the largest differences between GenAI and practitioner scoring?
+\end{itemize}
+

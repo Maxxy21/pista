@@ -1,15 +1,19 @@
 \chapter{Background and Related Work}
 \label{ch:soa}
 
+This chapter positions the thesis in prior work. It first reviews limits of traditional pitch evaluation and then surveys GenAI-based approaches. The goal is to motivate the need for a consistent, accessible, and transparent evaluation method.
+
 \section{Limitations of Traditional Pitch Evaluation Methods}
 \label{sec:traditional-methods}
+
+This section reviews how traditional methods fall short on scalability, reliability, and access, setting up the need for a more consistent and accessible approach.
 
 Startup pitch assessment has relied on industry expert judgment and intuition for decades. This happens primarily through expert panels or standardized frameworks. Both approaches remain integral to investor decision processes. However, research identifies three major problems: scalability, reliability, and accessibility. This section examines traditional expert panels and standardized frameworks. It focuses on challenges that GenAI-driven alternatives might address more effectively.
 
 \subsection{Expert Panels}\label{subsec:expert-panels}
 Expert panels composed of industry experts, investors, and entrepreneurs have dominated pitch evaluation for decades. These panels evaluate pitches through live presentations. They provide immediate feedback based on predetermined criteria regarding market opportunity and team capability. Supporters emphasize human insight's value in assessing characteristics difficult to quantify algorithmically, such as founder passion, confidence, and presentation effectiveness.
 
-Despite human insight's value, research reveals significant consistency problems with expert panels. Gius (2024) analyzed data from 67 venture competitions and found that disagreement among expert judges evaluating identical pitches is common and actually predicts startup success \cite{Gius2024}. This assessment variability highlights concerns about the evaluation process's reliability and fairness..
+Despite human insight's value, research shows consistency problems with expert panels. Gius (2024) analyzed data from 67 venture competitions and found that disagreement among expert judges evaluating identical pitches is common and actually predicts startup success \cite{Gius2024}. This variation raises concerns about reliability and fairness in the evaluation process.
 
 Systematic bias presents another significant challenge. Balachandra et al. (2019) documented gender-based differences in investor evaluations. They showed that identical business propositions receive different treatment based on presenter demographics \cite{Balachandra2019}. Female entrepreneurs face more questions about risk mitigation strategies, while male entrepreneurs receive growth-focused questions. This indicates that even experienced evaluators exhibit unconscious biases.
 
@@ -22,7 +26,7 @@ To address subjectivity problems, many organizations have developed standardized
     \item Business model (revenue streams, scalability)
 \end{itemize}
 
-Organizations using structured rubrics show better inter-evaluator consistency compared to unstructured approaches \cite{Tsay2021VISUALSDI}.Despite this benefit, major challenges persist; Gompers et al. (2020) conducted extensive surveys of venture capital firms, revealing significant differences in evaluation practices. No standardized framework exists across the industry \cite{Gompers2020}. This variation suggests that while standardization addresses some bias, fundamental evaluation challenges remain.
+Organizations using structured rubrics show better inter-evaluator consistency than unstructured approaches \cite{Tsay2021VISUALSDI}. Despite this benefit, major challenges persist. Gompers et al. (2020) surveyed venture capital firms and found large differences in evaluation practices. No single framework exists across the industry \cite{Gompers2020}. So, standardization helps, but core evaluation challenges remain.
 
 Most standardized frameworks focus on these core evaluation dimensions. These appear in leading accelerator scoring rubrics and are supported by research as key startup success predictors \cite{Kalvapalle2024}.
 
@@ -37,12 +41,14 @@ Three interconnected challenges affect traditional evaluation processes:
     \item \textbf{Consistency Challenges}: Traditional assessment approaches struggle to consistently balance subjective and objective evaluation criteria. The relative importance of subjective characteristics versus objective metrics in predicting funding success varies inconsistently across evaluators \cite{Tsay2021VISUALSDI}.
 \end{enumerate}
 
-These challenges collectively disadvantage early-stage startups and founders from underrepresented backgrounds. This shows the need for more systematic and equitable evaluation approaches. Traditional evaluation methods face a fundamental tension between consistency and contextual judgment. GenAI systems can provide consistent criteria application and structured feedback. They may be uniquely positioned to address this tension.
+These challenges disadvantage early-stage startups and underrepresented founders. They show a need for more systematic and fair evaluation. Traditional methods face a tension between consistency and context. GenAI systems can apply criteria consistently and return structured feedback. This may help address that tension. Taken together, these limits motivate the structured and scalable design presented in Chapter~\\ref{ch:problem-solution}.
 
 \section{GenAI-Driven Evaluation Systems}
 \label{sec:ai-systems}
 
-Traditional assessment method limitations have driven growing interest in GenAI-based evaluation systems. These systems use advances in Natural Language Processing (NLP) and GenAI to address scalability, consistency, and accessibility challenges in pitch assessment.
+This section surveys GenAI-based evaluation approaches and summarizes their capabilities and limitations relative to traditional methods.
+
+Traditional assessment method limitations have driven growing interest in GenAI-based evaluation systems. These systems use advances in large language models and automated text analysis to address scalability, consistency, and accessibility challenges in pitch assessment.
 
 \subsection{Current Approaches}\label{subsec:current-approaches}
 Growing interest in GenAI-driven evaluation has produced several technological approaches. Each targets different aspects of traditional assessment challenges:
@@ -50,9 +56,9 @@ Growing interest in GenAI-driven evaluation has produced several technological a
 \begin{itemize}
     \item \textbf{Machine Learning-Based Assessment}: Researchers have developed systems that use historical startup data to inform evaluation decisions. Arroyo et al. (2019) showed machine learning methods' potential in venture capital decision support \cite{Arroyo2019}. These approaches analyze patterns in successful and unsuccessful ventures to identify key success indicators.
 
-    \item \textbf{Text-Based Evaluation Systems}: Natural language processing techniques allow automated analysis of pitch content, business plans, and presentation materials. These systems can evaluate factors like clarity of value proposition, market understanding, and competitive positioning.
+    \item \textbf{Text-Based Evaluation Systems}: Automated text analysis allows the analysis of pitch content, business plans, and presentation materials. These systems can evaluate factors like clarity of value proposition, market understanding, and competitive positioning.
 
-    \item \textbf{Commercial Evaluation Platforms}: Platforms like Winds2Ventures have emerged that combine GenAI-based evaluation tools with investor matching services. They attempt to provide integrated startup evaluation experiences \cite{w2v}. These platforms typically evaluate pitches across multiple dimensions and provide structured feedback to entrepreneurs.
+    \item \textbf{Commercial Evaluation Platforms}: Commercial and practitioner systems operate in this space. Winds2Ventures (W2V), used by our research partner, provides multi-criteria startup evaluations and structured feedback \cite{w2v}. Some products also include investor matching, but features vary by platform.
 
     \item \textbf{Large Language Model Integration}: Recent advances in large language models enable more sophisticated text understanding and evaluation capabilities. These systems can process pitch content and provide detailed feedback across multiple evaluation dimensions.
 \end{itemize}
@@ -73,8 +79,10 @@ GenAI systems offer several advantages over traditional methods:
 However, important limitations remain. Human oversight remains necessary for contextual validation and final investment decisions \cite{Steyvers2024}. GenAI systems may struggle to understand nuanced aspects of entrepreneurship that require deep domain expertise or insights into market dynamics beyond textual analysis.
 
 \subsection{Integration with Traditional Methods}\label{subsec:integration-with-traditional-methods}
-Current research suggests that GenAI-driven evaluation systems serve fundamentally different functions than those of traditional human-centered approaches. Rather than direct competition, these systems demonstrate complementary capabilities that address distinct use cases within the evaluation ecosystem.
+Current research suggests that GenAI systems and human-centered approaches serve different functions. They work best together in different use cases within the evaluation ecosystem.
 
-GenAI systems excel at providing consistent, scalable feedback for early-stage development and high-volume screening applications. Human experts remain essential for nuanced evaluation aspects requiring domain expertise, risk assessment, and investment decision-making. Understanding these systematic differences enables strategic deployment that maximizes each approach's strengths while mitigating their respective limitations.
+GenAI systems work well for consistent, scalable feedback in early stages and high-volume screening. Human experts are essential for nuanced judgment, risk assessment, and investment decisions. Knowing the difference helps use each where it fits best.
+
+In summary, GenAI can improve access and consistency, while expert evaluators provide contextual judgment. These roles guide the design choices in Chapter~\ref{ch:problem-solution}.
 
 

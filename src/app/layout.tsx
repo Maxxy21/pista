@@ -17,7 +17,7 @@ const defaultFont = Noto_Sans_Georgian({subsets: ["latin"]});
 
 const ORIGIN_URL =
     process.env.NODE === "production"
-        ? "https://startup-pitches.vercel.app/"
+        ? "https://pista-app.vercel.app/"
         : "http://localhost:3000";
 
 

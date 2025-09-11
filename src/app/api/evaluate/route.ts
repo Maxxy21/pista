@@ -141,7 +141,7 @@ function buildStructuredPrompt(
   return `
 As an expert evaluator, score ONLY the criterion: ${criteriaName}.
 
-Work from the content below without inventing facts. If evidence is missing for an aspect, score that aspect \u22644 and note what is missing.
+Work from the content below without inventing facts. If evidence is missing for an aspect, score that aspect <= 4 and note what is missing.
 
 Aspects to score (each 1-10 with a one sentence rationale):
 ${aspects.map((aspect) => `- ${aspect}`).join("\n")}

@@ -1,4 +1,4 @@
-\documentclass[10pt,a4paper]{book}  % Changed to 10pt
+\documentclass[10pt,a4paper,openany]{book}  % 10pt, A4, allow chapters on any page
 
 % Normal margins
 \usepackage[margin=2.5cm]{geometry}  % Standard margins
@@ -7,6 +7,9 @@
 % Single spacing
 \usepackage{setspace}
 \singlespacing
+
+% Avoid vertical stretching to "flush" bottoms — helps prevent big gaps
+\raggedbottom
 
 % Other packages
 \usepackage[a-1b]{pdfx}
@@ -34,9 +37,12 @@
 
 
 
+% Localize/rename auto-generated list titles
+\addto\captionsenglish{\renewcommand{\contentsname}{Table of Contents}}
+
 \input{definitions}
 
-\def\titleOfTheThesis{GenAI-Powered System for Automated Startup Pitch Evaluation}
+\def\titleOfTheThesis{Pista: A GenAI-Powered System for Automated Startup Pitch Evaluation}
 \def\author{}
 
 \def\candidate{}
@@ -75,6 +81,7 @@
 
 
 \appendix
+\input{chapters/appendix-implementation}
 
 % \input{help} 
 

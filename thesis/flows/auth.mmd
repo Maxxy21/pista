@@ -1,0 +1,36 @@
+%% Authentication & Landing (styled)
+flowchart TB
+  subgraph subGraph0["Landing Page Components"]
+    Hero["Hero Section"]
+    LandingPage["Landing Page"]
+    HowItWorks["How It Works"]
+    CTAs["Get Started"]
+  end
+
+  subgraph subGraph1["Landing Flow"]
+    Entry("User Visits Site")
+    subGraph0
+    SignUpFlow["Sign Up"]
+    LoginFlow["Login"]
+  end
+
+  subgraph Authentication["Authentication"]
+    ClerkAuth["Clerk Authentication"]
+    Middleware["Next.js Middleware (/dashboard)"]
+    Dashboard["Dashboard"]
+  end
+
+  Entry --> LandingPage
+  LandingPage --> Hero & HowItWorks & CTAs
+  CTAs -- Sign Up --> SignUpFlow
+  CTAs -- Login --> LoginFlow
+  SignUpFlow --> ClerkAuth
+  LoginFlow --> ClerkAuth
+  ClerkAuth --> Middleware --> Dashboard
+
+  classDef landingNode fill:#f3e5f5,stroke:#9c27b0
+  classDef authNode fill:#e1f5fe,stroke:#0288d1
+  classDef mainNode fill:#f3e5f5,stroke:#7b1fa2
+
+  class Hero,LandingPage,HowItWorks,CTAs,Entry landingNode
+  class SignUpFlow,LoginFlow,ClerkAuth,Middleware,Dashboard authNode

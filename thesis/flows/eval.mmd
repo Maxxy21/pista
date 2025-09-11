@@ -1,0 +1,31 @@
+%% Evaluation Pipeline (styled)
+flowchart TB
+  subgraph subGraph4["OpenAI Processing"]
+    OpenAI["OpenAI API"]
+    ProblemSolutionFit["Problem-Solution Fit"]
+    BusinessModel["Business Model & Market"]
+    TeamExecution["Team & Execution"]
+    PresentationQuality["Pitch Quality"]
+  end
+
+  subgraph subGraph5["AI Evaluation Process"]
+    BuildContent["Build Content (Pitch + Q&A)"]
+    Prompting["Rubric-Anchored Prompts (per criterion)"]
+    ParseJSON["Parse JSON → Evaluation"]
+    CollectScores["Collect 4 Evaluations"]
+    WeightScore["Weighted Overall Score"]
+    DetailedFeedback["Structured Feedback"]
+    Finalize["Return Result"]
+  end
+
+  BuildContent --> Prompting --> OpenAI
+  OpenAI -- Analyze --> ProblemSolutionFit & BusinessModel & TeamExecution & PresentationQuality
+  OpenAI -- Return --> ParseJSON --> CollectScores --> WeightScore --> DetailedFeedback --> Finalize
+
+  classDef aiNode fill:#fff3e0,stroke:#ff9800
+  classDef openaiNode fill:#fce4ec,stroke:#e91e63
+  classDef mainNode fill:#f3e5f5,stroke:#7b1fa2
+
+  class OpenAI openaiNode
+  class ProblemSolutionFit,BusinessModel,TeamExecution,PresentationQuality aiNode
+  class BuildContent,Prompting,ParseJSON,CollectScores,WeightScore,DetailedFeedback,Finalize mainNode
