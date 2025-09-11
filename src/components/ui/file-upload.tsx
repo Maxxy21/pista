@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 import React, { useRef, useState } from "react";
 import { motion } from "motion/react";
 import { IconUpload } from "@tabler/icons-react";
-import { useDropzone, type Accept } from "react-dropzone";
+import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
 
 const mainVariant = {
@@ -39,7 +39,7 @@ export const FileUpload = ({
   multiple?: boolean;
   hint?: string;
   showList?: boolean;
-  maxSize?: number; // in bytes
+  maxSize?: number;
 }) => {
   const [files, setFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -48,7 +48,7 @@ export const FileUpload = ({
     if (multiple) {
       setFiles((prevFiles) => [...prevFiles, ...newFiles]);
     } else {
-      setFiles(newFiles.slice(0, 1));
+      setFiles(newFiles);
     }
     onChange && onChange(newFiles);
   };
@@ -57,37 +57,25 @@ export const FileUpload = ({
     fileInputRef.current?.click();
   };
 
-  const toDropzoneAccept = (s?: string): Accept | undefined => {
-    if (!s) return undefined;
-    const lower = s.toLowerCase();
-    const map: Accept = {};
-    if (lower.includes("audio/")) {
-      map["audio/*"] = [];
-    }
-    if (lower.includes("text/plain") || lower.includes(".txt")) {
-      map["text/plain"] = [".txt"];
-    }
-    return Object.keys(map).length ? map : undefined;
-  };
-
   const { getRootProps, isDragActive } = useDropzone({
-    multiple,
+    multiple: multiple,
     noClick: true,
-    accept: toDropzoneAccept(accept),
-    maxSize,
-    onDrop: handleFileChange,
-    onDropRejected: (rejections) => {
-      try {
-        const first = rejections?.[0];
-        const reason = first?.errors?.[0]?.message || "File not accepted";
-        if (reason.toLowerCase().includes("too large") && maxSize) {
-          const mb = (maxSize / (1024 * 1024)).toFixed(0);
-          toast.error(`File too large. Max ${mb} MB allowed.`);
+    onDrop: (acceptedFiles, rejectedFiles) => {
+      if (acceptedFiles.length > 0) {
+        if (typeof maxSize === "number") {
+          const allowed = acceptedFiles.filter((f) => f.size <= maxSize);
+          const rejected = acceptedFiles.filter((f) => f.size > maxSize);
+          if (rejected.length) {
+            const mb = (maxSize / (1024 * 1024)).toFixed(0);
+            toast.error(`Some files exceed the ${mb} MB limit`);
+          }
+          if (allowed.length) handleFileChange(allowed);
         } else {
-          toast.error(reason);
+          handleFileChange(acceptedFiles);
         }
-      } catch (e) {
-        console.log(rejections);
+      }
+      if (rejectedFiles.length > 0) {
+        toast.error("Some files were rejected due to invalid format");
       }
     },
   });

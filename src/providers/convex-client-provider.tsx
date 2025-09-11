@@ -2,6 +2,8 @@
 
 import {Loading} from "@/components/shared/auth/loading";
 import {ClerkProvider, useAuth} from "@clerk/nextjs";
+import { useTheme } from "next-themes";
+import { getClerkAppearance } from "@/lib/utils/clerk-appearance";
 import {AuthLoading, Authenticated, ConvexReactClient, Unauthenticated} from "convex/react";
 import {ConvexProviderWithClerk} from "convex/react-clerk";
 import {useMemo} from "react";
@@ -22,8 +24,11 @@ export const ConvexClientProvider = ({
     // Check if we're on an auth page
     const isAuthPage = pathname === '/sign-in' || pathname === '/sign-up';
 
+    const { resolvedTheme } = useTheme();
+    const isDark = resolvedTheme === 'dark';
+
     return (
-        <ClerkProvider>
+        <ClerkProvider appearance={getClerkAppearance(isDark)}>
             <ConvexProviderWithClerk useAuth={useAuth} client={convex}>
                 <AuthLoading>
                     <Loading/>

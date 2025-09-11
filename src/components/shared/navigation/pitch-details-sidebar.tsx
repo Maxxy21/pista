@@ -1,14 +1,18 @@
 "use client";
 
 import * as React from "react";
-import { ArrowLeft, Star, FileText, Folder, PlusCircle } from "lucide-react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
+import Image from "next/image";
+
 import { useOrganization, useAuth, useUser } from "@clerk/nextjs";
-import { useWorkspace } from "@/hooks/use-workspace";
-import { useDebounceValue } from "usehooks-ts";
+import { useQuery } from "convex/react";
 import { motion } from "framer-motion";
 import qs from "query-string";
+import { toast } from "sonner";
+import { useDebounceValue } from "usehooks-ts";
+import { useTheme } from "next-themes";
 
+import { ArrowLeft, Star, FileText, Folder, PlusCircle } from "lucide-react";
 import {
     Sidebar,
     SidebarHeader,
@@ -22,24 +26,21 @@ import {
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useQuery } from "convex/react";
-import { Id } from "@/convex/_generated/dataModel";
-import { api } from "@/convex/_generated/api";
-import { type UniversalPitchData } from "@/lib/types/pitch";
-// User menu and team switcher consolidated into top navbar
-import { SearchForm } from "../forms/search-form";
-import { InviteButton } from "../common/invite-button";
-import { useTheme } from "next-themes";
 import LogoIcon from "@/components/ui/logo-icon";
 import { Badge } from "@/components/ui/badge";
-// Avatar moved into CurrentPitchBanner component
 import { Separator } from "@/components/ui/separator";
-import { toast } from "sonner";
-import Image from "next/image";
+
+import { Id } from "@/convex/_generated/dataModel";
+import { api } from "@/convex/_generated/api";
 import { useApiMutation } from "@/hooks/use-api-mutation";
+import { useWorkspace } from "@/hooks/use-workspace";
+import { type UniversalPitchData } from "@/lib/types/pitch";
+import { downloadCsvFromRows } from "@/lib/utils/pitch-export";
+
+import { SearchForm } from "../forms/search-form";
+import { InviteButton } from "../common/invite-button";
 import { CurrentPitchBanner } from "./pitch-current-banner";
 import { PitchListItem } from "./pitch-list-item";
-import { downloadCsvFromRows } from "@/lib/utils/pitch-export";
 
 // Using shared pitch type from lib/types
 
@@ -351,7 +352,7 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
                                       const inOrg = workspace.mode === 'org' && !!workspace.orgId;
                                       const mismatch = (inOrg && !pitchOrg) || (!inOrg && !!pitchOrg);
                                       const note = mismatch
-                                        ? `Viewing a ${pitchOrg ? 'team' : 'personal'} pitch in ${inOrg ? 'organization' : 'personal'} context.`
+                                        ? `Viewing a ${pitchOrg ? 'organization' : 'personal'} pitch in ${inOrg ? 'organization' : 'personal'} context.`
                                         : null;
                                       return (
                                         <CurrentPitchBanner
@@ -475,7 +476,7 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
                             </SidebarMenuItem>
                         </SidebarMenu>
                         
-                        {/* User Profile and Team Switcher moved to top avatar menu for consistency */}
+                        {/* User Profile and Organization switcher moved to top avatar menu for consistency */}
                     </>
                 )}
             </SidebarFooter>

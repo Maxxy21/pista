@@ -1,8 +1,8 @@
 "use client";
 
 import {SignUp} from "@clerk/nextjs";
-import { dark } from "@clerk/themes";
 import { useTheme } from "next-themes";
+import { getClerkAppearance } from "@/lib/utils/clerk-appearance";
 
 export function SignUpForm() {
     const { resolvedTheme } = useTheme();
@@ -19,12 +19,7 @@ export function SignUpForm() {
                         Get started with your journey to the perfect pitch
                     </p>
                 </div>
-                <SignUp
-                    appearance={{
-                        baseTheme: isDark ? dark : undefined,
-                    }}
-                    forceRedirectUrl="/dashboard"
-                />
+                <SignUp appearance={getClerkAppearance(isDark)} forceRedirectUrl="/dashboard" />
             </div>
         </div>
     );

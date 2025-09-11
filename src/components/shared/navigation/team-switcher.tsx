@@ -4,7 +4,6 @@ import * as React from "react";
 import Image from "next/image";
 import { ChevronsUpDown, Plus, Check, Building2 } from "lucide-react";
 import { useOrganization, useOrganizationList, useUser } from "@clerk/nextjs";
-import { CreateOrganization } from "@clerk/nextjs";
 import { motion } from "framer-motion";
 
 import {

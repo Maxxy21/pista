@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import {Button} from "@/components/ui/button"
 import {dark} from "@clerk/themes"
+import { getClerkAppearance } from "@/lib/utils/clerk-appearance";
 // import {useRouter} from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -143,9 +144,9 @@ export function NavUserNavbar({isDark, className}: NavUserNavbarProps) {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator/>
                 
-                {/* Organization submenu removed; use sidebar team switcher */}
+                {/* Organization submenu removed; use organization switcher in sidebar */}
                 <DropdownMenuItem
-                    onClick={() => openUserProfile({appearance: {baseTheme: isDark ? dark : undefined}})}
+                    onClick={() => openUserProfile({appearance: getClerkAppearance(isDark)})}
                     className="gap-2"
                 >
                     <User className="mr-2 h-4 w-4 text-muted-foreground"/>

@@ -34,6 +34,7 @@ import {
 } from "@/components/ui/sidebar"
 import {Button} from "@/components/ui/button"
 import {dark} from "@clerk/themes"
+import { getClerkAppearance } from "@/lib/utils/clerk-appearance";
 // import {useRouter} from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { useQuery } from "convex/react";
@@ -258,7 +259,7 @@ export function NavUser({isDark, className}: NavUserProps) {
                         </DropdownMenuSub>
 
                         <DropdownMenuItem
-                            onClick={() => openUserProfile({appearance: {baseTheme: isDark ? dark : undefined}})}
+                            onClick={() => openUserProfile({appearance: getClerkAppearance(isDark)})}
                             className="gap-2"
                         >
                             <User className="mr-2 h-4 w-4 text-muted-foreground"/>

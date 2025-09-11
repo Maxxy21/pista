@@ -3,6 +3,7 @@
 import React from "react";
 import {UserPlus, Building2} from "lucide-react";
 import { OrganizationProfile } from "@clerk/nextjs";
+import { getClerkAppearance } from "@/lib/utils/clerk-appearance";
 import {
     Dialog,
     DialogContent,
@@ -37,7 +38,7 @@ export const InviteButton = ({ isDark }: InviteButtonProps) => {
                     <VisuallyHidden>
                         <DialogTitle>Organization</DialogTitle>
                     </VisuallyHidden>
-                    <OrganizationProfile appearance={{ baseTheme: isDark ? dark : undefined }} routing="hash" />
+                    <OrganizationProfile appearance={getClerkAppearance(isDark)} routing="hash" />
                 </DialogContent>
             </Dialog>
         );

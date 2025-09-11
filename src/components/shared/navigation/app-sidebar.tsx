@@ -21,7 +21,7 @@ import {
     useSidebar,
 } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
-// Team switcher moved into user avatar menu for consistency
+// Organization switcher moved into user avatar menu for consistency
 import { InviteButton } from "../common/invite-button";
 import Link from "next/link";
 import LogoIcon from "@/components/ui/logo-icon";
@@ -120,7 +120,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
                         <InviteButton isDark={isDark} />
                     </SidebarMenuItem>
                     <SidebarMenuItem>
-                        {/* Team switcher positioned at bottom of sidebar */}
+                        {/* Organization switcher positioned at bottom of sidebar */}
                         <TeamSwitcher />
                     </SidebarMenuItem>
                 </SidebarMenu>

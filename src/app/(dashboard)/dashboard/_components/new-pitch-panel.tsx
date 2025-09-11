@@ -16,8 +16,8 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Progress } from "@/components/ui/progress"
 import { useEvaluationProgress } from "@/hooks/use-evaluation-progress"
 import { streamUpload } from "@/lib/utils"
-import { FileAudio2, FileText as FileTextIcon } from "lucide-react"
-import { FileUpload as PrettyFileUpload } from "@/components/ui/file-upload"
+import { FileAudio2, FileText as FileTextIcon, Upload, Loader2, Mic } from "lucide-react"
+import { FileUpload as PrettyFileUpload, GridPattern } from "@/components/ui/file-upload"
 import { AudioPreview } from "@/components/ui/previews/audio-preview"
 import { FilePreview } from "@/components/ui/previews/file-preview"
 
@@ -174,66 +174,137 @@ export function NewPitchPanel() {
           </div>
 
           <Tabs value={type} onValueChange={(v) => setType(v as PitchType)}>
-            <TabsList>
-              <TabsTrigger value="text">Text</TabsTrigger>
-              <TabsTrigger value="textFile">Text File</TabsTrigger>
-              <TabsTrigger value="audio">Audio</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-3 h-11">
+              <TabsTrigger value="text" className="flex items-center gap-2 text-xs sm:text-sm">
+                <FileTextIcon className="w-4 h-4" />
+                <span className="hidden sm:inline">Text</span>
+              </TabsTrigger>
+              <TabsTrigger value="textFile" className="flex items-center gap-2 text-xs sm:text-sm">
+                <FileAudio2 className="w-4 h-4" />
+                <span className="hidden sm:inline">Text </span>File
+              </TabsTrigger>
+              <TabsTrigger value="audio" className="flex items-center gap-2 text-xs sm:text-sm">
+                <Mic className="w-4 h-4" />
+                <span className="hidden sm:inline">Audio</span>
+              </TabsTrigger>
             </TabsList>
             <TabsContent value="text" className="space-y-2">
-              <Label htmlFor="pitch-text">Pitch</Label>
-              <div className="min-h-96 border border-dashed bg-background rounded-lg p-2">
-                <Textarea 
-                  id="pitch-text" 
-                  value={text} 
-                  onChange={(e) => setText(e.target.value)} 
-                  placeholder="Paste or write your pitch..." 
-                  className="h-96 resize-vertical"
-                />
+              <Label htmlFor="pitch-text">Pitch Content</Label>
+              <div className="min-h-96 border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-background rounded-lg p-4 relative overflow-hidden">
+                <div className="absolute inset-0 [mask-image:radial-gradient(ellipse_at_center,white,transparent)]">
+                  <GridPattern />
+                </div>
+                <div className="h-full flex flex-col relative z-10">
+                  {!text && (
+                    <div className="flex items-center justify-center h-20 mb-4">
+                      <div className="text-center space-y-2">
+                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+                          <FileTextIcon className="w-5 h-5 text-primary" />
+                        </div>
+                        <p className="text-sm text-muted-foreground text-center">Type or paste your pitch content</p>
+                      </div>
+                    </div>
+                  )}
+                  <Textarea 
+                    id="pitch-text" 
+                    value={text} 
+                    onChange={(e) => setText(e.target.value)} 
+                    placeholder="Describe your startup idea, business model, target market, and competitive advantages..." 
+                    className={`flex-1 min-h-[280px] resize-none border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 ${text ? 'mt-0 text-left' : 'mt-auto text-center'} placeholder:text-center relative z-10`}
+                  />
+                </div>
               </div>
             </TabsContent>
             <TabsContent value="textFile" className="space-y-2">
-              <Label>Upload .txt</Label>
-              <div className="min-h-96 border border-dashed bg-background rounded-lg">
+              <Label>Upload Text File</Label>
+              <div className="min-h-96 border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-background rounded-lg">
                 <PrettyFileUpload accept="text/plain,.txt" maxSize={5 * 1024 * 1024} onChange={handleFilesSelected} showList={false} />
               </div>
               {file && (
-                <div className="mt-3 rounded-lg border bg-muted/20 p-3">
+                <div className="mt-3 rounded-lg border bg-muted/20 p-3 sm:p-4">
                   <FilePreview file={file} />
                   {preview?.text && (
-                    <pre className="mt-2 max-h-48 overflow-auto whitespace-pre-wrap rounded bg-background p-2 text-xs border">
+                    <pre className="mt-3 max-h-32 sm:max-h-48 overflow-auto whitespace-pre-wrap rounded bg-background p-2 sm:p-3 text-xs border">
                       {preview.text}
                       {file.size > 800 && "\n..."}
                     </pre>
                   )}
-                  <div className="mt-2 flex justify-end">
-                    <Button variant="ghost" size="sm" className="h-7 px-2" onClick={() => setFile(null)}>Remove</Button>
+                  <div className="mt-3 flex justify-between items-center">
+                    <div className="text-xs text-muted-foreground">
+                      {(file.size / 1024).toFixed(1)} KB
+                    </div>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="h-8 px-3 text-xs touch-manipulation" 
+                      onClick={() => setFile(null)}
+                    >
+                      Remove
+                    </Button>
                   </div>
                 </div>
               )}
             </TabsContent>
             <TabsContent value="audio" className="space-y-2">
-              <Label>Upload audio</Label>
-              <div className="min-h-96 border border-dashed bg-background rounded-lg">
+              <Label>Upload Audio File</Label>
+              <div className="min-h-96 border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-background rounded-lg">
                 <PrettyFileUpload accept="audio/*" maxSize={25 * 1024 * 1024} onChange={handleFilesSelected} showList={false} />
               </div>
               {file && (
-                <div className="mt-3 rounded-lg border bg-muted/20 p-3">
+                <div className="mt-3 rounded-lg border bg-muted/20 p-3 sm:p-4">
                   <AudioPreview file={file} onRemove={() => setFile(null)} />
+                  <div className="mt-3 flex justify-between items-center">
+                    <div className="text-xs text-muted-foreground">
+                      {(file.size / (1024 * 1024)).toFixed(1)} MB • {file.name}
+                    </div>
+                  </div>
                 </div>
               )}
             </TabsContent>
           </Tabs>
 
           {processing && (
-            <div className="space-y-2">
-              <Progress value={progress} />
-              <p className="text-xs text-muted-foreground">Processing...</p>
+            <div className="space-y-4 p-4 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 rounded-lg border border-primary/20">
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                    <Loader2 className="w-5 h-5 text-primary animate-spin" />
+                  </div>
+                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-primary rounded-full animate-pulse" />
+                </div>
+                <div className="flex-1">
+                  <p className="font-medium text-sm">Processing your pitch...</p>
+                  <p className="text-xs text-muted-foreground">This may take a few moments</p>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <div className="flex justify-between text-xs">
+                  <span className="text-muted-foreground">Progress</span>
+                  <span className="font-medium text-primary">{Math.round(progress)}%</span>
+                </div>
+                <Progress value={progress} className="h-2 bg-primary/10" />
+              </div>
             </div>
           )}
 
-          <div className="flex justify-end">
-            <Button onClick={onSubmit} disabled={!canSubmit || processing || pending}>
-              {processing || pending ? "Creating..." : "Create & Evaluate"}
+          <div className="flex flex-col sm:flex-row gap-3 sm:justify-end">
+            <Button 
+              onClick={onSubmit} 
+              disabled={!canSubmit || processing || pending}
+              className="w-full sm:w-auto h-11 text-sm font-medium touch-manipulation"
+              size="lg"
+            >
+              {processing || pending ? (
+                <div className="flex items-center gap-2">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Creating...
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <Upload className="w-4 h-4" />
+                  Create & Evaluate
+                </div>
+              )}
             </Button>
           </div>
         </CardContent>

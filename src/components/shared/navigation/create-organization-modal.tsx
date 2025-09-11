@@ -3,7 +3,7 @@
 import React from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { CreateOrganization } from "@clerk/nextjs";
-import { dark } from "@clerk/themes";
+import { getClerkAppearance } from "@/lib/utils/clerk-appearance";
 
 interface CreateOrganizationModalProps {
   open: boolean;
@@ -15,19 +15,8 @@ export function CreateOrganizationModal({ open, onOpenChange, isDark }: CreateOr
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="p-0 bg-transparent border-none max-w-[430px]">
-        <CreateOrganization
-          appearance={{
-            baseTheme: isDark ? dark : undefined,
-            elements: {
-              formButtonPrimary: "bg-primary text-primary-foreground hover:bg-primary/90",
-              card: "bg-background border border-border shadow-lg",
-              headerTitle: "text-xl font-bold",
-            },
-          }}
-          routing="hash"
-        />
+        <CreateOrganization appearance={getClerkAppearance(isDark)} routing="hash" />
       </DialogContent>
     </Dialog>
   );
 }
-
