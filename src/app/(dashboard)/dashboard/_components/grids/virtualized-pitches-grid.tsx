@@ -64,10 +64,14 @@ export const VirtualizedPitchesGrid: React.FC<VirtualizedPitchesGridProps> = ({
         [pitches.length, columnCount, isLoading]
     );
 
+    const LIST_CARD_HEIGHT = 200;  // fixed card height in list view
+    const GRID_CARD_HEIGHT = 250;  // fixed card height in grid view
+    const ROW_GAP_PX = 24;         // matches `py-3` vertical padding per row
+
     const rowVirtualizer = useVirtualizer({
         count: rowCount,
         getScrollElement: () => parentRef.current,
-        estimateSize: () => (viewMode === "list" ? 120 : 250),
+        estimateSize: () => ((viewMode === "list" ? LIST_CARD_HEIGHT : GRID_CARD_HEIGHT) + ROW_GAP_PX),
         overscan: 5,
     });
 
@@ -86,6 +90,18 @@ export const VirtualizedPitchesGrid: React.FC<VirtualizedPitchesGridProps> = ({
         return null;
     }
 
+    // Tailwind cannot generate dynamic `grid-cols-${n}` classes at runtime.
+    // Map the computed column count to static class names to ensure CSS exists.
+    const gridColsClass = viewMode === "grid"
+        ? (columnCount === 1
+            ? "grid-cols-1"
+            : columnCount === 2
+                ? "grid-cols-2"
+                : columnCount === 3
+                    ? "grid-cols-3"
+                    : "grid-cols-4")
+        : "grid-cols-1";
+
     return (
         <div ref={parentRef} className="h-full w-full overflow-auto">
             <div
@@ -99,16 +115,12 @@ export const VirtualizedPitchesGrid: React.FC<VirtualizedPitchesGridProps> = ({
                     return (
                         <div
                             key={virtualRow.key}
-                            className={cn(
-                                "absolute top-0 left-0 w-full grid gap-6",
-                                viewMode === "grid"
-                                    ? `grid-cols-${columnCount}`
-                                    : "grid-cols-1"
-                            )}
+                            className={cn("absolute top-0 left-0 w-full grid gap-6 py-3", gridColsClass)}
                             style={{
                                 height: `${virtualRow.size}px`,
                                 transform: `translateY(${virtualRow.start}px)`,
                             }}
+                            ref={rowVirtualizer.measureElement}
                         >
                             {Array.from({ length: columnCount }).map((_, colIndex) => {
                                 const pitchIndex = rowIndex * columnCount + colIndex;
@@ -119,7 +131,7 @@ export const VirtualizedPitchesGrid: React.FC<VirtualizedPitchesGridProps> = ({
                                         <SkeletonCard
                                             key={`skeleton-${pitchIndex}`}
                                             variant="pitch"
-                                            height={viewMode === "list" ? "h-[120px]" : "h-[250px]"}
+                                            height={viewMode === "list" ? "h-[200px]" : "h-[250px]"}
                                         />
                                     ) : null;
                                 }
@@ -130,7 +142,8 @@ export const VirtualizedPitchesGrid: React.FC<VirtualizedPitchesGridProps> = ({
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}
                                     >
-                                        <PitchCard
+                                        <div style={{ height: viewMode === "list" ? LIST_CARD_HEIGHT : GRID_CARD_HEIGHT }}>
+                                          <PitchCard
                                             id={pitch._id}
                                             title={pitch.title}
                                             text={pitch.text}
@@ -141,7 +154,8 @@ export const VirtualizedPitchesGrid: React.FC<VirtualizedPitchesGridProps> = ({
                                             isFavorite={pitch.isFavorite}
                                             score={pitch.evaluation.overallScore}
                                             onClick={() => handlePitchClick(pitch._id)}
-                                        />
+                                          />
+                                        </div>
                                     </motion.div>
                                 );
                             })}
