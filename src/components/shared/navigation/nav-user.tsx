@@ -2,7 +2,7 @@
 
 import {ChevronsUpDown, LogOut, User, Download, Check, Building2, Plus} from 'lucide-react'
 import { toast } from "sonner";
-import {useClerk, useUser, useOrganization, useOrganizationList, CreateOrganization, OrganizationProfile} from "@clerk/nextjs"
+import {useClerk, useUser, useOrganization, useOrganizationList, OrganizationProfile} from "@clerk/nextjs"
 import {useTheme} from "next-themes"
 import { motion } from "framer-motion";
 import React, { useEffect, useState } from "react";
@@ -39,8 +39,10 @@ import { Badge } from "@/components/ui/badge";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { CreateOrganizationModal } from "./create-organization-modal";
 import { useWorkspace } from "@/hooks/use-workspace";
 import { ThemeMenu } from "./theme-menu";
+import { exportPitchesCsv } from "@/lib/utils/pitch-export";
 
 interface NavUserProps {
     isDark?: boolean
@@ -59,6 +61,7 @@ export function NavUser({isDark, className}: NavUserProps) {
     const workspace = useWorkspace()
     const { userMemberships, setActive } = useOrganizationList({ userMemberships: { infinite: true } })
     const [exportRequested, setExportRequested] = useState(false)
+    const [createOpen, setCreateOpen] = useState(false)
     const pitches = useQuery(
       api.pitches.getFilteredPitches,
       workspace.mode === 'org' && workspace.orgId ? { orgId: workspace.orgId } : (workspace.userId ? { ownerUserId: workspace.userId } : "skip")
@@ -86,58 +89,13 @@ export function NavUser({isDark, className}: NavUserProps) {
         if (!organization || !Array.isArray(pitches)) return
 
         const toastId = toast.loading("Preparing CSV…")
-        const rows: string[] = []
-        const headers = [
-          'id','title','type','author','createdAt','overallScore','evaluatedAt','modelVersion','promptVersion','policyVersion'
-        ]
-        rows.push(headers.join(','))
-
-        try {
-          for (const p of pitches) {
-            const id = String(p._id)
-            const title = JSON.stringify(p.title ?? "")
-            const type = JSON.stringify(p.type ?? "")
-            const author = JSON.stringify(p.authorName ?? "")
-            const createdAt = new Date(p.createdAt).toISOString()
-
-            const ev = p.evaluation || {}
-            const overallScore = String(ev.overallScore ?? '')
-            const meta = ev.metadata || {}
-            const evaluatedAt = meta.evaluatedAt ?? ''
-            const modelVersion = JSON.stringify(meta.modelVersion ?? '')
-            const promptVersion = JSON.stringify(meta.promptVersion ?? '')
-            const policyVersion = JSON.stringify(meta.policyVersion ?? '')
-
-            rows.push([
-              id,
-              title,
-              type,
-              author,
-              createdAt,
-              overallScore,
-              evaluatedAt,
-              modelVersion,
-              promptVersion,
-              policyVersion,
-            ].join(','))
-          }
-
-          const csv = rows.join('\n')
-          const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-          const url = URL.createObjectURL(blob)
-          const a = document.createElement('a')
-          a.href = url
-          a.download = `pitches-export-${new Date().toISOString().slice(0,10)}.csv`
-          document.body.appendChild(a)
-          a.click()
-          document.body.removeChild(a)
-          URL.revokeObjectURL(url)
-          toast.success(`Exported ${Math.max(rows.length - 1, 0)} rows`, { id: toastId })
-        } catch (e) {
+        const { data, error } = exportPitchesCsv(pitches as any[])
+        if (error) {
           toast.error("Export failed", { id: toastId })
-        } finally {
-          setExportRequested(false)
+        } else {
+          toast.success(`Exported ${data?.rows ?? 0} rows`, { id: toastId })
         }
+        setExportRequested(false)
     }, [exportRequested, organization, pitches])
 
     if (!user) return null
@@ -268,29 +226,12 @@ export function NavUser({isDark, className}: NavUserProps) {
                                         )}
                                     </DropdownMenuItem>
                                 ))}
-                                <Dialog>
-                                    <DialogTrigger asChild>
-                                        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="gap-2">
-                                            <div className="flex h-6 w-6 items-center justify-center rounded-sm border border-dashed border-muted-foreground/60">
-                                                <Plus className="h-4 w-4 text-muted-foreground" />
-                                            </div>
-                                            <span>Create Organization</span>
-                                        </DropdownMenuItem>
-                                    </DialogTrigger>
-                                    <DialogContent className="p-0 bg-transparent border-none max-w-[430px]">
-                                        <CreateOrganization
-                                            appearance={{
-                                                baseTheme: isDark ? dark : undefined,
-                                                elements: {
-                                                    formButtonPrimary: "bg-primary text-primary-foreground hover:bg-primary/90",
-                                                    card: "bg-background border border-border shadow-lg",
-                                                    headerTitle: "text-xl font-bold",
-                                                },
-                                            }}
-                                            routing="hash"
-                                        />
-                                    </DialogContent>
-                                </Dialog>
+                                <DropdownMenuItem onSelect={(e) => { e.preventDefault(); setCreateOpen(true); }} className="gap-2">
+                                    <div className="flex h-6 w-6 items-center justify-center rounded-sm border border-dashed border-muted-foreground/60">
+                                        <Plus className="h-4 w-4 text-muted-foreground" />
+                                    </div>
+                                    <span>Create Organization</span>
+                                </DropdownMenuItem>
                                 <DropdownMenuSeparator />
                                 <Dialog>
                                     <DialogTrigger asChild>
@@ -343,5 +284,6 @@ export function NavUser({isDark, className}: NavUserProps) {
                 </DropdownMenu>
             </SidebarMenuItem>
         </SidebarMenu>
+        <CreateOrganizationModal open={createOpen} onOpenChange={setCreateOpen} isDark={isDark} />
     )
 }

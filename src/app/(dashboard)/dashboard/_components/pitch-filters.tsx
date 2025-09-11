@@ -5,8 +5,6 @@ import { Separator } from "@/components/ui/separator";
 import { NewPitchButton } from "./new-pitch-button";
 import { useWorkspace } from "@/hooks/use-workspace";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { CreateOrganization } from "@clerk/nextjs";
-import { dark } from "@clerk/themes";
 import { useOrganization } from "@clerk/nextjs";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";

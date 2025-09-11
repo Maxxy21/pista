@@ -31,6 +31,10 @@ import { useTheme } from "next-themes";
 import { dark } from "@clerk/themes";
 import { cn } from "@/lib/utils";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { OrganizationList, OrgItem } from "./organization-list";
+import { CreateOrganizationModal } from "./create-organization-modal";
+import { PersonalWorkspaceAvatar } from "./personal-workspace-avatar";
+import { PersonalWorkspaceLabel } from "./personal-workspace-label";
 
 interface TeamSwitcherProps {
     isDark?: boolean;
@@ -52,8 +56,9 @@ export function TeamSwitcher({ isDark, className }: TeamSwitcherProps) {
     const { resolvedTheme } = useTheme();
     const isDarkTheme = isDark ?? resolvedTheme === "dark";
     const [pending, setPending] = React.useState<string | "personal" | null>(null);
+    const [createOpen, setCreateOpen] = React.useState(false);
 
-    const organizations =
+    const organizations: OrgItem[] =
         userMemberships.data?.map((membership) => ({
             id: membership.organization.id,
             name: membership.organization.name,
@@ -118,26 +123,7 @@ export function TeamSwitcher({ isDark, className }: TeamSwitcherProps) {
                                     </div>
                                 </>
                             ) : (
-                                <>
-                                    <div className="relative flex h-7 w-7 shrink-0 overflow-hidden rounded-md border border-border">
-                                        {user?.imageUrl ? (
-                                            <Image
-                                                src={user.imageUrl}
-                                                alt={user.fullName ?? "You"}
-                                                width={28}
-                                                height={28}
-                                                className="aspect-square h-full w-full"
-                                            />
-                                        ) : (
-                                            <div className="flex h-full w-full items-center justify-center bg-muted">
-                                                <Building2 className="h-4 w-4 text-muted-foreground" />
-                                            </div>
-                                        )}
-                                    </div>
-                                    <div className="grid flex-1 text-left text-sm">
-                                        <span className="truncate font-medium">Personal Workspace</span>
-                                    </div>
-                                </>
+                                <PersonalWorkspaceLabel />
                             )}
                             <motion.div
                                 whileTap={{ rotate: 180 }}
@@ -165,27 +151,7 @@ export function TeamSwitcher({ isDark, className }: TeamSwitcherProps) {
                             role="menuitemradio"
                             aria-checked={isPersonalActive}
                         >
-                            <div className="relative flex h-7 w-7 shrink-0 overflow-hidden rounded-md border border-border">
-                                {user?.imageUrl ? (
-                                    <Image
-                                        src={user.imageUrl}
-                                        alt={user.fullName ?? "You"}
-                                        width={28}
-                                        height={28}
-                                        className="aspect-square h-full w-full"
-                                    />
-                                ) : (
-                                    <div className="flex h-full w-full items-center justify-center bg-muted" />
-                                )}
-                            </div>
-                            <div className="flex-1 overflow-hidden">
-                                <p className="text-sm font-medium truncate">Personal Workspace</p>
-                                {user?.primaryEmailAddress?.emailAddress && (
-                                    <p className="text-xs text-muted-foreground truncate">
-                                        {user.primaryEmailAddress.emailAddress}
-                                    </p>
-                                )}
-                            </div>
+                            <PersonalWorkspaceLabel subtitleEmail={user?.primaryEmailAddress?.emailAddress ?? null} />
                             {isPersonalActive && (
                                 <Check className="h-4 w-4 text-primary ml-2" />
                             )}
@@ -211,72 +177,27 @@ export function TeamSwitcher({ isDark, className }: TeamSwitcherProps) {
                                     You don’t belong to any organizations yet.
                                 </div>
                             ) : (
-                                organizations.map((org) => (
-                                    <DropdownMenuItem
-                                        key={org.id}
-                                        onClick={() => handleSetActive(org.id)}
-                                        disabled={pending !== null}
-                                        className={cn(
-                                            "gap-2 p-2 rounded-md",
-                                            organization?.id === org.id && "bg-primary/10"
-                                        )}
-                                        role="menuitemradio"
-                                        aria-checked={organization?.id === org.id}
-                                    >
-                                        <div className="relative flex h-7 w-7 shrink-0 overflow-hidden rounded-md border border-border">
-                                            <Image
-                                                src={org.imageUrl}
-                                                alt={org.name}
-                                                width={28}
-                                                height={28}
-                                                className="aspect-square h-full w-full"
-                                            />
-                                        </div>
-                                        <div className="flex-1 overflow-hidden">
-                                            <p className="text-sm font-medium truncate">{org.name}</p>
-                                            <p className="text-xs text-muted-foreground truncate capitalize">
-                                                {org.role.toLowerCase()}
-                                            </p>
-                                        </div>
-                                        {organization?.id === org.id && (
-                                            <Check className="h-4 w-4 text-primary ml-2" />
-                                        )}
-                                    </DropdownMenuItem>
-                                ))
+                                <OrganizationList
+                                  items={organizations}
+                                  activeId={organization?.id}
+                                  pending={pending !== null}
+                                  onSelect={(id) => handleSetActive(id)}
+                                />
                             )}
                         </div>
                         <DropdownMenuSeparator className="my-1" />
-                        <Dialog>
-                            <DialogTrigger asChild>
-                                <DropdownMenuItem
-                                    className="gap-2 p-2 rounded-md focus:bg-primary/10 focus:text-primary"
-                                    onSelect={(e) => e.preventDefault()}
-                                >
-                                    <div className="flex h-7 w-7 items-center justify-center rounded-md border border-dashed border-muted-foreground/70">
-                                        <Plus className="h-4 w-4 text-muted-foreground" />
-                                    </div>
-                                    <div className="text-sm font-medium">
-                                        Create Organization
-                                    </div>
-                                </DropdownMenuItem>
-                            </DialogTrigger>
-                            <DialogContent className="p-0 bg-transparent border-none max-w-[430px]">
-                                <CreateOrganization
-                                    appearance={{
-                                        baseTheme: isDarkTheme ? dark : undefined,
-                                        elements: {
-                                            formButtonPrimary:
-                                                "bg-primary text-primary-foreground hover:bg-primary/90",
-                                            card: "bg-background border border-border shadow-lg",
-                                            headerTitle: "text-xl font-bold",
-                                        },
-                                    }}
-                                    routing="hash"
-                                />
-                            </DialogContent>
-                        </Dialog>
+                        <DropdownMenuItem
+                          className="gap-2 p-2 rounded-md focus:bg-primary/10 focus:text-primary"
+                          onSelect={(e) => { e.preventDefault(); setCreateOpen(true); }}
+                        >
+                          <div className="flex h-7 w-7 items-center justify-center rounded-md border border-dashed border-muted-foreground/70">
+                            <Plus className="h-4 w-4 text-muted-foreground" />
+                          </div>
+                          <div className="text-sm font-medium">Create Organization</div>
+                        </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
+                <CreateOrganizationModal open={createOpen} onOpenChange={setCreateOpen} isDark={isDarkTheme} />
             </SidebarMenuItem>
         </SidebarMenu>
     );

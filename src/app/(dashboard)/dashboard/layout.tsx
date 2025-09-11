@@ -17,9 +17,9 @@ export default function DashboardLayout({children}: { children: React.ReactNode 
     return (
         <SidebarProvider defaultOpen={true}>
             <AppSidebar />
-            <SidebarInset>
+            <SidebarInset className="overflow-hidden">
                 <Navbar title="Dashboard" searchValue={searchValue} setSearchValue={setSearchValue} />
-                <main className="flex-1 overflow-auto">
+                <main className="flex min-h-0 flex-1 flex-col overflow-hidden">
                     {children}
                 </main>
             </SidebarInset>

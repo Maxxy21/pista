@@ -1,17 +1,17 @@
 import React, { useCallback, useMemo, useRef } from 'react';
 import { useRouter } from "next/navigation";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { OrganizationResource } from "@clerk/types";
 import { PitchCard } from "../cards/pitch-card";
 import { SkeletonCard } from "@/components/ui/skeleton-card";
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { NewPitchButton } from "../new-pitch-button";
 import { EmptySearch } from "../empty-states/empty-search";
 import { EmptyFavorites } from "../empty-states/empty-favorites";
 import { EmptyPitches } from "../empty-states/empty-pitches";
 import { Pitch } from "./pitches-grid";
+import { getColumnCount, gridColsClass } from "./grid-utils";
+import { toPitchCardProps } from "./pitch-to-card";
 
 interface VirtualizedPitchesGridProps {
     data?: Pitch[];
@@ -20,15 +20,8 @@ interface VirtualizedPitchesGridProps {
     currentView: string;
     organization?: OrganizationResource | null;
     isLoading?: boolean;
+    scrollRef?: React.RefObject<HTMLDivElement>;
 }
-
-const getColumnCount = (viewMode: "grid" | "list", width: number) => {
-    if (viewMode === "list") return 1;
-    if (width < 768) return 1;
-    if (width < 1024) return 2;
-    if (width < 1280) return 3;
-    return 4;
-};
 
 export const VirtualizedPitchesGrid: React.FC<VirtualizedPitchesGridProps> = ({
     data = [],
@@ -37,6 +30,7 @@ export const VirtualizedPitchesGrid: React.FC<VirtualizedPitchesGridProps> = ({
     currentView,
     organization,
     isLoading = false,
+    scrollRef,
 }) => {
     const router = useRouter();
     const parentRef = useRef<HTMLDivElement>(null);
@@ -70,7 +64,7 @@ export const VirtualizedPitchesGrid: React.FC<VirtualizedPitchesGridProps> = ({
 
     const rowVirtualizer = useVirtualizer({
         count: rowCount,
-        getScrollElement: () => parentRef.current,
+        getScrollElement: () => (scrollRef?.current as any) ?? parentRef.current,
         estimateSize: () => ((viewMode === "list" ? LIST_CARD_HEIGHT : GRID_CARD_HEIGHT) + ROW_GAP_PX),
         overscan: 5,
     });
@@ -90,20 +84,10 @@ export const VirtualizedPitchesGrid: React.FC<VirtualizedPitchesGridProps> = ({
         return null;
     }
 
-    // Tailwind cannot generate dynamic `grid-cols-${n}` classes at runtime.
-    // Map the computed column count to static class names to ensure CSS exists.
-    const gridColsClass = viewMode === "grid"
-        ? (columnCount === 1
-            ? "grid-cols-1"
-            : columnCount === 2
-                ? "grid-cols-2"
-                : columnCount === 3
-                    ? "grid-cols-3"
-                    : "grid-cols-4")
-        : "grid-cols-1";
+    const colsClass = gridColsClass(viewMode, columnCount);
 
     return (
-        <div ref={parentRef} className="h-full w-full overflow-auto">
+        <div ref={parentRef} className={scrollRef ? "h-full w-full" : "h-full w-full overflow-auto"}>
             <div
                 className="relative w-full"
                 style={{
@@ -115,7 +99,7 @@ export const VirtualizedPitchesGrid: React.FC<VirtualizedPitchesGridProps> = ({
                     return (
                         <div
                             key={virtualRow.key}
-                            className={cn("absolute top-0 left-0 w-full grid gap-6 py-3", gridColsClass)}
+                            className={cn("absolute top-0 left-0 w-full grid gap-6 py-3", colsClass)}
                             style={{
                                 height: `${virtualRow.size}px`,
                                 transform: `translateY(${virtualRow.start}px)`,
@@ -143,18 +127,7 @@ export const VirtualizedPitchesGrid: React.FC<VirtualizedPitchesGridProps> = ({
                                         animate={{ opacity: 1 }}
                                     >
                                         <div style={{ height: viewMode === "list" ? LIST_CARD_HEIGHT : GRID_CARD_HEIGHT }}>
-                                          <PitchCard
-                                            id={pitch._id}
-                                            title={pitch.title}
-                                            text={pitch.text}
-                                            authorId={pitch.userId}
-                                            authorName={pitch.authorName}
-                                            createdAt={pitch._creationTime}
-                                            orgId={pitch.orgId}
-                                            isFavorite={pitch.isFavorite}
-                                            score={pitch.evaluation.overallScore}
-                                            onClick={() => handlePitchClick(pitch._id)}
-                                          />
+                                          <PitchCard {...toPitchCardProps(pitch, handlePitchClick)} />
                                         </div>
                                     </motion.div>
                                 );

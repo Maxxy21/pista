@@ -1,12 +1,7 @@
 "use client";
 
 import * as React from "react";
-import {
-    Home,
-    Clock,
-    Star,
-    PlusCircle,
-} from "lucide-react";
+import { PlusCircle } from "lucide-react";
 import { useOrganization } from "@clerk/nextjs";
 import { useTheme } from "next-themes";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -31,28 +26,7 @@ import { InviteButton } from "../common/invite-button";
 import Link from "next/link";
 import LogoIcon from "@/components/ui/logo-icon";
 import { TeamSwitcher } from "./team-switcher";
-
-const NAVIGATION_ITEMS = [
-    {
-        title: "All Pitches",
-        url: "/dashboard",
-        icon: Home,
-        value: "all",
-    },
-    {
-        title: "Recent",
-        url: "/dashboard?view=recent",
-        icon: Clock,
-        value: "recent",
-    },
-    {
-        title: "Favorites",
-        url: "/dashboard?view=favorites", 
-        icon: Star,
-        value: "favorites",
-        badge: "New",
-    },
-];
+import { SidebarNav } from "./sidebar-nav";
 
 export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
     const { organization, isLoaded } = useOrganization();
@@ -119,32 +93,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
                     <SidebarGroupLabel className="px-4 pt-2 pb-1 text-xs font-medium text-muted-foreground/70">
                         Navigation
                     </SidebarGroupLabel>
-                    <SidebarMenu className="mb-6 space-y-1">
-                        {NAVIGATION_ITEMS.map((item) => {
-                            const isActive =
-                                (item.value === "all" && !currentView) ||
-                                currentView === item.value;
-
-                            return (
-                                <SidebarMenuItem key={item.value}>
-                                    <SidebarMenuButton
-                                        isActive={isActive}
-                                        tooltip={state === "collapsed" ? item.title : undefined}
-                                        onClick={() => handleNavigation(item.value)}
-                                        className="rounded-lg transition-all duration-200 hover:shadow-sm"
-                                    >
-                                        <item.icon className="h-4 w-4" />
-                                        <span className="font-medium">{item.title}</span>
-                                    </SidebarMenuButton>
-                                    {item.badge && (
-                                        <SidebarMenuBadge className="bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xs font-medium">
-                                            {item.badge}
-                                        </SidebarMenuBadge>
-                                    )}
-                                </SidebarMenuItem>
-                            );
-                        })}
-                    </SidebarMenu>
+                    <SidebarNav currentView={currentView} collapsed={state === "collapsed"} onNavigate={handleNavigation} />
                 </div>
             </SidebarContent>
 

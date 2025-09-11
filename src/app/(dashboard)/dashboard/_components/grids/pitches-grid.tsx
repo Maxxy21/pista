@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { OrganizationResource } from "@clerk/types";
 import { PitchCard } from "../cards/pitch-card";
+import { toPitchCardProps } from "./pitch-to-card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptySearch } from "../empty-states/empty-search";
 import { EmptyFavorites } from "../empty-states/empty-favorites";
@@ -32,6 +33,7 @@ interface PitchesGridProps {
     currentView: string;
     organization: OrganizationResource | null | undefined;
     isLoading?: boolean;
+    useOuterScroll?: boolean;
 }
 
 const SkeletonPitchCard: React.FC<{ viewMode: "grid" | "list" }> = ({ viewMode }) => (
@@ -64,6 +66,7 @@ export const PitchesGrid: React.FC<PitchesGridProps> = ({
     currentView,
     organization,
     isLoading = false,
+    useOuterScroll = false,
 }) => {
     const router = useRouter();
 
@@ -87,15 +90,14 @@ export const PitchesGrid: React.FC<PitchesGridProps> = ({
 
     // Loading state
     if (isLoading || data === undefined) {
-        return (
-            <ScrollArea className="h-full w-full">
-                <div className={gridClass}>
-                    {Array.from({ length: 8 }).map((_, i) => (
-                        <SkeletonPitchCard key={i} viewMode={viewMode} />
-                    ))}
-                </div>
-            </ScrollArea>
+        const content = (
+            <div className={gridClass}>
+                {Array.from({ length: 8 }).map((_, i) => (
+                    <SkeletonPitchCard key={i} viewMode={viewMode} />
+                ))}
+            </div>
         );
+        return useOuterScroll ? content : <ScrollArea className="h-full w-full">{content}</ScrollArea>;
     }
 
     // Empty states
@@ -107,31 +109,19 @@ export const PitchesGrid: React.FC<PitchesGridProps> = ({
     }
 
     // Main grid/list
-    return (
-        <ScrollArea className="h-full w-full">
-            <AnimatePresence>
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className={gridClass}
-                >
-                    {data.map((pitch) => (
-                        <PitchCard
-                            key={pitch._id}
-                            id={pitch._id}
-                            title={pitch.title}
-                            text={pitch.text}
-                            authorId={pitch.userId}
-                            authorName={pitch.authorName}
-                            createdAt={Number(new Date(pitch._creationTime))}
-                            orgId={pitch.orgId}
-                            isFavorite={pitch.isFavorite}
-                            score={pitch.evaluation.overallScore}
-                            onClick={() => handlePitchClick(pitch._id)}
-                        />
-                    ))}
-                </motion.div>
-            </AnimatePresence>
-        </ScrollArea>
+    const grid = (
+        <AnimatePresence>
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className={gridClass}
+            >
+                {data.map((pitch) => {
+                    const props = toPitchCardProps(pitch, handlePitchClick);
+                    return <PitchCard key={pitch._id} {...props} />;
+                })}
+            </motion.div>
+        </AnimatePresence>
     );
+    return useOuterScroll ? grid : <ScrollArea className="h-full w-full">{grid}</ScrollArea>;
 };

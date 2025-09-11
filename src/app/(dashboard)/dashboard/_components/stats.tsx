@@ -10,18 +10,20 @@ import { useMemo, memo } from "react";
 import { useWorkspace } from "@/hooks/use-workspace";
 import { motion } from "framer-motion";
 import { SkeletonCard } from "@/components/ui/skeleton-card";
+import { ScoreBadge } from "./cards/score-badge";
 
 interface StatCardProps {
     title: string;
     value: string | number;
-    description?: string;
+    valueNode?: React.ReactNode;
+    description?: React.ReactNode;
     icon: React.ElementType;
     className?: string;
     trend?: "up" | "down" | "neutral";
 }
 
 const StatCard = memo<StatCardProps>(
-    ({ title, value, description, icon: Icon, className, trend = "neutral" }) => {
+    ({ title, value, valueNode, description, icon: Icon, className, trend = "neutral" }) => {
         const trendColor =
             trend === "up"
                 ? "text-green-500"
@@ -42,11 +44,13 @@ const StatCard = memo<StatCardProps>(
                                 <p className="text-sm font-medium text-muted-foreground mb-1">
                                     {title}
                                 </p>
-                                <h3 className="text-xl sm:text-2xl font-bold truncate">{value}</h3>
+                                <h3 className="text-xl sm:text-2xl font-bold truncate">
+                                    {valueNode ?? value}
+                                </h3>
                                 {description && (
-                                    <p className={cn("text-xs mt-1", trendColor)}>
+                                    <div className={cn("text-xs mt-1", trendColor)}>
                                         {description}
-                                    </p>
+                                    </div>
                                 )}
                             </div>
                             <div className="bg-primary/10 p-2 rounded-full ml-2 flex-shrink-0">
@@ -98,13 +102,9 @@ export function DashboardStats() {
             : "0%";
     }, [stats?.recentPitches]);
 
-    const bestPitchScore = useMemo(() => {
-        return stats?.bestPitch?.evaluation?.overallScore?.toFixed(1) ?? "0.0";
-    }, [stats?.bestPitch]);
+    const bestPitchScore = stats?.bestPitch?.evaluation?.overallScore ?? 0;
 
-    const averageScoreFormatted = useMemo(() => {
-        return stats?.averageScore?.toFixed(1) ?? "0.0";
-    }, [stats?.averageScore]);
+    const averageScore = stats?.averageScore ?? 0;
 
     // Loading state
     if (!shouldFetch || !stats) {
@@ -131,7 +131,8 @@ export function DashboardStats() {
             />
             <StatCard
                 title="Average Score"
-                value={averageScoreFormatted}
+                value={averageScore.toFixed(1)}
+                valueNode={<ScoreBadge score={averageScore} />}
                 description={`${mergedStats.totalPitches} pitches analyzed`}
                 icon={LineChart}
                 trend="neutral"
@@ -139,7 +140,7 @@ export function DashboardStats() {
             <StatCard
                 title="Best Pitch"
                 value={mergedStats.bestPitch?.title ?? "None"}
-                description={bestPitchScore}
+                description={<ScoreBadge score={bestPitchScore} />}
                 icon={ChevronUp}
                 trend="up"
             />

@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { ChevronLeft, ArrowLeft, Star, Calendar, FileText, Clock8, Folder, PlusCircle } from "lucide-react";
+import { ArrowLeft, Star, FileText, Folder, PlusCircle } from "lucide-react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { useOrganization, useAuth, useUser } from "@clerk/nextjs";
 import { useWorkspace } from "@/hooks/use-workspace";
@@ -32,12 +32,14 @@ import { InviteButton } from "../common/invite-button";
 import { useTheme } from "next-themes";
 import LogoIcon from "@/components/ui/logo-icon";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { format } from "date-fns";
+// Avatar moved into CurrentPitchBanner component
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import Image from "next/image";
 import { useApiMutation } from "@/hooks/use-api-mutation";
+import { CurrentPitchBanner } from "./pitch-current-banner";
+import { PitchListItem } from "./pitch-list-item";
+import { downloadCsvFromRows } from "@/lib/utils/pitch-export";
 
 // Using shared pitch type from lib/types
 
@@ -344,60 +346,25 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
                                     <div className="text-xs font-medium text-muted-foreground/70 uppercase tracking-wider px-1">
                                         Current Pitch
                                     </div>
-                                    <motion.div 
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        className="relative"
-                                    >
-                                        <div className="bg-gradient-to-br from-primary/8 via-primary/5 to-primary/3 p-5 rounded-2xl border border-primary/15 shadow-sm hover:shadow-md transition-all duration-300 relative overflow-hidden w-full">
-                                            <div className="absolute top-0 right-0 w-20 h-20 bg-primary/5 rounded-full -translate-y-10 translate-x-10" />
-                                            <div className="relative">
-                                                {/* Context banner if workspace and pitch org differ */}
-                                                {(() => {
-                                                    const pitchOrg = currentPitch.orgId;
-                                                    const inOrg = workspace.mode === 'org' && !!workspace.orgId;
-                                                    const mismatch = (inOrg && !pitchOrg) || (!inOrg && !!pitchOrg);
-                                                    if (!mismatch) return null;
-                                                    return (
-                                                        <div className="mb-3 text-[11px] rounded-md border border-amber-300/40 bg-amber-100/40 text-amber-900 px-2 py-1">
-                                                            Viewing a {pitchOrg ? 'team' : 'personal'} pitch in {inOrg ? 'organization' : 'personal'} context.
-                                                        </div>
-                                                    );
-                                                })()}
-                                                <h2 className="font-bold text-base line-clamp-2 mb-3 text-foreground/90">
-                                                    {currentPitch.title}
-                                                </h2>
-                                                <div className="flex items-center gap-2 mb-3 text-xs text-muted-foreground">
-                                                    <Calendar className="h-3.5 w-3.5" />
-                                                    <span>
-                                                        {format(
-                                                            new Date(currentPitch._creationTime),
-                                                            "MMM d, yyyy"
-                                                        )}
-                                                    </span>
-                                                </div>
-                                                <div className="flex items-center gap-2 mb-4">
-                                                    <Badge className="bg-primary/15 hover:bg-primary/20 text-primary border-primary/25 font-medium shadow-sm">
-                                                        {currentPitch.evaluation.overallScore.toFixed(1)} Score
-                                                    </Badge>
-                                                    {renderTypeBadge(currentPitch.type)}
-                                                </div>
-                                                {/* Quick actions removed from banner to avoid layout issues in collapsed mode */}
-                                                <Separator className="my-3 bg-primary/10" />
-                                                <div className="flex items-center gap-2">
-                                                    <Avatar className="h-7 w-7 border-2 border-primary/20">
-                                                        <AvatarImage src={user?.imageUrl} />
-                                                        <AvatarFallback className="bg-primary/10 text-primary text-xs font-medium">
-                                                            {currentPitch.authorName?.charAt(0) || "U"}
-                                                        </AvatarFallback>
-                                                    </Avatar>
-                                                    <span className="text-xs font-medium text-muted-foreground">
-                                                        {currentPitch.authorName}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </motion.div>
+                                    {(() => {
+                                      const pitchOrg = currentPitch.orgId;
+                                      const inOrg = workspace.mode === 'org' && !!workspace.orgId;
+                                      const mismatch = (inOrg && !pitchOrg) || (!inOrg && !!pitchOrg);
+                                      const note = mismatch
+                                        ? `Viewing a ${pitchOrg ? 'team' : 'personal'} pitch in ${inOrg ? 'organization' : 'personal'} context.`
+                                        : null;
+                                      return (
+                                        <CurrentPitchBanner
+                                          title={currentPitch.title}
+                                          creationTime={currentPitch._creationTime}
+                                          score={currentPitch.evaluation.overallScore}
+                                          typeBadge={renderTypeBadge(currentPitch.type)}
+                                          authorName={currentPitch.authorName}
+                                          userImageUrl={user?.imageUrl || null}
+                                          contextNote={note}
+                                        />
+                                      );
+                                    })()}
                                 </div>
                             )}
                             <div className="space-y-4">
@@ -414,48 +381,13 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
                                 {displayPitches.length > 0 ? (
                                     <div className="space-y-2">
                                         {displayPitches.map((pitch: UniversalPitchData) => (
-                                            <motion.div
-                                                key={pitch._id}
-                                                whileHover={{ x: 4, scale: 1.01 }}
-                                                whileTap={{ scale: 0.98 }}
-                                                initial={{ opacity: 0, y: 5 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                className="group"
-                                            >
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    onClick={() => navigateToPitch(pitch._id)}
-                                                    className="h-auto py-3 px-4 justify-start w-full text-left hover:bg-gradient-to-r hover:from-muted/50 hover:to-muted/30 rounded-xl transition-all duration-200 border border-transparent hover:border-muted-foreground/10"
-                                                >
-                                                    <div className="flex flex-col items-start gap-2 min-w-0 w-full">
-                                                        <div className="flex w-full justify-between items-start gap-2">
-                                                            <span className="font-semibold truncate text-sm leading-tight text-foreground/90 group-hover:text-foreground">
-                                                                {pitch.title}
-                                                            </span>
-                                                            <ChevronLeft className="h-4 w-4 rotate-180 opacity-0 group-hover:opacity-100 transition-all duration-200 text-primary shrink-0 mt-0.5" />
-                                                        </div>
-                                                        <div className="flex items-center gap-2 text-xs text-muted-foreground w-full">
-                                                            <div className="flex items-center gap-1">
-                                                                <Clock8 className="h-3 w-3" />
-                                                                <span>
-                                                                    {format(
-                                                                        new Date(pitch._creationTime),
-                                                                        "MMM d"
-                                                                    )}
-                                                                </span>
-                                                            </div>
-                                                            <div className="w-1 h-1 rounded-full bg-muted-foreground/50"></div>
-                                                            <div className="flex items-center gap-1">
-                                                                <Star className="h-3 w-3 fill-amber-400/20 text-amber-500" />
-                                                                <span className="font-medium">
-                                                                    {pitch.evaluation.overallScore.toFixed(1)}
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </Button>
-                                            </motion.div>
+                                          <PitchListItem
+                                            key={pitch._id}
+                                            title={pitch.title}
+                                            creationTime={pitch._creationTime}
+                                            score={pitch.evaluation.overallScore}
+                                            onClick={() => navigateToPitch(pitch._id)}
+                                          />
                                         ))}
                                     </div>
                                 ) : (

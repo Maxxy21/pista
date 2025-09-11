@@ -13,17 +13,8 @@ import {
     FileText,
     CheckCircle2,
 } from "lucide-react";
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-    DialogDescription,
-    DialogFooter,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -39,7 +30,13 @@ import { api } from "@/convex/_generated/api";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
+import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
+import { StepHeader } from "./components/step-header";
+import { AudioDropzone } from "./components/audio-dropzone";
+import { TextFileDropzone } from "./components/text-file-dropzone";
+import { QuestionsStep } from "./steps/questions-step";
+import { ReviewStep } from "./steps/review-step";
 
 interface StepInfo {
     title: string;
@@ -292,36 +289,12 @@ export function FileDialog({
             </DialogTrigger>
 
             <DialogContent className="sm:max-w-[600px] p-0 gap-0 overflow-hidden">
-                <div className="sticky top-0 z-10 bg-background border-b">
-                    <DialogHeader className="px-6 pt-6 pb-4">
-                        <div className="flex items-center gap-2">
-                            <div className="bg-primary/10 p-2 rounded-md">
-                                <Upload className="h-5 w-5 text-primary" />
-                            </div>
-                            <div>
-                                <DialogTitle>{steps[currentStep].title}</DialogTitle>
-                                <DialogDescription className="mt-1">
-                                    {steps[currentStep].description}
-                                </DialogDescription>
-                            </div>
-                        </div>
-                    </DialogHeader>
-
-                    {/* Step Progress */}
-                    <div className="px-6 pb-4">
-                        <div className="flex justify-between text-xs text-muted-foreground mb-2">
-                            <span>
-                                Step{" "}
-                                {currentStep === "pitch"
-                                    ? 1
-                                    : 2}{" "}
-                                of 2
-                            </span>
-                            <span>{steps[currentStep].progress}% Complete</span>
-                        </div>
-                        <Progress value={steps[currentStep].progress} className="h-1" />
-                    </div>
-                </div>
+                <StepHeader
+                  icon={<Upload className="h-5 w-5 text-primary" />}
+                  title={steps[currentStep].title}
+                  description={steps[currentStep].description}
+                  progress={steps[currentStep].progress}
+                />
 
                 <div className="p-6 max-h-[70vh] overflow-y-auto">
                     <AnimatePresence mode="wait">
@@ -394,109 +367,23 @@ export function FileDialog({
                                         </TabsContent>
 
                                         <TabsContent value="audio" className="mt-0">
-                                            <div
-                                                {...getRootProps()}
-                                                className={cn(
-                                                    "border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors",
-                                                    isDragActive &&
-                                                        !isProcessing &&
-                                                        "border-primary bg-primary/5",
-                                                    isProcessing
-                                                        ? "opacity-50 cursor-not-allowed bg-muted"
-                                                        : "hover:border-primary hover:bg-primary/5"
-                                                )}
-                                            >
-                                                <input {...getInputProps()} />
-                                                {files.length > 0 ? (
-                                                    <div className="flex flex-col items-center gap-2">
-                                                        <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                                                            <Mic className="h-8 w-8 text-primary" />
-                                                        </div>
-                                                        <p className="font-medium">{files[0].name}</p>
-                                                        <p className="text-sm text-muted-foreground">
-                                                            {(
-                                                                files[0].size /
-                                                                (1024 * 1024)
-                                                            ).toFixed(2)}{" "}
-                                                            MB
-                                                        </p>
-                                                    </div>
-                                                ) : (
-                                                    <div className="flex flex-col items-center gap-3">
-                                                        <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                                                            <Upload className="h-8 w-8 text-primary" />
-                                                        </div>
-                                                        <p className="font-medium">
-                                                            {isDragActive
-                                                                ? "Drop the audio file here"
-                                                                : "Drag & drop your audio file here"}
-                                                        </p>
-                                                        <p className="text-sm text-muted-foreground">
-                                                            Supports MP3, WAV, M4A (max 50MB)
-                                                        </p>
-                                                        <Button
-                                                            size="sm"
-                                                            variant="outline"
-                                                            type="button"
-                                                        >
-                                                            Browse files
-                                                        </Button>
-                                                    </div>
-                                                )}
-                                            </div>
+                                            <AudioDropzone
+                                                getRootProps={getRootProps}
+                                                getInputProps={getInputProps}
+                                                isDragActive={isDragActive}
+                                                isProcessing={isProcessing}
+                                                files={files}
+                                            />
                                         </TabsContent>
 
                                         <TabsContent value="textFile" className="mt-0">
-                                            <div
-                                                {...getRootProps()}
-                                                className={cn(
-                                                    "border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors",
-                                                    isDragActive &&
-                                                        !isProcessing &&
-                                                        "border-primary bg-primary/5",
-                                                    isProcessing
-                                                        ? "opacity-50 cursor-not-allowed bg-muted"
-                                                        : "hover:border-primary hover:bg-primary/5"
-                                                )}
-                                            >
-                                                <input {...getInputProps()} />
-                                                {files.length > 0 ? (
-                                                    <div className="flex flex-col items-center gap-2">
-                                                        <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                                                            <FileText className="h-8 w-8 text-primary" />
-                                                        </div>
-                                                        <p className="font-medium">{files[0].name}</p>
-                                                        <p className="text-sm text-muted-foreground">
-                                                            {(
-                                                                files[0].size /
-                                                                (1024 * 1024)
-                                                            ).toFixed(2)}{" "}
-                                                            MB
-                                                        </p>
-                                                    </div>
-                                                ) : (
-                                                    <div className="flex flex-col items-center gap-3">
-                                                        <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                                                            <Upload className="h-8 w-8 text-primary" />
-                                                        </div>
-                                                        <p className="font-medium">
-                                                            {isDragActive
-                                                                ? "Drop the text file here"
-                                                                : "Drag & drop your text file here"}
-                                                        </p>
-                                                        <p className="text-sm text-muted-foreground">
-                                                            Supports TXT files (max 5MB)
-                                                        </p>
-                                                        <Button
-                                                            size="sm"
-                                                            variant="outline"
-                                                            type="button"
-                                                        >
-                                                            Browse files
-                                                        </Button>
-                                                    </div>
-                                                )}
-                                            </div>
+                                            <TextFileDropzone
+                                                getRootProps={getRootProps}
+                                                getInputProps={getInputProps}
+                                                isDragActive={isDragActive}
+                                                isProcessing={isProcessing}
+                                                files={files}
+                                            />
                                         </TabsContent>
                                     </Tabs>
                                 </div>
@@ -504,131 +391,21 @@ export function FileDialog({
                         )}
 
                         {currentStep === "questions" && (
-                            <motion.div
-                                key="questions-step"
-                                initial={{ opacity: 0, x: -20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: 20 }}
-                                transition={{ duration: 0.3 }}
-                                className="space-y-6"
-                            >
-                                <Card>
-                                    <CardContent className="p-6">
-                                        <div className="flex justify-between items-center mb-4">
-                                            <div className="space-y-1">
-                                                <h3 className="font-medium">
-                                                    Question {currentQuestionIndex + 1} of {questions.length}
-                                                </h3>
-                                                <p className="text-xs text-muted-foreground">
-                                                    These questions help improve your evaluation accuracy
-                                                </p>
-                                            </div>
-                                            <div className="flex items-center gap-1 text-xs">
-                                                {questions.map((_, i) => (
-                                                    <span
-                                                        key={i}
-                                                        className={cn(
-                                                            "w-2 h-2 rounded-full",
-                                                            i === currentQuestionIndex
-                                                                ? "bg-primary"
-                                                                : i < currentQuestionIndex
-                                                                ? "bg-primary/40"
-                                                                : "bg-muted"
-                                                        )}
-                                                    />
-                                                ))}
-                                            </div>
-                                        </div>
-
-                                        <AnimatePresence mode="wait">
-                                            <motion.div
-                                                key={currentQuestionIndex}
-                                                initial={{ opacity: 0, y: 20 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                exit={{ opacity: 0, y: -20 }}
-                                                transition={{ duration: 0.3 }}
-                                                className="space-y-4"
-                                            >
-                                                <p className="text-base font-medium">
-                                                    {questions[currentQuestionIndex].text}
-                                                </p>
-                                                <Textarea
-                                                    placeholder="Type your answer here..."
-                                                    value={questions[currentQuestionIndex].answer}
-                                                    onChange={(e) => {
-                                                        setQuestions((prev) => {
-                                                            const updated = [...prev];
-                                                            updated[currentQuestionIndex].answer = e.target.value;
-                                                            return updated;
-                                                        });
-                                                    }}
-                                                    className="min-h-[150px] resize-none"
-                                                />
-                                            </motion.div>
-                                        </AnimatePresence>
-                                    </CardContent>
-                                </Card>
-                            </motion.div>
+                          <QuestionsStep
+                            questions={questions}
+                            currentIndex={currentQuestionIndex}
+                            onAnswerChange={(index, value) => {
+                              setQuestions(prev => {
+                                const updated = [...prev];
+                                updated[index].answer = value;
+                                return updated;
+                              });
+                            }}
+                          />
                         )}
 
                         {currentStep === "review" && (
-                            <motion.div
-                                key="review-step"
-                                initial={{ opacity: 0, x: -20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: 20 }}
-                                transition={{ duration: 0.3 }}
-                                className="space-y-6"
-                            >
-                                <Card>
-                                    <CardContent className="p-6 space-y-6">
-                                        <div>
-                                            <h3 className="text-lg font-semibold mb-2">Pitch Summary</h3>
-                                            <div className="flex items-center gap-2 mb-4">
-                                                <CheckCircle2 className="h-5 w-5 text-green-500" />
-                                                <span className="text-sm text-muted-foreground">
-                                                    Your pitch is ready for evaluation
-                                                </span>
-                                            </div>
-
-                                            <div className="rounded-lg bg-muted p-4">
-                                                <p className="font-medium">{pitchData.title}</p>
-                                                <p className="text-sm text-muted-foreground mt-1">
-                                                    {pitchData.type === "text"
-                                                        ? `${pitchData.content.slice(0, 100)}${
-                                                              pitchData.content.length > 100 ? "..." : ""
-                                                          }`
-                                                        : files[0]?.name}
-                                                </p>
-                                            </div>
-                                        </div>
-
-                                        {/* Q&A section hidden for testing with external pitches */}
-                                        {questions.length > 0 && (
-                                            <>
-                                                <Separator />
-                                                <div>
-                                                    <h3 className="text-lg font-semibold mb-2">
-                                                        Follow-up Questions
-                                                    </h3>
-                                                    <div className="space-y-3">
-                                                        {questions.map((q, index) => (
-                                                            <div key={index} className="space-y-1">
-                                                                <p className="text-sm font-medium">
-                                                                    {index + 1}. {q.text}
-                                                                </p>
-                                                                <p className="text-sm text-muted-foreground pl-5">
-                                                                    {q.answer}
-                                                                </p>
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            </>
-                                        )}
-                                    </CardContent>
-                                </Card>
-                            </motion.div>
+                          <ReviewStep pitchData={pitchData} files={files} questions={questions} />
                         )}
                     </AnimatePresence>
                 </div>
