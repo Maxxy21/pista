@@ -10,7 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { toast } from '@/components/ui/use-toast'
+import { toast } from 'sonner'
 import { UniversalPitchData } from '@/lib/types/pitch'
 import { getOverallFeedback, getEvaluations } from '@/lib/utils/evaluation-utils'
 
@@ -166,17 +166,10 @@ export const ExportPDFButton = ({ data }: ExportPDFButtonProps) => {
       
       // Save the PDF
       doc.save(`${data.title.replace(/\s+/g, '_')}_${type === 'full' ? 'Full' : 'Summary'}_Report.pdf`)
-      toast({
-        title: "Export successful",
-        description: `Your ${type} report has been downloaded.`,
-      })
+      toast.success(`${type === 'full' ? 'Full' : 'Summary'} report downloaded successfully`)
     } catch (error) {
       console.error('PDF generation error:', error)
-      toast({
-        title: "Export failed",
-        description: "There was an error generating your PDF report.",
-        variant: "destructive",
-      })
+      toast.error("Failed to generate PDF report")
     } finally {
       setIsExporting(false)
     }

@@ -9,7 +9,7 @@ import { useAuth } from "@clerk/nextjs";
 import { ScoreBadge } from "./score-badge";
 import { FavoriteToggleButton } from "./favorite-toggle";
 import { CardActions } from "./card-actions";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { useWorkspace } from "@/hooks/use-workspace";
 
 export interface PitchCardProps {
@@ -38,7 +38,6 @@ export function PitchCard({
     onClick,
 }: PitchCardProps) {
     const { userId } = useAuth();
-    const { toast } = useToast();
     const workspace = useWorkspace();
 
     const authorLabel = useMemo(
@@ -68,14 +67,10 @@ export function PitchCard({
             const action = isFavorite ? onUnfavorite : onFavorite;
             const payload = workspace.mode === 'org' ? { id, orgId } : { id };
             action(payload as any).catch(() =>
-                toast({
-                    title: "Error",
-                    description: `Failed to ${isFavorite ? "unfavorite" : "favorite"}`,
-                    variant: "destructive",
-                })
+                toast.error(`Failed to ${isFavorite ? "unfavorite" : "favorite"} pitch`)
             );
         },
-        [isFavorite, onFavorite, onUnfavorite, id, orgId, toast, workspace.mode]
+        [isFavorite, onFavorite, onUnfavorite, id, orgId, workspace.mode]
     );
 
     const isPending = pendingFavorite || pendingUnfavorite;
@@ -107,7 +102,7 @@ export function PitchCard({
 
                 <CardContent className="flex-1 pt-10 pb-4">
                     <h3 className="text-lg font-semibold mb-2 line-clamp-2">{title}</h3>
-                    <p className="text-sm text-muted-foreground line-clamp-3">{text}</p>
+                    <p className="text-sm text-muted-foreground line-clamp-4">{text}</p>
                 </CardContent>
 
                 <CardFooter className="flex-none pt-0 pb-4 px-6 text-xs text-muted-foreground flex justify-between items-center">
