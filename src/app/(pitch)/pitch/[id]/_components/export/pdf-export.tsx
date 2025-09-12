@@ -13,6 +13,7 @@ import {
 import { toast } from 'sonner'
 import { UniversalPitchData } from '@/lib/types/pitch'
 import { getOverallFeedback, getEvaluations } from '@/lib/utils/evaluation-utils'
+import { normalizeTranscriptText } from '@/lib/utils/text'
 
 interface ExportPDFButtonProps {
   data: UniversalPitchData
@@ -81,8 +82,9 @@ export const ExportPDFButton = ({ data }: ExportPDFButtonProps) => {
         
         doc.setFontSize(10)
         doc.setTextColor(44, 62, 80)
-        const transcriptLines = doc.splitTextToSize(data.text.substring(0, 1000) + 
-          (data.text.length > 1000 ? '...' : ''), 170)
+        const normalized = normalizeTranscriptText(data.text)
+        const transcriptLines = doc.splitTextToSize(normalized.substring(0, 1000) + 
+          (normalized.length > 1000 ? '...' : ''), 170)
         doc.text(transcriptLines, 20, yPosition + 10)
         
         yPosition += 10 + (transcriptLines.length * 5)

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { normalizeTranscriptText } from "@/lib/utils/text";
 import { toast } from "sonner";
 import { useApiMutation } from "@/hooks/use-api-mutation";
 import { api } from "@/convex/_generated/api";
@@ -78,14 +79,15 @@ export function usePitchForm(orgId?: string, enableQuestions = false) {
     setIsProcessing(true);
     try {
       const text = await processContent();
-      setPitchText(text);
+      const normalized = normalizeTranscriptText(text);
+      setPitchText(normalized);
 
       if (enableQuestions) {
         try {
           const response = await fetch("/api/generate-questions", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ text }),
+            body: JSON.stringify({ text: normalized }),
           });
 
           if (!response.ok) throw new Error("Failed to generate questions");
@@ -119,11 +121,12 @@ export function usePitchForm(orgId?: string, enableQuestions = false) {
   const handleSubmit = useCallback(async () => {
     setIsProcessing(true);
     try {
+      const textForEval = pitchText || normalizeTranscriptText(await processContent());
       const evaluationResponse = await fetch("/api/evaluate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          text: pitchText,
+          text: textForEval,
           questions,
         }),
       });
@@ -134,7 +137,7 @@ export function usePitchForm(orgId?: string, enableQuestions = false) {
       const id = await createPitch({
         orgId: orgId ?? "",
         title: pitchData.title,
-        text: pitchText,
+        text: textForEval,
         type: pitchData.type,
         status: "evaluated",
         evaluation: evaluationData,
@@ -151,7 +154,7 @@ export function usePitchForm(orgId?: string, enableQuestions = false) {
       setIsProcessing(false);
       setUploadProgress(0);
     }
-  }, [pitchData, pitchText, questions, createPitch, orgId, router]);
+  }, [pitchData, pitchText, questions, createPitch, orgId, router, processContent]);
 
   const resetForm = useCallback(() => {
     setPitchData(initialPitchData);

@@ -18,6 +18,7 @@ import { useEvaluationProgress } from "@/hooks/use-evaluation-progress"
 import { streamUpload } from "@/lib/utils"
 import { FileAudio2, FileText as FileTextIcon, Upload, Loader2, Mic } from "lucide-react"
 import { FileUpload as PrettyFileUpload, GridPattern } from "@/components/ui/file-upload"
+import { normalizeTranscriptText } from "@/lib/utils/text"
 import { AudioPreview } from "@/components/ui/previews/audio-preview"
 import { FilePreview } from "@/components/ui/previews/file-preview"
 
@@ -32,17 +33,26 @@ export function NewPitchPanel() {
   const [title, setTitle] = useState("")
   const [type, setType] = useState<PitchType>("text")
   const [text, setText] = useState("")
+  const [preparedText, setPreparedText] = useState("")
   const [file, setFile] = useState<File | null>(null)
   const [preview, setPreview] = useState<{ url?: string; text?: string } | null>(null)
   const [processing, setProcessing] = useState(false)
   const [progress, setProgress] = useState(0)
   const evalProg = useEvaluationProgress()
+  const [stage, setStage] = useState<"compose" | "questions">("compose")
+  const [qa, setQa] = useState<Array<{ text: string; answer: string }>>([])
 
-  const canSubmit = useMemo(() => {
+  const canSubmitBase = useMemo(() => {
     if (!title.trim()) return false
     if (type === "text") return text.trim().length > 0
     return !!file
   }, [title, type, text, file])
+
+  const allAnswersProvided = useMemo(() => qa.every(q => q.answer.trim().length > 0), [qa])
+
+  const canSubmit = useMemo(() => {
+    return stage === 'questions' ? (canSubmitBase && allAnswersProvided) : canSubmitBase
+  }, [stage, canSubmitBase, allAnswersProvided])
 
   const handleFilesSelected = (newFiles: File[]) => {
     if (!newFiles?.length) return
@@ -105,15 +115,27 @@ export function NewPitchPanel() {
 
   const readTextFile = async (f: File) => await f.text()
 
-  const evaluateText = async (t: string) => {
+  const evaluateText = async (t: string, questions: Array<{ text: string; answer: string }>) => {
     const res = await fetch("/api/evaluate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text: t, questions: [] }),
+      body: JSON.stringify({ text: t, questions }),
     })
     if (!res.ok) throw new Error("Evaluation failed")
     return await res.json()
   }
+
+  const generateQuestionsForText = useCallback(async (t: string) => {
+    const res = await fetch("/api/generate-questions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: t }),
+    })
+    if (!res.ok) return [] as string[]
+    const data = await res.json()
+    const items: string[] = Array.isArray(data?.questions) ? data.questions : []
+    return items.slice(0, 3)
+  }, [])
 
   const onSubmit = useCallback(async () => {
     if (!canSubmit || processing) return
@@ -127,18 +149,32 @@ export function NewPitchPanel() {
       } else if (type === "textFile" && file) {
         sourceText = await readTextFile(file)
       }
+      const normalized = normalizeTranscriptText(sourceText)
+      setPreparedText(normalized)
+
+      if (stage === 'compose') {
+        evalProg.setStep('analyzing', 'Generating follow-up questions...')
+        const questions = await generateQuestionsForText(normalized)
+        if (questions.length > 0) {
+          setQa(questions.map(q => ({ text: q, answer: "" })))
+          setStage('questions')
+          toast.message('Answer a few questions to improve the evaluation')
+          evalProg.done()
+          return
+        }
+      }
 
       evalProg.setStep('analyzing', 'Analyzing content...')
-      const evaluation = await evaluateText(sourceText)
+      const evaluation = await evaluateText(normalized, qa)
 
       const id = await createPitch({
         orgId: workspace.mode === "org" ? organization?.id : undefined,
         title,
-        text: sourceText,
+        text: normalized,
         type,
         status: "evaluated",
         evaluation,
-        questions: [],
+        questions: qa,
       })
 
       toast.success("Pitch created")
@@ -152,7 +188,7 @@ export function NewPitchPanel() {
       setProcessing(false)
       setProgress(0)
     }
-  }, [canSubmit, processing, type, file, text, title, workspace.mode, organization?.id, createPitch, router, evalProg, transcribeAudio])
+  }, [canSubmit, processing, type, file, text, title, workspace.mode, organization?.id, createPitch, router, evalProg, transcribeAudio, generateQuestionsForText, qa, stage])
 
   return (
     <div className="max-w-4xl mx-auto p-0 md:p-2">
@@ -224,10 +260,10 @@ export function NewPitchPanel() {
                 <div className="mt-3 rounded-lg border bg-muted/20 p-3 sm:p-4">
                   <FilePreview file={file} />
                   {preview?.text && (
-                    <pre className="mt-3 max-h-32 sm:max-h-48 overflow-auto whitespace-pre-wrap rounded bg-background p-2 sm:p-3 text-xs border">
-                      {preview.text}
-                      {file.size > 800 && "\n..."}
-                    </pre>
+                    <div className="mt-3 max-h-32 sm:max-h-48 overflow-auto rounded bg-background p-2 sm:p-3 text-xs border" style={{ textAlign: 'justify' }}>
+                      {normalizeTranscriptText(preview.text).slice(0, 800)}
+                      {file.size > 800 && "..."}
+                    </div>
                   )}
                   <div className="mt-3 flex justify-between items-center">
                     <div className="text-xs text-muted-foreground">
@@ -287,6 +323,25 @@ export function NewPitchPanel() {
             </div>
           )}
 
+          {stage === 'questions' && (
+            <div className="space-y-3 p-4 border rounded-lg bg-muted/10">
+              <h3 className="font-medium">Follow-up Questions</h3>
+              <p className="text-sm text-muted-foreground">Answer these to improve the evaluation quality.</p>
+              {qa.map((q, idx) => (
+                <div key={idx} className="space-y-1">
+                  <Label htmlFor={`qa-${idx}`}>{q.text}</Label>
+                  <Textarea
+                    id={`qa-${idx}`}
+                    value={q.answer}
+                    onChange={(e) => setQa(prev => prev.map((it, i) => i === idx ? { ...it, answer: e.target.value } : it))}
+                    placeholder="Your answer"
+                    className="min-h-[80px]"
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+
           <div className="flex flex-col sm:flex-row gap-3 sm:justify-end">
             <Button 
               onClick={onSubmit} 
@@ -297,12 +352,12 @@ export function NewPitchPanel() {
               {processing || pending ? (
                 <div className="flex items-center gap-2">
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  Creating...
+                  {stage === 'questions' ? 'Evaluating...' : 'Creating...'}
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
                   <Upload className="w-4 h-4" />
-                  Create & Evaluate
+                  {stage === 'questions' ? 'Evaluate with Answers' : 'Create & Evaluate'}
                 </div>
               )}
             </Button>

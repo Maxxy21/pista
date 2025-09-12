@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getOpenAI } from "@/lib/utils";
-import { PROMPT_VERSION, POLICY_VERSION } from "@/lib/constants/eval";
+import { getOpenAI, OpenAIConfigError } from "@/lib/utils";
+import { PROMPT_VERSION, POLICY_VERSION, MODEL_NAME } from "@/lib/constants/eval";
 import { withAuth, AuthenticatedRequest } from "@/lib/auth/api-auth";
 import { withRateLimit, apiRateLimiter } from "@/lib/rate-limit/rate-limiter";
 import { z } from "zod";
@@ -49,7 +49,7 @@ export const POST = withRateLimit(apiRateLimiter)(withAuth(async (req: Authentic
 
         const openai = getOpenAI();
         const completion = await openai.chat.completions.create({
-            model: "gpt-4",
+            model: MODEL_NAME,
             messages: [
                 {
                     role: "system",
@@ -96,6 +96,13 @@ export const POST = withRateLimit(apiRateLimiter)(withAuth(async (req: Authentic
         return NextResponse.json(result);
     } catch (error) {
         console.error("Answer evaluation error:", error);
+        
+        if (error instanceof OpenAIConfigError) {
+            return NextResponse.json({
+                error: error.message,
+                code: error.code
+            }, { status: 503 })
+        }
         
         if (error instanceof z.ZodError) {
             return NextResponse.json({ 

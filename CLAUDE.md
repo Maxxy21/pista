@@ -91,7 +91,7 @@ Convex provides real-time data synchronization. Components use Convex React hook
 - Convex deployment for backend services
 
 ## Thesis Writing Style (Bachelor Level)
-- Mirror the tone of `thesis/img/master-thesis.txt` (clear, structured, accessible). Keep language simple and direct.
+- Mirror the tone of `thesis/thesis-example-3.txt` and `thesis/master-thesis.txt` (clear, structured, accessible). Keep language simple and direct.
 - Paragraphs: 3–6 sentences; one idea per sentence; add brief lead‑in sentences to figures/tables so there are no figure‑only paragraphs.
 - Sections: begin with a short purpose line (what this section covers) and end with a one‑sentence takeaway when helpful.
 - Voice: active and precise; avoid jargon and stacked clauses. Prefer plain words (e.g., "shows", "uses", "finds").

@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { motion, AnimatePresence } from "framer-motion";
 import { Doc } from "@/convex/_generated/dataModel";
+import { normalizeTranscriptText, splitParagraphs } from "@/lib/utils/text";
 
 interface QuestionsSectionProps {
   data: Doc<"pitches">;
@@ -38,9 +39,15 @@ export const QuestionsSection = ({ data }: QuestionsSectionProps) => {
                   {questions.map((qa, index) => (
                     <Fragment key={index}>
                       <div className="space-y-2">
-                        <div className="font-medium text-primary">Q: {qa.text}</div>
+                        <div className="font-medium text-primary" style={{ textAlign: 'justify' }}>
+                          Q: {normalizeTranscriptText(qa.text)}
+                        </div>
                         <div className="pl-4 border-l-2 border-muted-foreground/20">
-                          <p className="text-muted-foreground">A: {qa.answer}</p>
+                          <div className="text-muted-foreground" style={{ textAlign: 'justify' }}>
+                            {splitParagraphs(normalizeTranscriptText(qa.answer)).map((p, i) => (
+                              <p key={i} className="mb-2">A: {p}</p>
+                            ))}
+                          </div>
                         </div>
                       </div>
                     </Fragment>

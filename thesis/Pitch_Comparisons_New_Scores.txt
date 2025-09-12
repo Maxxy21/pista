@@ -1,0 +1,774 @@
+Pitch Comparisons between my system(Pista)
+and winds2ventures
+September 11, 2025
+
+Contents
+1 Aerovisio
+1.1 Pista Scores . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+1.2 Winds2Ventures’s Scores . . . . . . . . . . . . . . . . . . . . . . .
+
+4
+4
+4
+
+2 Assistme
+2.1 Pista Scores . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+2.2 Winds2Ventures’s Scores . . . . . . . . . . . . . . . . . . . . . . .
+
+4
+4
+5
+
+3 Assistme
+3.1 Pista Scores . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+3.2 Winds2Ventures’s Scores . . . . . . . . . . . . . . . . . . . . . . .
+
+5
+5
+5
+
+4 CampoRapido
+4.1 Pista Scores . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+4.2 Winds2Ventures’s Scores . . . . . . . . . . . . . . . . . . . . . . .
+
+6
+6
+6
+
+5 Coontent
+5.1 Pista Score . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+5.2 WindsVentures Score . . . . . . . . . . . . . . . . . . . . . . . . .
+
+6
+6
+7
+
+6 Corptech
+6.1 Pista Scores . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+6.2 Winds2Ventures’s Scores . . . . . . . . . . . . . . . . . . . . . . .
+
+7
+7
+7
+
+7 Finnaid
+7.1 Pista Score . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+7.2 WindsVentures Score . . . . . . . . . . . . . . . . . . . . . . . . .
+
+8
+8
+8
+
+8 Fitly
+8.1 Pista Score . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+8.2 WindsVentures Score . . . . . . . . . . . . . . . . . . . . . . . . .
+
+8
+8
+9
+
+1
+
+9 HHCoders
+9.1 Pista Score . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+9.2 WindsVentures Score . . . . . . . . . . . . . . . . . . . . . . . . .
+
+9
+9
+9
+
+10 MatchIt
+10
+10.1 Pista Score . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 10
+10.2 WindsVentures Score . . . . . . . . . . . . . . . . . . . . . . . . . 10
+11 Math4Me
+10
+11.1 Pista Score . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 10
+11.2 WindsVentures Score . . . . . . . . . . . . . . . . . . . . . . . . . 11
+12 Mediflow
+11
+12.1 Pista Score . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 11
+12.2 WindsVentures Score . . . . . . . . . . . . . . . . . . . . . . . . . 11
+13 Myok
+12
+13.1 Pista Score . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 12
+13.2 WindsVentures Score . . . . . . . . . . . . . . . . . . . . . . . . . 12
+14 PolyGlobe
+12
+14.1 Pista Score . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 12
+14.2 WindsVentures Score . . . . . . . . . . . . . . . . . . . . . . . . . 13
+15 Prosilta
+13
+15.1 Pista Score . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 13
+15.2 WindsVentures Score . . . . . . . . . . . . . . . . . . . . . . . . . 13
+16 Rideshare
+14
+16.1 Pista Score . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 14
+16.2 WindsVentures Score . . . . . . . . . . . . . . . . . . . . . . . . . 14
+17 saunaYou&Me
+14
+17.1 Pista Score . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 14
+17.2 WindsVentures Score . . . . . . . . . . . . . . . . . . . . . . . . . 15
+18 Serenity
+15
+18.1 Pista Score . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 15
+18.2 WindsVentures Score . . . . . . . . . . . . . . . . . . . . . . . . . 15
+19 Shieldskin
+16
+19.1 Pista Score . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 16
+19.2 WindsVentures Score . . . . . . . . . . . . . . . . . . . . . . . . . 16
+20 Sundove
+16
+20.1 Pista Score . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 16
+20.2 WindsVentures Score . . . . . . . . . . . . . . . . . . . . . . . . . 17
+
+2
+
+21 UnversitAI
+17
+21.1 Pista Score . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 17
+21.2 WindsVentures Score . . . . . . . . . . . . . . . . . . . . . . . . . 17
+22 Whopika
+18
+22.1 Pista Score . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 18
+22.2 WindsVentures Score . . . . . . . . . . . . . . . . . . . . . . . . . 18
+
+3
+
+These pitches were taken from a student pitches competition. they are evaluated by my system(Pista) and wind2ventures system
+
+1
+
+Aerovisio
+
+1.1
+
+Pista Scores
+
+• Overall Score: 5.3/10
+• Problem-Solution Fit: 6.2/10
+• Business Model & Market: 5.2/10
+• Team & Execution: 4/10
+• Pitch Quality: 5.8/10
+
+1.2
+
+Winds2Ventures’s Scores
+
+• Problem Clarity: 5 / 10
+• Solution Viability: 6 / 10
+• Market Size Estimation: 4 / 10
+• Competitive Advantages: 6 / 10
+• Team Assessment: 5 / 10
+• Business Model Viability: 4 / 10
+• Go-To-Market Strategy: 3 / 10
+• Competitive Landscape: 5 / 10
+• Funding Ask and Use: 4 / 10
+• Investibility: 4.5 / 10
+
+2
+
+Assistme
+
+2.1
+
+Pista Scores
+
+• Overall Score: 4.9/10
+• Problem-Solution Fit: 6.2/10
+• Business Model & Market: 5.0/10
+• Team & Execution: 3.0/10
+• Pitch Quality: 6.8/10
+4
+
+2.2
+
+Winds2Ventures’s Scores
+
+• Problem Clarity: 7 / 10
+• Solution Viability: 6 / 10
+• Market Size Estimation: 5 / 10
+• Competitive Advantages: 5 / 10
+• Team Assessment: 5 / 10
+• Business Model Viability: 6 / 10
+• Go-To-Market Strategy: 4 / 10
+• Competitive Landscape: 4 / 10
+• Funding Ask and Use: 3 / 10
+• Investibility: 5.4 / 10
+
+3
+
+Assistme
+
+3.1
+
+Pista Scores
+
+• Overall Score: 6.2/10
+• Problem-Solution Fit: 6.2/10
+• Business Model & Market: 6.2/10
+• Team & Execution: 6.0/10
+• Pitch Quality: 6.6/10
+
+3.2
+
+Winds2Ventures’s Scores
+
+• Problem Clarity: 7 / 10
+• Solution Viability: 6 / 10
+• Market Size Estimation: 4 / 10
+• Competitive Advantages: 5 / 10
+• Team Assessment: 6 / 10
+• Business Model Viability: 4 / 10
+• Go-To-Market Strategy: 3 / 10
+• Competitive Landscape: 4 / 10
+• Funding Ask and Use: 3 / 10
+• Investibility: 4.4 / 10
+5
+
+4
+
+CampoRapido
+
+4.1
+
+Pista Scores
+
+• Overall Score: 4.2/10
+• Problem-Solution Fit: 6.2/10
+• Business Model & Market: 3.0/10
+• Team & Execution: 3.0/10
+• Pitch Quality: 6/10
+
+4.2
+
+Winds2Ventures’s Scores
+
+• Problem Clarity: 6 / 10
+• Solution Viability: 6 / 10
+• Market Size Estimation: 4 / 10
+• Competitive Advantages: 5 / 10
+• Team Assessment: 6 / 10
+• Business Model Viability: 5 / 10
+• Go-To-Market Strategy: 5 / 10
+• Competitive Landscape: 4 / 10
+• Funding Ask and Use: 3 / 10
+• Investibility: 4.5 / 10
+
+5
+
+Coontent
+
+5.1
+
+Pista Score
+
+• Overall Score: 6/10
+• Problem-Solution Fit: 7.2/10
+• Business Model & Market: 5.8/10
+• Team & Execution: 5.0/10
+• Pitch Quality: 5.8/10
+
+6
+
+5.2
+
+WindsVentures Score
+
+• Problem Clarity: 7 / 10
+• Solution Viability: 6 / 10
+• Market Size Estimation: 5 / 10
+• Competitive Advantages: 6 / 10
+• Team Assessment: 5 / 10
+• Business Model Viability: 6 / 10
+• Go-To-Market Strategy: 5 / 10
+• Competitive Landscape: 5 / 10
+• Funding Ask and Use: 4 / 10
+• Investibility: 5.3 / 10
+
+6
+
+Corptech
+
+6.1
+
+Pista Scores
+
+• Overall Score: 6.3/10
+• Problem-Solution Fit: 7.4/10
+• Business Model & Market: 6.0/10
+• Team & Execution: 5.0/10
+• Pitch Quality: 6.8/10
+
+6.2
+
+Winds2Ventures’s Scores
+
+• Problem Clarity: 8 / 10
+• Solution Viability: 7 / 10
+• Market Size Estimation: 7 / 10
+• Competitive Advantages: 6 / 10
+• Team Assessment: 5 / 10
+• Business Model Viability: 6 / 10
+• Go-To-Market Strategy: 6 / 10
+• Competitive Landscape: 5 / 10
+• Funding Ask and Use: 6 / 10
+• Investibility: 6 / 10
+7
+
+7
+
+Finnaid
+
+7.1
+
+Pista Score
+
+• Overall Score: 5.0/10
+• Problem-Solution Fit: 5.4/10
+• Business Model & Market: 5.0/10
+• Team & Execution: 4.0/10
+• Pitch Quality: 5.8/10
+
+7.2
+
+WindsVentures Score
+
+• Problem Clarity: 7 / 10
+• Solution Viability: 6 / 10
+• Market Size Estimation: 7 / 10
+• Competitive Advantages: 5 / 10
+• Team Assessment: 6 / 10
+• Business Model Viability: 6 / 10
+• Go-To-Market Strategy: 4 / 10
+• Competitive Landscape: 4 / 10
+• Funding Ask and Use: 4 / 10
+• Investibility: 5.5 / 10
+
+8
+
+Fitly
+
+8.1
+
+Pista Score
+
+• Overall Score: 5.6/10
+• Problem-Solution Fit: 6.2/10
+• Business Model & Market: 6.0/10
+• Team & Execution: 4.2/10
+• Pitch Quality: 6.0/10
+
+8
+
+8.2
+
+WindsVentures Score
+
+• Problem Clarity: 6 / 10
+• Solution Viability: 6 / 10
+• Market Size Estimation: 7 / 10
+• Competitive Advantages: 5 / 10
+• Team Assessment: 5 / 10
+• Business Model Viability: 6 / 10
+• Go-To-Market Strategy: 5 / 10
+• Competitive Landscape: 4 / 10
+• Funding Ask and Use: 3 / 10
+• Investibility: 4.7 / 10
+
+9
+
+HHCoders
+
+9.1
+
+Pista Score
+
+• Overall Score: 4.8/10
+• Problem-Solution Fit: 6.2/10
+• Business Model & Market: 5.0/10
+• Team & Execution: 3.0/10
+• Pitch Quality: 4.8/10
+
+9.2
+
+WindsVentures Score
+
+• Problem Clarity: 6 / 10
+• Solution Viability: 7 / 10
+• Market Size Estimation: 4 / 10
+• Competitive Advantages: 5 / 10
+• Team Assessment: 5 / 10
+• Business Model Viability: 5 / 10
+• Go-To-Market Strategy: 3 / 10
+• Competitive Landscape: 4 / 10
+• Funding Ask and Use: 2 / 10
+• Investibility: 4.5 / 10
+9
+
+10
+10.1
+
+MatchIt
+Pista Score
+
+• Overall Score: 5.3/10
+• Problem-Solution Fit: 6.2/10
+• Business Model & Market: 5.4/10
+• Team & Execution: 4.0/10
+• Pitch Quality: 6.0/10
+
+10.2
+
+WindsVentures Score
+
+• Problem Clarity: 8 / 10
+• Solution Viability: 7 / 10
+• Market Size Estimation: 8 / 10
+• Competitive Advantages: 7 / 10
+• Team Assessment: 6 / 10
+• Business Model Viability: 6 / 10
+• Go-To-Market Strategy: 5 / 10
+• Competitive Landscape: 5 / 10
+• Funding Ask and Use: 6 / 10
+• Investibility: 6.4 / 10
+
+11
+11.1
+
+Math4Me
+Pista Score
+
+• Overall Score: 4.6/10
+• Problem-Solution Fit: 6.2/10
+• Business Model & Market: 3.8/10
+• Team & Execution: 3.0/10
+• Pitch Quality: 5.8/10
+
+10
+
+11.2
+
+WindsVentures Score
+
+• Problem Clarity: 7 / 10
+• Solution Viability: 6 / 10
+• Market Size Estimation: 4 / 10
+• Competitive Advantages: 5 / 10
+• Team Assessment: 5 / 10
+• Business Model Viability: 4 / 10
+• Go-To-Market Strategy: 3 / 10
+• Competitive Landscape: 3 / 10
+• Funding Ask and Use: 2 / 10
+• Investibility: 4.5 / 10
+
+12
+12.1
+
+Mediflow
+Pista Score
+
+• Overall Score: 6.1/10
+• Problem-Solution Fit: 7.0/10
+• Business Model & Market: 6.0/10
+• Team & Execution: 5.0/10
+• Pitch Quality: 6.6/10
+
+12.2
+
+WindsVentures Score
+
+• Problem Clarity: 5 / 10
+• Solution Viability: 6 / 10
+• Market Size Estimation: 4 / 10
+• Competitive Advantages: 5 / 10
+• Team Assessment: 5 / 10
+• Business Model Viability: 6 / 10
+• Go-To-Market Strategy: 3 / 10
+• Competitive Landscape: 4 / 10
+• Funding Ask and Use: 4 / 10
+• Investibility: 4.5 / 10
+11
+
+13
+13.1
+
+Myok
+Pista Score
+
+• Overall Score: 6.1/10
+• Problem-Solution Fit: 7.2/10
+• Business Model & Market: 5.6/10
+• Team & Execution: 5.0/10
+• Pitch Quality: 6.8/10
+
+13.2
+
+WindsVentures Score
+
+• Problem Clarity: 8 / 10
+• Solution Viability: 7 / 10
+• Market Size Estimation: 8 / 10
+• Competitive Advantages: 7 / 10
+• Team Assessment: 6 / 10
+• Business Model Viability: 6 / 10
+• Go-To-Market Strategy: 5 / 10
+• Competitive Landscape: 5 / 10
+• Funding Ask and Use: 6 / 10
+• Investibility: 6.4 / 10
+
+14
+14.1
+
+PolyGlobe
+Pista Score
+
+• Overall Score: 5.8/10
+• Problem-Solution Fit: 7.0/10
+• Business Model & Market: 6.2/10
+• Team & Execution: 3.2/10
+• Pitch Quality: 6.6/10
+
+12
+
+14.2
+
+WindsVentures Score
+
+• Problem Clarity: 8 / 10
+• Solution Viability: 7 / 10
+• Market Size Estimation: 8 / 10
+• Competitive Advantages: 7 / 10
+• Team Assessment: 5 / 10
+• Business Model Viability: 6 / 10
+• Go-To-Market Strategy: 6 / 10
+• Competitive Landscape: 7 / 10
+• Funding Ask and Use: 7 / 10
+• Investibility: 6.4 / 10
+
+15
+15.1
+
+Prosilta
+Pista Score
+
+• Overall Score: 5.8/10
+• Problem-Solution Fit: 7.2/10
+• Business Model & Market: 6.0/10
+• Team & Execution: 3.3/10
+• Pitch Quality: 6.8/10
+
+15.2
+
+WindsVentures Score
+
+• Problem Clarity: 7 / 10
+• Solution Viability: 6 / 10
+• Market Size Estimation: 7 / 10
+• Competitive Advantages: 6 / 10
+• Team Assessment: 6 / 10
+• Business Model Viability: 6 / 10
+• Go-To-Market Strategy: 4 / 10
+• Competitive Landscape: 4 / 10
+• Funding Ask and Use: 4 / 10
+• Investibility: 5.4 / 10
+13
+
+16
+16.1
+
+Rideshare
+Pista Score
+
+• Overall Score: 4.1/10
+• Problem-Solution Fit: 5.0/10
+• Business Model & Market: 3.8/10
+• Team & Execution: 3.0/10
+• Pitch Quality: 5.0/10
+
+16.2
+
+WindsVentures Score
+
+• Problem Clarity: 6 / 10
+• Solution Viability: 5 / 10
+• Market Size Estimation: 4 / 10
+• Competitive Advantages: 5 / 10
+• Team Assessment: 6 / 10
+• Business Model Viability: 5 / 10
+• Go-To-Market Strategy: 4 / 10
+• Competitive Landscape: 4 / 10
+• Funding Ask and Use: 3 / 10
+• Investibility: 4.5 / 10
+
+17
+17.1
+
+saunaYou&Me
+Pista Score
+
+• Overall Score: 5.5/10
+• Problem-Solution Fit: 6.2/10
+• Business Model & Market: 6.0/10
+• Team & Execution: 4.0/10
+• Pitch Quality: 5.8/10
+
+14
+
+17.2
+
+WindsVentures Score
+
+• Problem Clarity: 7 / 10
+• Solution Viability: 6 / 10
+• Market Size Estimation: 6 / 10
+• Competitive Advantages: 5 / 10
+• Team Assessment: 6 / 10
+• Business Model Viability: 6 / 10
+• Go-To-Market Strategy: 4 / 10
+• Competitive Landscape: 4 / 10
+• Funding Ask and Use: 6 / 10
+• Investibility: 5.5 / 10
+
+18
+18.1
+
+Serenity
+Pista Score
+
+• Overall Score: 6.0/10
+• Problem-Solution Fit: 6.8/10
+• Business Model & Market: 6.2/10
+• Team & Execution: 4.2/10
+• Pitch Quality: 7.0/10
+
+18.2
+
+WindsVentures Score
+
+• Problem Clarity: 7 / 10
+• Solution Viability: 8 / 10
+• Market Size Estimation: 8 / 10
+• Competitive Advantages: 7 / 10
+• Team Assessment: 7 / 10
+• Business Model Viability: 7 / 10
+• Go-To-Market Strategy: 4 / 10
+• Competitive Landscape: 4 / 10
+• Funding Ask and Use: 3 / 10
+• Investibility: 6.1 / 10
+15
+
+19
+19.1
+
+Shieldskin
+Pista Score
+
+• Overall Score: 5.7/10
+• Problem-Solution Fit: 6.2/10
+• Business Model & Market: 6.0/10
+• Team & Execution: 4.0/10
+• Pitch Quality: 7.0/10
+
+19.2
+
+WindsVentures Score
+
+• Problem Clarity: 7 / 10
+• Solution Viability: 6 / 10
+• Market Size Estimation: 4 / 10
+• Competitive Advantages: 6 / 10
+• Team Assessment: 6 / 10
+• Business Model Viability: 5 / 10
+• Go-To-Market Strategy: 4 / 10
+• Competitive Landscape: 5 / 10
+• Funding Ask and Use: 4 / 10
+• Investibility: 5 / 10
+
+20
+20.1
+
+Sundove
+Pista Score
+
+• Overall Score: 5/10
+• Problem-Solution Fit: 6.2/10
+• Business Model & Market: 4.0/10
+• Team & Execution: 4.2/10
+• Pitch Quality: 6.0/10
+
+16
+
+20.2
+
+WindsVentures Score
+
+• Problem Clarity: 8 / 10
+• Solution Viability: 7 / 10
+• Market Size Estimation: 4 / 10
+• Competitive Advantages: 6 / 10
+• Team Assessment: 5 / 10
+• Business Model Viability: 6 / 10
+• Go-To-Market Strategy: 4 / 10
+• Competitive Landscape: 3 / 10
+• Funding Ask and Use: 2 / 10
+• Investibility: 5 / 10
+
+21
+21.1
+
+UnversitAI
+Pista Score
+
+• Overall Score: 4.0/10
+• Problem-Solution Fit: 5.2/10
+• Business Model & Market: 3.2/10
+• Team & Execution: 3.0/10
+• Pitch Quality: 4.8/10
+
+21.2
+
+WindsVentures Score
+
+• Problem Clarity: 6 / 10
+• Solution Viability: 7 / 10
+• Market Size Estimation: 3 / 10
+• Competitive Advantages: 5 / 10
+• Team Assessment: 5 / 10
+• Business Model Viability: 4 / 10
+• Go-To-Market Strategy: 3 / 10
+• Competitive Landscape: 2 / 10
+• Funding Ask and Use: 6 / 10
+• Investibility: 4.3 / 10
+17
+
+22
+22.1
+
+Whopika
+Pista Score
+
+• Overall Score: 5.7/10
+• Problem-Solution Fit: 6.4/10
+• Business Model & Market: 5.0/10
+• Team & Execution: 5.0/10
+• Pitch Quality: 6.8/10
+
+22.2
+
+WindsVentures Score
+
+• Problem Clarity: 7 / 10
+• Solution Viability: 6 / 10
+• Market Size Estimation: 6 / 10
+• Competitive Advantages: 5 / 10
+• Team Assessment: 6 / 10
+• Business Model Viability: 5 / 10
+• Go-To-Market Strategy: 5 / 10
+• Competitive Landscape: 4 / 10
+• Funding Ask and Use: 3 / 10
+• Investibility: 5.5 / 10
+
+18
+
+

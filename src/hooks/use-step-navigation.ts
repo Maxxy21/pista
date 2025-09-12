@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 
 type Step = "pitch" | "questions" | "review";
 
@@ -8,18 +8,18 @@ export function useStepNavigation() {
   const [currentStep, setCurrentStep] = useState<Step>("pitch");
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
-  const goToStep = (step: Step) => setCurrentStep(step);
+  const goToStep = useCallback((step: Step) => setCurrentStep(step), []);
   
-  const nextQuestion = () => setCurrentQuestionIndex(prev => prev + 1);
+  const nextQuestion = useCallback(() => setCurrentQuestionIndex(prev => prev + 1), []);
   
-  const previousQuestion = () => setCurrentQuestionIndex(prev => prev - 1);
+  const previousQuestion = useCallback(() => setCurrentQuestionIndex(prev => prev - 1), []);
   
-  const setQuestionIndex = (index: number) => setCurrentQuestionIndex(index);
+  const setQuestionIndex = useCallback((index: number) => setCurrentQuestionIndex(index), []);
   
-  const resetNavigation = () => {
+  const resetNavigation = useCallback(() => {
     setCurrentStep("pitch");
     setCurrentQuestionIndex(0);
-  };
+  }, []);
 
   return {
     currentStep,

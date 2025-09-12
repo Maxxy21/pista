@@ -2,332 +2,124 @@
 \chapter{Evaluation and Results}
 \label{ch:evaluation}
 
-This chapter evaluates the Pista system by comparing it with Winds2Ventures (W2V)\footnote{\url{https://w2v.network/}}, the partner evaluation system introduced in Chapter~\ref{ch:introduction}. The comparison examines differences in scoring patterns and evaluation approaches between the GenAI-powered system and the partner platform.
+This chapter compares the Pista system with an existing AI-powered evaluation platform called Winds2Ventures (W2V)\footnote{\url{https://w2v.network/}}. The research addresses a key question: how do different AI evaluation systems compare when rating the same startup pitches, and what can we learn from their agreement patterns?
 
-Evaluating startup pitches involves subjective judgment and domain expertise. To validate the Pista system, comparison with an existing evaluation platform provides insights into how GenAI approaches differ from human-driven assessment methods.
+To answer this question, both AI systems were compared on how they scored the same startup pitches. The analysis examined whether the two systems agreed on which pitches were good, average, or below average. The comparison focuses on the final overall scores that each system produces. Statistical measures of agreement were analyzed to understand how well different AI evaluation approaches align with each other.
 
-The comparison examined differences in scoring patterns, evaluation consistency, and assessment approaches between the two systems. The analysis focused on understanding where each system shows strengths and limitations.
+Twenty-two startup pitches from university competitions were analyzed using statistical methods to measure agreement between the systems. The results show that the systems agree moderately well, but there are some systematic differences in their evaluation approaches. Pista tends to give slightly higher scores than W2V, which appears to use more conservative evaluation criteria. The Cohen's kappa coefficient shows moderate agreement at 0.450, indicating the systems align much better than random chance.
 
-Comparing GenAI evaluation with existing platforms helps understand the practical utility and limitations of automated assessment tools for startup pitch evaluation.
+This comparison helps us understand how different AI evaluation approaches perform and what we can learn from comparing automated assessment systems. The findings suggest that different AI evaluation systems can have distinct characteristics and evaluation patterns, even when assessing the same content. The results provide insights into the variety that exists within automated evaluation systems and how different algorithmic approaches can lead to different assessment outcomes. These findings are important for understanding the current diversity and future potential of AI-powered evaluation platforms.
 
-The comparison addressed three key questions:
-\begin{enumerate}
-    \item How do Pista scores compare with W2V assessments?
-    \item What patterns emerge in the scoring differences?
-    \item What are the practical implications for using GenAI evaluation tools?
-\end{enumerate}
-
-\section{Methodology and Experimental Design}
+\section{Methodology}
 \label{sec:methodology}
 
-All results in this chapter use the calibrated scoring prompt (\texttt{PROMPT\_VERSION = criteria\textrm{-}v1.2}) with rubric anchors, evidence gating, aspect first scoring, and a lower sampling temperature for scoring. When Q\&A is enabled, the question generator asks for 1--3 structured, evidence seeking questions and accepts JSON or a numbered list fallback.
+This section explains how the Pista system was tested against the Winds2Ventures platform. The final version of Pista was used, which uses GPT-4 with specialized prompts to evaluate startup pitches consistently. The testing approach focuses on comparing final scores from both systems using the same set of university competition pitches. Statistical methods were selected that account for chance agreement to provide meaningful comparisons.
 
-\subsection{Metrics}
-To evaluate distribution quality and alignment, the analysis reports:
-\begin{itemize}
-  \item \textbf{Score concentration}: share of exact 7.0 scores before/after calibration
-  \item \textbf{Dispersion}: variance or IQR per criterion
-  \item \textbf{Rank alignment}: Kendall's $\tau$ with baseline/commercial assessments
-  \item \textbf{Evidence sensitivity}: proportion of scores $\leq 4$ when specific evidence is missing
-\end{itemize}
-
-\section{Future Work: Ensemble Evaluation}
-The current implementation uses a single provider (GPT\,4) with rubric anchored prompts. A practical extension is an ensemble across multiple models to improve stability and evidence coverage:
-\begin{itemize}
-  \item \textbf{Providers}: Add adapters for OpenAI, Anthropic, and Google; run all providers per criterion in parallel.
-  \item \textbf{Aggregation Policy}: Aggregate aspect scores via trimmed mean (e.g., 20\% trim if $\geq$3 providers), then average to the criterion score; record provenance.\footnote{Bump \texttt{POLICY\_VERSION} to \texttt{scoring-policy-v3}.}
-  \item \textbf{Disagreement Flags}: If interquartile range across provider scores exceeds a threshold, mark the criterion as low confidence.
-  \item \textbf{Adjudication (Optional)}: For flagged criteria, use an adjudicator prompt to merge rationales into the final JSON.
-  \item \textbf{Disagreement-Driven Q\&A}: When flagged, generate 1--3 targeted questions for the highest-variance aspects and re-score on answers.
-  \item \textbf{Reporting}: Compare ensemble vs. single provider on score dispersion and Kendall's $\tau$ against the baseline (W2V), and document cost/latency trade-offs.
-\end{itemize}
-
-\subsection{Dataset Selection and Characteristics}
+\subsection{Dataset Selection}
 \label{subsec:dataset}
 
-Twenty-two startup pitches from university entrepreneurship competitions were evaluated by both systems. University competition pitches provided consistent content and format, enabling direct comparison between the two evaluation approaches.
+Twenty-two startup pitches from university competitions were used as the test dataset for this evaluation. University pitches were chosen because they all follow the same format and contain similar information, which makes it easier to compare how the two systems evaluate them. University competition pitches provide a standardized structure that ensures both evaluation systems receive comparable input data. The pitches represent real student ventures that have been through competitive selection processes.
 
-Both systems evaluated all 22 pitches, covering diverse sectors including technology, healthcare, agriculture, and consumer services.
+The pitches cover different areas like technology, healthcare, agriculture, and consumer services. This variety helps me see how both systems handle different types of businesses across multiple industry sectors. The diversity ensures that the evaluation results reflect how the systems perform across different business models and market contexts. Each industry sector presents unique challenges and opportunities that test different aspects of the evaluation frameworks.
 
-The pitches were obtained through university entrepreneurship programs with appropriate permissions for research use.
+Each pitch includes the standard parts you expect: the problem they're solving, their solution, market analysis, team information, and how they plan to make money. Since all pitches follow the same format, both evaluation systems get the same type of information to work with.
 
-Each pitch contained the fundamental components required for comprehensive startup evaluation: clearly defined problem statements, proposed solution descriptions, market opportunity analysis, team capability presentations, and business model articulation. The standardized competition format ensured consistent information availability across all evaluated pitches, facilitating meaningful cross-system comparison.
+The W2V evaluation results for these pitches were provided by the thesis supervisor to enable this comparative analysis. This supervisor-facilitated comparison allows for meaningful statistical analysis between different AI evaluation approaches using standardized pitch data.
 
-\subsection{Evaluation Framework Comparison}
+\subsection{Evaluation Frameworks}
 \label{subsec:frameworks}
 
-Fundamental differences in evaluation architecture between the two systems necessitated careful methodological consideration for comparative analysis. Each platform employs distinct assessment criteria and weighting mechanisms that reflect different philosophical approaches to startup evaluation.
+Both systems need to be explained since they use different ways to evaluate pitches. Understanding these differences helps explain why the scores sometimes vary between the systems. The frameworks use different criteria and weighting approaches, which can lead to different assessments of the same pitch. Comparing these frameworks helps identify the strengths and limitations of each evaluation approach.
 
 \subsubsection{Pista Evaluation Framework}
 
-The Pista system employs a four-dimensional weighted assessment structure designed to capture critical aspects of startup viability. The dimensional weighting was calibrated based on venture capital research findings and established industry evaluation practices.
+Pista uses four main areas to evaluate pitches, with different weights for each:
 
-The assessment framework comprises four weighted dimensions:
 \begin{enumerate}
-    \item \textbf{Problem-Solution Fit (30\% weight)}: Examination of problem definition clarity, solution innovation depth, market understanding sophistication, competitive differentiation strength, and value proposition coherence.
-
-    \item \textbf{Business Model \& Market (30\% weight)}: Analysis of revenue model sustainability, market size estimation credibility, go-to-market strategy feasibility, customer acquisition viability, and scalability potential.
-
-    \item \textbf{Team \& Execution (25\% weight)}: Assessment of team competency profiles, domain expertise relevance, historical performance indicators, resource allocation efficiency, and implementation strategy depth.
-
-    \item \textbf{Pitch Quality (15\% weight)}: Evaluation of presentation structure, evidence integration effectiveness, narrative coherence, and persuasive communication quality.
+    \item \textbf{Problem-Solution Fit (30\%)}: How well the startup understands the problem and how good their solution is
+    \item \textbf{Business Model \& Market (30\%)}: How they plan to make money and if the market is big enough
+    \item \textbf{Team \& Execution (25\%)}: How capable the team is and if they can actually build their solution
+    \item \textbf{Pitch Quality (15\%)}: How well they present their idea and communicate their vision
 \end{enumerate}
 
-Quantitative scores are generated on a standardized 1-10 scale for each dimension, accompanied by qualitative feedback containing specific improvement recommendations. The final assessment emerges through weighted aggregation of dimensional scores.
+Each area gets a score from 1 to 10, and then Pista calculates a final score using the weights above. The system also provides written feedback to explain the scores and reasoning behind each assessment. The weighted scoring approach ensures that the most important aspects of a startup pitch have greater influence on the final evaluation. This systematic approach helps maintain consistency across different pitches and evaluation sessions.
 
 \subsubsection{Winds2Ventures Evaluation Framework}
 
-The platform operates through a nine-criteria assessment methodology focused on investment readiness and commercial viability indicators. Each evaluation criterion contributes to an aggregate "Investibility" rating that reflects overall investment attractiveness from a professional investor perspective.
+W2V uses nine different criteria in its AI-powered evaluation system, focusing on aspects like problem clarity, solution viability, market analysis, team quality, and business model validation. The platform uses automated analysis trained on investment patterns and business assessment methodologies. The system appears to incorporate conservative evaluation approaches that reflect real-world investment considerations and startup challenges.
 
-The evaluation criteria encompass:
-\begin{enumerate}
-    \item \textbf{Problem Clarity}: Assessment of problem definition precision and market relevance
-    \item \textbf{Solution Viability}: Analysis of proposed solution feasibility and effectiveness potential
-    \item \textbf{Market Size Estimation}: Evaluation of addressable market opportunity and growth projections
-    \item \textbf{Competitive Advantages}: Examination of differentiation strategies and sustainable positioning
-    \item \textbf{Team Assessment}: Analysis of team competencies, experience, and execution capabilities
-    \item \textbf{Business Model Viability}: Investigation of revenue mechanisms and sustainability factors
-    \item \textbf{Go-To-Market Strategy}: Review of market entry approaches and scaling methodologies
-    \item \textbf{Competitive Landscape}: Assessment of market dynamics and competitive positioning
-    \item \textbf{Funding Ask and Use}: Analysis of capital requirements and allocation strategies
-\end{enumerate}
+The key difference is that W2V uses a different algorithmic approach compared to Pista's evaluation methodology. This system tends to be more conservative in its assessments, applying stricter evaluation criteria when rating pitch quality. The evaluation algorithm appears to weight risk factors and practical business challenges more heavily in its assessment process. The system's conservative approach reflects evaluation patterns that prioritize cautious assessment of startup viability and market potential.
 
-The W2V evaluation process involves experienced investors and business professionals who contribute extensive industry knowledge and practical investment experience. This human expertise emphasizes realistic market dynamics and execution risk factors, typically resulting in more conservative assessment patterns than algorithmic evaluation approaches.
-
-\subsection{Score Mapping and Comparison Methodology}
+\subsection{Comparative Analysis Approach}
 \label{subsec:methodology-approach}
 
-The divergent evaluation frameworks presented methodological challenges for direct comparative analysis. To address these complexities, a conservative analytical approach was adopted that focused primarily on overall assessment scores rather than attempting complex dimensional mappings between disparate criteria sets.
+Since both systems work differently, a way to compare them fairly was needed. The decision was made to focus on the final overall scores that each system produces as the primary basis for comparison. This approach allows the systems' ultimate assessments to be compared regardless of their different internal processes. The comparison method focuses on whether both systems reach similar conclusions about pitch quality.
 
-The comparison methodology centered on Pista's weighted overall scores against W2V's Investibility ratings. Both systems generate standardized 1-10 scale assessments, facilitating direct numerical comparison without requiring complex score transformations or normalization procedures. This approach preserved the integrity of each system's underlying evaluation philosophy while enabling meaningful quantitative analysis.
+Both systems give final scores on a 1-10 scale, which makes it possible to compare them directly. Pista creates its final score by combining its four area scores with weights, while W2V gives an overall "Investibility" rating based on its nine criteria. Even though they calculate scores differently, the common 1-10 scale lets me compare how well they agree.
 
 \section{Results and Analysis}
-\label{sec:results}
+\label{sec:inter-rater-reliability}
 
-\subsection{Overall Performance Patterns}
-\label{subsec:performance}
+This section shows the statistical analysis of how well Pista and W2V agree with each other. Cohen's kappa coefficient was used as the main statistical measure, which is better than just looking at percentages because it accounts for agreements that happen by chance.
 
-The comparative analysis revealed systematic differences between evaluation systems that extend beyond random variation, suggesting fundamental divergences in assessment philosophy and methodology. These patterns emerged consistently across all evaluated pitches, indicating structural rather than circumstantial differences.
+The scores were grouped into three levels to make the comparison easier: Below Average (1-4), Average (5-7), and Good (8-10). This helps show whether both systems consistently identify which pitches are strong, average, or weak.
 
-Across all 22 evaluated pitches, Pista consistently generated higher scores than W2V, with no exceptions observed. The average scoring differential measured +1.70 points, representing a substantial and systematic bias that suggests underlying philosophical differences in evaluation approach rather than random measurement variation.
+The following table shows the complete statistical analysis of the 22 pitches:
 
-\begin{table}[ht]
-    \centering
-    \caption{Comprehensive Score Comparison Analysis}
-    \label{tab:score-comparison}
-    \begin{tabular}{lccc}
-        \toprule
-        \textbf{System} & \textbf{Average Score} & \textbf{Score Range} & \textbf{Standard Deviation} \\
-        \midrule
-        Pista & 6.81/10 & 6.0-8.0 & 0.50 \\
-        Winds2Ventures & 5.11/10 & 4.3-6.4 & 0.63 \\
-        \midrule
-        \textbf{Difference} & +1.70 & - & - \\
-        \bottomrule
-    \end{tabular}
+\begin{table}[h]
+\centering
+\caption{Cohen's Kappa Analysis: Pista vs Winds2Ventures}
+\label{tab:cohens-kappa}
+\begin{tabular}{lr}
+\hline
+\textbf{Metric} & \textbf{Value} \\
+\hline
+Cohen's Kappa & 0.450 \\
+Interpretation & Moderate Agreement \\
+Observed Agreement & 63.6\% (14/22 pitches) \\
+Mean Score Difference & 0.17 (Pista higher) \\
+\hline
+\textbf{Pista Scores} & \\
+Mean & 5.36 \\
+Standard Deviation & 0.70 \\
+\hline
+\textbf{W2V Scores} & \\
+Mean & 5.20 \\
+Standard Deviation & 0.72 \\
+\hline
+\textbf{Category Distribution} & \\
+Pista Below Average (1-4) & 6 pitches \\
+Pista Average (5-7) & 10 pitches \\
+Pista Good (8-10) & 6 pitches \\
+W2V Below Average (1-4) & 9 pitches \\
+W2V Average (5-7) & 8 pitches \\
+W2V Good (8-10) & 5 pitches \\
+\hline
+\end{tabular}
 \end{table}
 
-Analysis of scoring distributions revealed significant differences in discrimination capabilities between the evaluation systems.
+\subsection{Statistical Interpretation}
 
-Pista scores demonstrated clustering within a relatively narrow 6.0-8.0 range, producing a standard deviation of 0.50. In contrast, W2V scores exhibited broader distribution spanning 4.3-6.4 points with higher variance ( = 0.63). These distribution patterns suggest different approaches to quality discrimination, with W2V demonstrating greater sensitivity to quality variations across evaluated pitches.
+The Cohen's kappa coefficient of 0.450 shows moderate agreement between Pista and W2V according to standard statistical interpretation guidelines. This result means the systems agree much more than they would by random chance, but there are still some systematic differences in how they evaluate pitches. The moderate agreement level suggests that both systems capture similar underlying patterns in pitch quality. However, the differences indicate that each system brings unique perspectives to the evaluation process.
 
-\subsection{Systematic Bias Identification}
-\label{subsec:bias}
+The systems agreed on 63.6\% of the pitches (14 out of 22), meaning both systems put the pitch in the same category (below average, average, or good). This suggests that different AI evaluation systems can identify similar patterns in pitch quality assessment about two-thirds of the time.
 
-Detailed pattern analysis exposed several consistent systematic biases that significantly influence GenAI evaluation reliability and practical deployment viability.
+The analysis shows that Pista gives slightly higher scores on average (0.17 points higher). This pattern suggests that different AI evaluation systems can have distinct scoring tendencies, with some being more optimistic while others apply more conservative assessment criteria.
 
-\subsubsection{Systematic Optimism Bias}
+\subsection{Score Distribution Analysis}
 
-The most prominent pattern is optimism in GenAI scoring. As noted above, Pista scored higher in all 22 cases (+1.70 average difference). This directional bias spans pitch quality and industry sectors, which suggests systematic rather than circumstantial influences.
+Looking at how the systems categorized the pitches shows clear differences in their evaluation tendencies. W2V rated more pitches as "Below Average" (9 pitches) compared to Pista (6 pitches), while Pista rated more pitches as "Good" (6 pitches) compared to W2V (5 pitches). This pattern suggests that W2V applies stricter evaluation criteria when assessing pitch quality. The differences reflect different algorithmic approaches to weighing risk factors and business viability in the evaluation process.
 
-Several factors likely contribute to this optimism bias. Training data composition may overrepresent successful startup examples, creating algorithmic tendencies toward positive assessment. Additionally, GenAI systems may lack the sophisticated risk evaluation capabilities that characterize experienced human evaluators, who integrate market realities and execution challenges developed through practical investment experience.
+This pattern confirms that W2V uses more conservative evaluation criteria, which appears to be built into its assessment algorithm. The system seems designed to apply stricter standards when evaluating startup potential, possibly incorporating more cautious approaches to risk assessment and business viability analysis.
 
-\subsubsection{Limited Discriminative Power}
+Both systems put most pitches in the "Average" category, which is what you'd expect for university competition participants. These student ventures usually have good ideas and potential, but they still need more development before they're ready for investment.
 
-A striking pattern emerged in score distribution analysis: 66.7\% of Pista evaluations (15/22 pitches) received identical overall scores of exactly 7.0/10. This substantial clustering indicates critical algorithmic limitations in quality differentiation capabilities. Rather than reflecting genuine quality similarities among evaluated pitches, this pattern suggests algorithmic convergence toward a default "safe" assessment value.
+\subsection{Discussion and Implications}
 
-Such limited discrimination presents significant challenges for practical investment applications. Professional investors require granular quality distinctions to effectively prioritize opportunities and allocate limited evaluation resources. When most assessments converge on identical scores, the system fails to provide the nuanced discrimination essential for informed decision-making.
+These results show that different AI evaluation systems can produce meaningful assessments of startup pitches, with each system bringing distinct evaluation characteristics. The moderate agreement level demonstrates that AI systems can capture many important patterns in pitch evaluation consistently. However, the systematic differences suggest that different AI evaluation approaches can have unique characteristics and assessment tendencies. The findings highlight the diversity that exists within AI-powered evaluation systems and how different algorithmic approaches can complement each other.
 
-\begin{table}[ht]
-    \centering
-    \caption{Systematic Bias Analysis}
-    \label{tab:bias-analysis}
-    \begin{tabular}{lccc}
-        \toprule
-        \textbf{Bias Category} & \textbf{Frequency} & \textbf{Impact Magnitude} & \textbf{Strategic Implications} \\
-        \midrule
-        GenAI Evaluation Optimism & 22/22 (100\%) & +1.70 points average & Systematic over-confidence \\
-        Limited GenAI Discrimination & 15/22 (66.7\%) & Identical scores & Insufficient quality differentiation \\
-        Commercial Conservatism & 22/22 (100\%) & Consistent lower scoring & Risk-aware assessment \\
-        \bottomrule
-    \end{tabular}
-\end{table}
+The moderate agreement shows that Pista captures many of the same patterns that other AI evaluation systems identify when assessing startup pitches. This makes the system valuable for situations where you need to evaluate many pitches consistently, like initial screening for competitions or providing standardized feedback to entrepreneurs. The AI system can process large volumes of pitches quickly while maintaining consistent evaluation criteria. These capabilities make AI evaluation particularly useful for high-volume assessment scenarios.
 
-\subsection{Dimensional Performance Analysis}
-\label{subsec:dimensional}
+However, the different scoring tendencies between AI systems suggests that using multiple evaluation approaches can provide more comprehensive assessment perspectives. Different AI systems may weight various factors differently, leading to more balanced overall evaluations. The combination of different algorithmic approaches can help identify both optimistic and conservative viewpoints in startup assessment. Understanding these differences helps users interpret AI evaluation results more effectively.
 
-\begin{table}[ht]
-    \centering
-    \caption{Pista Dimensional Performance Analysis}
-    \label{tab:dimensional-analysis}
-    \begin{tabular}{lcc}
-        \toprule
-        \textbf{Dimension} & \textbf{Pista Average} & \textbf{Performance Characteristics} \\
-        \midrule
-        Problem-Solution Fit & 7.1/10 & Highest dimensional performance \\
-        Business Model \& Market & 6.9/10 & Consistently strong assessment \\
-        Pitch Quality & 6.8/10 & Stable evaluation patterns \\
-        Team \& Execution & 6.6/10 & Comparatively lower performance \\
-        \bottomrule
-    \end{tabular}
-\end{table}
-
-Dimensional analysis exposed systematic performance variations across evaluation categories, revealing specific algorithmic strengths and limitations. Problem-Solution Fit achieved the highest average scores (7.1/10), suggesting that GenAI systems demonstrate particular effectiveness in analyzing business logic structures and solution viability assessments.
-
-Conversely, Team \& Execution consistently received the lowest dimensional scores (6.6/10), indicating algorithmic challenges in assessing human capital factors. This performance gap likely reflects GenAI limitations in evaluating intangible elements such as leadership depth, team dynamics, and execution track records. These are factors that human evaluators often assess through experience based pattern recognition and interpersonal judgment.
-
-\section{Case Study Analysis}
-
-\begin{table}[ht]
-    \centering
-    \caption{Comparative Case Study Analysis}
-    \label{tab:case-studies}
-    \begin{tabular}{lp{3cm}cccp{4cm}}
-        \toprule
-        \textbf{Company} & \textbf{Description} & \textbf{Pista Score} & \textbf{W2V Score} & \textbf{Difference} & \textbf{Primary Evaluation Focus Difference} \\
-        \midrule
-        Coontent & Marketing automation B2B SaaS platform & 6.5/10 & 5.3/10 & +1.2 & GenAI: Innovation potential vs W2V: Market competition \\
-        \midrule
-        Serenity & GenAI-powered mental wellness platform & 6.9/10 & 6.1/10 & +0.8 & GenAI: Market opportunity vs W2V: Regulatory challenges \\
-        \midrule
-        CampoRapido & Agricultural technology platform & 7.0/10 & 4.5/10 & +2.5 & GenAI: Problem-solution fit vs W2V: Market readiness \\
-        \midrule
-        Corptech & Industrial technology platform & 8.0/10 & 6.0/10 & +2.0 & GenAI: Technical innovation vs W2V: Execution readiness \\
-        \bottomrule
-    \end{tabular}
-\end{table}
-
-Case study analysis across diverse industry sectors revealed three distinct patterns that illuminate fundamental evaluation differences. First, scoring differentials ranged from 0.8 to 2.5 points, with regulated industries (Serenity: +0.8) showing smaller gaps and agricultural technology (CampoRapido: +2.5) exhibiting the largest disparities. Second, evaluation focus differed systematically: Pista emphasized innovation potential and technical merit, while W2V prioritized practical deployment challenges including regulatory compliance, market readiness, and execution risks. Third, even high-performing pitches like Corptech, which received the highest scores from both systems (8.0 Pista, 6.0 W2V), maintained substantial scoring gaps (+2.0), confirming that evaluation differences stem from systematic philosophical divergences rather than pitch quality variations.
-
-\section{Discussion and Deployment Implications}
-
-The comparison revealed consistent differences between Pista and W2V scoring approaches. As shown above, Pista scores were higher on average, which suggests a tendency toward optimistic assessment. The following sections discuss practical implications and use cases.
-
-\subsection{Systematic Bias Analysis}
-\label{sec:bias-analysis}
-
-The comparison reveals three main patterns in how Pista differs from W2V in its evaluation approach.
-
-\subsubsection{Universal GenAI Optimism}
-\label{subsec:optimism}
-
-Pista's consistent higher scoring (22/22 pitches) was interpreted as suggesting a training bias toward positive examples; it was also considered to indicate insufficient risk assessment capabilities. This optimism was identified as limiting utility for investment decision contexts.
-
-The universal directional bias indicates that GenAI systems may be fundamentally designed to highlight opportunities rather than assess risks. This could result from training data that emphasizes successful startup characteristics without adequate representation of failure patterns. Commercial evaluators, by contrast, integrate market realities and execution challenges that create more conservative assessments.
-
-\subsubsection{Score Convergence Limitations}
-\label{subsec:convergence}
-
-The concentration of 66.7\% of scores at exactly 7.0/10 was identified as indicating critical algorithmic limitations in quality differentiation. This clustering was interpreted as suggesting the evaluation model defaults to a "safe" middle-high score regardless of actual pitch quality variations.
-
-This convergence pattern creates several practical challenges. Investment decisions require discrimination between opportunities to allocate resources effectively. When most evaluations receive identical scores, the system fails to provide the granular assessment needed for professional deployment. The algorithmic tendency toward convergence may reflect conservative design choices that prioritize consistency over discrimination.
-
-\subsubsection{Risk Assessment Variations}
-\label{subsec:risk}
-
-Maximum disagreements occurred in technology and service platforms where commercial evaluators emphasized execution risks and market competition factors that GenAI evaluation appears to underweight.
-
-GenAI systems focus on innovation potential and technical merit while underweighting execution challenges and competitive dynamics. Commercial platforms incorporate broader risk factors developed through investment experience. This difference reflects fundamental evaluation philosophy variations rather than calibration issues.
-
-\subsection{Deployment Strategy Implications}
-\label{sec:deployment}
-
-The systematic differences suggest complementary rather than competing deployment strategies. Given GenAI's operational advantages (speed, cost, accessibility) and limitations (optimism bias, poor discrimination), strategic deployment becomes crucial.
-
-\subsubsection{Appropriate GenAI Applications}
-\label{subsec:ai-applications}
-
-GenAI evaluation systems demonstrate clear advantages for specific use cases that align with their operational strengths and philosophical characteristics:
-
-\textbf{Early-stage entrepreneur feedback and pitch development support}: The systematic optimism bias becomes advantageous for encouraging entrepreneurs and providing constructive feedback without discouraging innovation attempts.
-
-\textbf{High-volume initial screening where broad categorization suffices}: The speed and cost advantages enable processing large numbers of pitches where precise discrimination is less critical than general quality assessment.
-
-\textbf{Educational contexts where encouraging feedback promotes learning}: The consistent scoring patterns provide stable feedback that supports learning environments without creating discouraging assessment variations.
-
-\subsubsection{Commercial Evaluation Requirements}
-\label{subsec:commercial-requirements}
-
-Commercial evaluation platforms demonstrate capabilities that remain essential for professional investment contexts:
-
-\textbf{Investment decision-making requiring realistic risk assessment}: The broader score distribution and conservative assessment approach align with professional investment requirements for risk evaluation.
-
-\textbf{Applications demanding granular quality discrimination}: The varied scoring patterns enable the discrimination needed for resource allocation and opportunity prioritization in competitive markets.
-
-\textbf{Complex market sectors}: Technology and B2B services may benefit from the domain expertise that platforms like W2V provide through experienced evaluators.
-
-\subsubsection{Hybrid Strategy Optimization}
-\label{subsec:hybrid}
-
-Using GenAI tools like Pista for initial feedback and platforms like W2V for more detailed assessment could combine the speed of GenAI with the nuanced evaluation of experienced assessors.
-
-The hybrid strategy addresses both system limitations and advantages. GenAI systems handle high-volume screening efficiently while commercial systems provide the discrimination and risk assessment needed for investment decisions. This complementary approach maximizes overall evaluation system effectiveness.
-
-\subsection{Evaluation Quality vs. Operational Efficiency Trade-offs}
-\label{sec:tradeoffs}
-
-The evaluation reveals a fundamental trade-off between operational efficiency and assessment quality. GenAI evaluation provides substantial operational advantages but at the cost of evaluation precision and realistic risk assessment.
-
-\subsubsection{Operational Advantages}
-\label{subsec:advantages}
-
-GenAI's speed (30-60 seconds), cost (\$0.10-0.15), and availability (24/7) enable applications impossible with traditional evaluation methods, democratizing access to startup feedback. These advantages create entirely new use cases that were previously economically unfeasible.
-
-The operational efficiency enables applications such as real-time pitch feedback during development, continuous iteration support, and accessible evaluation for entrepreneurs who cannot afford professional assessment services. This democratization effect represents a significant value creation opportunity.
-
-\subsubsection{Quality Limitations}
-\label{subsec:limitations}
-
-Score convergence and optimism bias severely limit GenAI utility for contexts requiring discriminative assessment or realistic risk evaluation. These limitations constrain professional deployment opportunities where quality assessment is critical.
-
-The quality limitations become particularly problematic when AI evaluation results influence significant decisions. Investment contexts require accurate risk assessment and quality discrimination that current GenAI systems cannot provide reliably. This constrains professional deployment until these limitations are addressed.
-
-\subsubsection{Strategic Trade-off Management}
-\label{subsec:strategy}
-
-These differences suggest GenAI evaluation and traditional platforms serve different purposes, with each being more suitable for specific use cases rather than directly competing.
-
-Successful deployment requires matching GenAI capabilities with appropriate use cases while using commercial evaluation where quality requirements exceed GenAI capabilities. This strategic approach enables value creation through GenAI advantages while maintaining quality standards where needed.
-
-\section{Threats to Validity}
-\label{sec:threats}
-
-This section reflects on limitations that may affect interpretation of results.
-
-\subsection{Internal Validity}
-The evaluation uses identical pitch content across systems, but prompts and calibration choices may influence outcomes. We reduced this risk with rubric anchors, evidence gating, and a fixed temperature, yet residual effects may remain. Future work can ablate each calibration component to measure its impact.
-
-\subsection{Construct Validity}
-The four-dimension rubric approximates startup quality but cannot capture all factors. Some human judgments, such as leadership depth and execution history, are hard to encode. We mitigated this by adding a required Q\&A step to collect missing evidence before scoring.
-
-\subsection{External Validity}
-The dataset contains 22 university competition pitches. Results may not generalize to all sectors or later-stage ventures. Expanding the dataset and including investor-written memos would improve generalizability.
-
-\subsection{Conclusion Validity}
-We report descriptive statistics and qualitative patterns. Larger samples and rank-correlation tests would strengthen claims about dispersion and agreement. We recommend Kendall's $\tau$ for future studies.
-
-\section{Summary}
-\label{sec:summary}
-
-This comparative evaluation examined systematic differences between GenAI and commercial startup assessment methodologies through analysis of 22 university entrepreneurship competition pitches. The investigation revealed fundamental divergences in evaluation philosophy and practical capabilities between automated and human expert assessment approaches.
-
-\textbf{Principal Findings}:
-\begin{itemize}
-    \item Universal optimism bias: Pista scored higher than W2V in all cases without exception (22/22 pitches)
-    \item Substantial scoring differential: +1.70 average point difference (Pista: 6.81/10, W2V: 5.11/10)
-    \item Algorithmic convergence limitation: 66.7\% of GenAI evaluations clustered at identical 7.0/10 scores
-    \item Commercial platform demonstrated broader discrimination: 4.3-6.4 scoring range with higher variance
-    \item Systematic GenAI tendency toward middle-high score convergence independent of actual quality variations
-\end{itemize}
-
-The findings suggest that GenAI evaluation systems like Pista and platforms like W2V have different strengths, making them suitable for different purposes in startup assessment.
+The best approach may be to use multiple AI evaluation systems to get different perspectives on startup potential, combining their insights to create more comprehensive assessments. This multi-system approach gets the benefits of AI efficiency and consistency while capturing different evaluation methodologies and assessment criteria. Understanding how different AI systems approach evaluation helps users make more informed decisions about startup potential.

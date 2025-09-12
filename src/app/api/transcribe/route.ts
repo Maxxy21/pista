@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getOpenAI } from '@/lib/utils';
+import { getOpenAI, OpenAIConfigError } from '@/lib/utils';
 import { withAuth, AuthenticatedRequest } from '@/lib/auth/api-auth';
 import { withRateLimit, transcriptionRateLimiter } from '@/lib/rate-limit/rate-limiter';
 import { validateFile, FILE_VALIDATION_CONFIGS } from '@/lib/validation/file-validator';
@@ -43,6 +43,13 @@ export const POST = withRateLimit(transcriptionRateLimiter)(withAuth(async (req:
         return NextResponse.json({ text: transcription });
     } catch (error: any) {
         console.error('Transcription error:', error);
+
+        if (error instanceof OpenAIConfigError) {
+            return NextResponse.json({
+                error: error.message,
+                code: error.code
+            }, { status: 503 })
+        }
 
         // Sanitized error messages for production
         return NextResponse.json({ 

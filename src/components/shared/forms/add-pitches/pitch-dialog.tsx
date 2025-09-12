@@ -23,7 +23,7 @@ export function PitchDialog({
   orgId,
   children,
   className,
-  enableQuestions = false,
+  enableQuestions = true,
 }: PitchDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
   const stepNav = useStepNavigation();
@@ -57,17 +57,18 @@ export function PitchDialog({
     setIsOpen(false);
   };
 
-  // form and navigation objects expose stable function references; only reset when dialog closes
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  // Reset form and navigation when dialog closes
+  const { resetForm } = form;
+  const { resetNavigation } = stepNav;
   useEffect(() => {
     if (!isOpen) {
       const timeout = setTimeout(() => {
-        form.resetForm();
-        stepNav.resetNavigation();
+        resetForm();
+        resetNavigation();
       }, 300);
       return () => clearTimeout(timeout);
     }
-  }, [isOpen]);
+  }, [isOpen, resetForm, resetNavigation]);
 
   const isContinueDisabled =
     form.isProcessing ||

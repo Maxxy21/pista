@@ -1,0 +1,73 @@
+\section{Inter-Rater Reliability Analysis}
+\label{sec:inter-rater-reliability}
+
+This section examines the statistical agreement between Pista and Winds2Ventures evaluation systems to understand the consistency of their assessment approaches. Inter-rater reliability analysis provides quantitative measures of agreement that complement the comparative scoring patterns presented earlier.
+
+Understanding agreement levels between evaluation systems helps identify areas where automated and commercial assessment approaches converge or diverge. This analysis informs practical deployment decisions by revealing which evaluation dimensions show reliable agreement and which require careful interpretation.
+
+\subsection{Cohen's Kappa Methodology}
+\label{subsec:kappa-methodology}
+
+Cohen's kappa coefficient measures inter-rater agreement for categorical ratings while accounting for chance agreement. The metric ranges from -1 to +1, where values above 0 indicate agreement better than chance, and higher values represent stronger agreement.
+
+For this analysis, continuous scores from both systems were converted to categorical ratings using consistent thresholds: Poor (1.0-3.9), Fair (4.0-5.9), Good (6.0-7.9), and Excellent (8.0-10.0). This categorization enables meaningful comparison while preserving the ordinal nature of quality assessments.
+
+The kappa calculation follows the standard formula: κ = (P₀ - Pₑ) / (1 - Pₑ), where P₀ represents observed agreement and Pₑ represents expected chance agreement. Standard interpretation guidelines classify agreement levels as: Slight (0.01-0.20), Fair (0.21-0.40), Moderate (0.41-0.60), Substantial (0.61-0.80), and Almost Perfect (0.81-1.00).
+
+\subsection{Overall Agreement Results}
+\label{subsec:overall-agreement}
+
+The overall agreement analysis reveals moderate consistency between the two evaluation systems across all assessed pitches.
+
+\begin{table}[ht]
+    \centering
+    \caption{Inter-Rater Reliability Analysis: Cohen's Kappa Results}
+    \label{tab:kappa-results}
+    \begin{tabular}{lccc}
+        \toprule
+        \textbf{Evaluation Dimension} & \textbf{Cohen's Kappa (κ)} & \textbf{Agreement Level} & \textbf{95\% CI} \\
+        \midrule
+        Overall Assessment & 0.450 & Moderate & [0.28, 0.62] \\
+        Problem-Solution Fit & 0.267 & Fair & [0.08, 0.45] \\
+        Business Model \& Market & 0.192 & Slight & [-0.01, 0.39] \\
+        Team \& Execution & 0.055 & Slight & [-0.15, 0.26] \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+Overall assessment agreement achieved moderate levels (κ = 0.450), indicating that both systems tend to place pitches in similar quality categories more often than would occur by chance. This moderate agreement suggests some underlying consistency in how the systems evaluate startup quality, despite the systematic scoring differences identified earlier.
+
+The confidence intervals indicate statistical significance for overall assessment and Problem-Solution Fit dimensions, while Business Model \& Market and Team \& Execution dimensions show wider intervals that include zero. This pattern suggests varying reliability across different evaluation aspects.
+
+\subsection{Dimensional Agreement Analysis}
+\label{subsec:dimensional-agreement}
+
+Agreement patterns vary substantially across evaluation dimensions, revealing specific areas where the systems show convergent or divergent assessment approaches.
+
+Problem-Solution Fit achieved the highest dimensional agreement (κ = 0.267, Fair agreement), suggesting both systems use similar criteria when evaluating business logic and solution viability. This convergence aligns with the dimensional analysis showing this area as Pista's strongest performance category.
+
+Business Model \& Market dimensions showed only slight agreement (κ = 0.192), indicating fundamental differences in how the systems assess market opportunity and revenue model viability. The low agreement reflects different emphasis on market risks versus opportunity potential between automated and commercial evaluation approaches.
+
+Team \& Execution demonstrated the lowest agreement (κ = 0.055, Slight agreement), confirming significant divergence in human capital assessment capabilities. This finding supports earlier observations about GenAI limitations in evaluating intangible team factors that human evaluators assess through experience-based pattern recognition.
+
+\subsection{Agreement Interpretation and Implications}
+\label{subsec:agreement-implications}
+
+The reliability analysis reveals that agreement levels correspond directly with evaluation complexity and human judgment requirements. Dimensions involving concrete business logic show higher agreement, while those requiring subjective assessment of human factors show minimal consensus.
+
+The moderate overall agreement (κ = 0.450) indicates partial convergence between automated and commercial evaluation approaches. This level suggests the systems often place pitches in similar quality categories, supporting the complementary deployment strategy discussed earlier rather than direct substitution.
+
+The dimensional variation in agreement levels provides practical guidance for system deployment. Problem-Solution Fit assessments show sufficient agreement to support cross-system validation, while Team \& Execution evaluations require careful interpretation given minimal agreement between approaches.
+
+These findings validate the hybrid deployment strategy where GenAI systems handle initial assessment while commercial platforms provide specialized evaluation for complex human-centered factors. The reliability analysis confirms that each system contributes distinct value rather than providing redundant assessment capabilities.
+
+\subsection{Limitations of Reliability Analysis}
+\label{subsec:reliability-limitations}
+
+Several methodological limitations affect the interpretation of these reliability results. The categorical conversion process necessarily reduces score precision and may mask subtle agreement patterns that exist at finer granularity levels.
+
+The sample size of 22 pitches, while sufficient for initial analysis, limits statistical power for detecting smaller effect sizes. Confidence intervals reflect this limitation, particularly for dimensional analyses where agreement appears borderline significant.
+
+The categorical thresholds used for kappa calculation were chosen for balanced distribution but may not reflect meaningful quality distinctions in professional investment contexts. Different threshold selections could yield varying agreement levels, affecting interpretation of system convergence.
+
+Future reliability studies would benefit from larger sample sizes, multiple threshold sensitivity analyses, and weighted kappa measures that account for the ordinal nature of quality assessments. These enhancements would provide more robust statistical evidence for agreement patterns across evaluation systems.

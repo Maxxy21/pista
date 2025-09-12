@@ -15,7 +15,7 @@ export interface FileValidationOptions {
 export const FILE_VALIDATION_CONFIGS: Record<string, FileValidationOptions> = {
   AUDIO: {
     maxSize: 25 * 1024 * 1024, // 25MB
-    allowedTypes: ['audio/mpeg', 'audio/wav', 'audio/m4a', 'audio/mp4', 'audio/webm'],
+    allowedTypes: ['audio/mpeg', 'audio/wav', 'audio/m4a', 'audio/mp4', 'audio/webm', 'application/octet-stream'],
     allowedExtensions: ['.mp3', '.wav', '.m4a', '.mp4', '.webm'],
   },
   TEXT: {

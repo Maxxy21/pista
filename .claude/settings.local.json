@@ -24,7 +24,11 @@
       "Bash(npm test:*)",
       "Bash(git check-ignore:*)",
       "Bash(git rm:*)",
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "Bash(python:*)",
+      "Bash(pip install:*)",
+      "Bash(source:*)",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []

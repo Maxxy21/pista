@@ -1,5 +1,6 @@
 import type { Pitch } from "./pitches-grid";
 import type { PitchCardProps } from "../cards/pitch-card";
+import { normalizeTranscriptText } from "@/lib/utils/text";
 
 export function toPitchCardProps(
   pitch: Pitch,
@@ -8,7 +9,7 @@ export function toPitchCardProps(
   return {
     id: pitch._id,
     title: pitch.title,
-    text: pitch.text,
+    text: normalizeTranscriptText(pitch.text),
     authorId: pitch.userId,
     authorName: pitch.authorName,
     createdAt: pitch._creationTime,
@@ -18,4 +19,3 @@ export function toPitchCardProps(
     onClick: () => onClick(pitch._id),
   };
 }
-

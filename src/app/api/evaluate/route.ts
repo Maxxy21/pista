@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getOpenAI } from "@/lib/utils";
+import { getOpenAI, OpenAIConfigError } from "@/lib/utils";
 import { withAuth, AuthenticatedRequest } from "@/lib/auth/api-auth";
 import { withRateLimit, evaluationRateLimiter } from "@/lib/rate-limit/rate-limiter";
 import { z } from "zod";
@@ -353,6 +353,13 @@ export const POST = withRateLimit(evaluationRateLimiter)(withAuth(async (req: Au
   } catch (error) {
     console.error("Evaluation error:", error);
     
+    if (error instanceof OpenAIConfigError) {
+      return NextResponse.json({
+        error: error.message,
+        code: error.code
+      }, { status: 503 })
+    }
+
     if (error instanceof z.ZodError) {
       return NextResponse.json({ 
         error: "Invalid request data",

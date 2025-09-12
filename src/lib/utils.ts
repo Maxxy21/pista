@@ -14,11 +14,24 @@ export function formatDuration(seconds: number): string {
 
 let openai: OpenAI | null = null;
 
-export function getOpenAI() {
-  if (openai === null) {
-    openai = new OpenAI();
+export class OpenAIConfigError extends Error {
+  code: string
+  constructor(message = 'OpenAI API key is not configured. Set OPENAI_API_KEY in your environment.') {
+    super(message)
+    this.name = 'OpenAIConfigError'
+    this.code = 'OPENAI_CONFIG_ERROR'
   }
-  return openai;
+}
+
+export function getOpenAI(): OpenAI {
+  if (openai === null) {
+    const apiKey = process.env.OPENAI_API_KEY
+    if (!apiKey || apiKey.trim().length === 0) {
+      throw new OpenAIConfigError()
+    }
+    openai = new OpenAI({ apiKey })
+  }
+  return openai
 }
 
 

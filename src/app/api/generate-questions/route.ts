@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getOpenAI } from "@/lib/utils";
+import { getOpenAI, OpenAIConfigError } from "@/lib/utils";
 import { withAuth, AuthenticatedRequest } from "@/lib/auth/api-auth";
 import { withRateLimit, apiRateLimiter } from "@/lib/rate-limit/rate-limiter";
 import { z } from "zod";
+import { MODEL_NAME } from "@/lib/constants/eval";
 
 export const runtime = "edge";
 const MAX_PROMPT_CHARS = 4000;
@@ -27,7 +28,7 @@ export const POST = withRateLimit(apiRateLimiter)(withAuth(async (req: Authentic
     ].join("\n\n");
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4",
+      model: MODEL_NAME,
       messages: [
         {
           role: "system",
@@ -70,6 +71,13 @@ export const POST = withRateLimit(apiRateLimiter)(withAuth(async (req: Authentic
     return NextResponse.json({ questions });
   } catch (error) {
     console.error("Question generation error:", error);
+    
+    if (error instanceof OpenAIConfigError) {
+      return NextResponse.json({
+        error: error.message,
+        code: error.code
+      }, { status: 503 })
+    }
     
     if (error instanceof z.ZodError) {
       return NextResponse.json({ 
