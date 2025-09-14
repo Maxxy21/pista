@@ -238,6 +238,18 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
         [router, searchParams]
     );
 
+    // Helper for pitch type badge - must be defined before conditional returns
+    const renderTypeBadge = React.useCallback((type: string) => {
+        switch (type) {
+            case "audio":
+                return <Badge variant="secondary" className="bg-emerald-500/15 text-emerald-700 border-emerald-500/25 hover:bg-emerald-500/20 font-medium">Audio</Badge>;
+            case "textFile":
+                return <Badge variant="secondary" className="bg-blue-500/15 text-blue-700 border-blue-500/25 hover:bg-blue-500/20 font-medium">File</Badge>;
+            default:
+                return <Badge variant="secondary" className="bg-purple-500/15 text-purple-700 border-purple-500/25 hover:bg-purple-500/20 font-medium">Text</Badge>;
+        }
+    }, []);
+
     // Loading state while authentication is being verified
     if (!isAuthLoaded) {
         return (
@@ -252,17 +264,6 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
             </Sidebar>
         );
     }
-
-    const renderTypeBadge = React.useCallback((type: string) => {
-        switch (type) {
-            case "audio":
-                return <Badge variant="secondary" className="bg-emerald-500/15 text-emerald-700 border-emerald-500/25 hover:bg-emerald-500/20 font-medium">Audio</Badge>;
-            case "textFile":
-                return <Badge variant="secondary" className="bg-blue-500/15 text-blue-700 border-blue-500/25 hover:bg-blue-500/20 font-medium">File</Badge>;
-            default:
-                return <Badge variant="secondary" className="bg-purple-500/15 text-purple-700 border-purple-500/25 hover:bg-purple-500/20 font-medium">Text</Badge>;
-        }
-    }, []);
 
     return (
         <Sidebar collapsible="icon" className="border-r" {...props}>
