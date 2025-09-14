@@ -29,7 +29,9 @@
       "Bash(pip install:*)",
       "Bash(source:*)",
       "Bash(find:*)",
-      "Bash(npx shadcn@latest add switch:*)"
+      "Bash(npx shadcn@latest add switch:*)",
+      "Bash(ls:*)",
+      "mcp__ide__executeCode"
     ],
     "deny": [],
     "ask": []
