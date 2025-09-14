@@ -1,6 +1,5 @@
 "use client";
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import Image from "next/image";
 import { MotionValue, motion, useScroll, useTransform } from "motion/react";
 import { cn } from "@/lib/utils";
 import {
@@ -76,7 +75,7 @@ export const MacbookScroll = ({
           translateY: textTransform,
           opacity: textOpacity,
         }}
-        className="mb-20 text-center text-xl text-muted-foreground"
+        className="mb-20 text-center text-3xl font-bold text-neutral-800 dark:text-white"
       >
         {title || (
           <span>
@@ -166,11 +165,10 @@ export const Lid = ({
         className="absolute inset-0 h-96 w-[32rem] rounded-2xl bg-[#010101] p-2"
       >
         <div className="absolute inset-0 rounded-lg bg-[#272729]" />
-        <Image
+        <img
           src={src as string}
-          alt="Dashboard screenshot showing pitch evaluation interface"
-          fill
-          className="rounded-lg object-contain object-center"
+          alt="aceternity logo"
+          className="absolute inset-0 h-full w-full rounded-lg object-cover object-left-top"
         />
       </motion.div>
     </div>
