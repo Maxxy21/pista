@@ -66,9 +66,13 @@ export function PitchCard({
 
             const action = isFavorite ? onUnfavorite : onFavorite;
             const payload = workspace.mode === 'org' ? { id, orgId } : { id };
-            action(payload as any).catch(() =>
-                toast.error(`Failed to ${isFavorite ? "unfavorite" : "favorite"} pitch`)
-            );
+            action(payload as any)
+                .then(() => {
+                    toast.success(`Pitch ${isFavorite ? "removed from" : "added to"} favorites`);
+                })
+                .catch(() => {
+                    toast.error(`Failed to ${isFavorite ? "unfavorite" : "favorite"} pitch`);
+                });
         },
         [isFavorite, onFavorite, onUnfavorite, id, orgId, workspace.mode]
     );
