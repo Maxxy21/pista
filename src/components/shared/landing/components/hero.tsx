@@ -72,13 +72,16 @@ const Hero = () => {
                     </motion.div>
                 </motion.div>
 
-                {/* Macbook Scroll Animation */}
+                {/* Dashboard Preview */}
                 <div className="mt-16">
-                    <MacbookScroll
+                    <MacbookScroll 
+                        src="/img.png" 
                         title={
-                            <div className="hidden">Pitch Perfect</div>
+                            <span>
+                                See your pitch evaluations <br /> 
+                                in our professional dashboard
+                            </span>
                         }
-                        src="/img.png"
                         showGradient={false}
                     />
                 </div>

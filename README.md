@@ -1,190 +1,66 @@
-# Pista - AI-Powered Startup Pitch Evaluator
+# Pista — Startup Pitch Evaluator
 
-> An intelligent platform for evaluating and analyzing startup pitches using advanced AI technology.
+Pista is a web application that helps teams review startup pitches in a consistent way. It supports text input, audio transcription, structured evaluation, and clear reports. The focus is on reproducibility and simple, transparent scoring.
 
-## 🌟 Overview
+## Overview
 
-Pista is a comprehensive web application that leverages artificial intelligence to evaluate startup pitches through multiple modalities - audio transcription, content analysis, and structured scoring. Built with modern web technologies, it provides entrepreneurs and investors with detailed insights into pitch quality, strengths, and areas for improvement.
+- Upload a pitch as text, a text file, or an audio file.
+- Get a structured evaluation across four criteria with transparent rules.
+- See summaries, strengths, and areas for improvement.
+- Export results and review past pitches in a clean dashboard.
 
-### Key Features
+## How It Works
 
-- 🎙️ **Audio-First Approach**: Upload pitch recordings for automatic transcription
-- 🤖 **AI-Powered Analysis**: Advanced evaluation using OpenAI's latest models
-- 📊 **Structured Scoring**: Multi-dimensional scoring across key pitch criteria
-- 📈 **Visual Analytics**: Interactive charts and radar plots for performance visualization
-- 👥 **Team Collaboration**: Organization-based pitch management with Clerk authentication
-- 🎨 **Modern UI/UX**: Responsive design with dark/light theme support
-- 📱 **Mobile Optimized**: Fully responsive interface for all devices
-- ⚡ **Real-time Updates**: Live data synchronization with Convex backend
+- Input: type or paste text, upload a `.txt` file, or upload audio for transcription.
+- Processing: the app prepares the content and applies a rubric with clear anchors and scoring rules.
+- Output: JSON results are rendered as charts and summaries, and can be exported as PDF.
 
-## 🏗️ Architecture
-
-### Technology Stack
-
-**Frontend:**
-- [Next.js 15](https://nextjs.org/) - React framework with App Router
-- [TypeScript](https://www.typescriptlang.org/) - Type-safe JavaScript
-- [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS framework
-- [Framer Motion](https://www.framer.com/motion/) - Animation library
-- [Shadcn/ui](https://ui.shadcn.com/) - Modern React components
-- [Recharts](https://recharts.org/) - Data visualization library
-
-**Backend & Services:**
-- [Convex](https://convex.dev/) - Real-time backend-as-a-service
-- [Clerk](https://clerk.com/) - Authentication and user management
-- [OpenAI API](https://openai.com/) - AI-powered content analysis
-- [Vercel](https://vercel.com/) - Deployment and hosting
-
-**Development:**
-- [ESLint](https://eslint.org/) - Code linting
-- [Prettier](https://prettier.io/) - Code formatting
-- [TypeScript](https://www.typescriptlang.org/) - Static type checking
-
-### Project Structure
+## Project Structure
 
 ```
 src/
-├── app/                              # Next.js App Router
-│   ├── (dashboard)/                  # Dashboard route group
-│   │   └── dashboard/
-│   │       ├── _components/          # Private dashboard components
-│   │       ├── _hooks/              # Dashboard-specific hooks
-│   │       └── _lib/                # Dashboard utilities
-│   ├── (pitch)/                     # Pitch evaluation route group
-│   │   └── pitch/[id]/
-│   │       └── _components/         # Private pitch components
-│   ├── (auth)/                      # Authentication routes
-│   └── api/                         # API endpoints
-├── components/                      # Shared components
-│   ├── ui/                         # UI primitives
-│   └── shared/                     # Feature-based components
-│       ├── navigation/             # Navigation components
-│       ├── forms/                  # Form components
-│       ├── modals/                 # Modal dialogs
-│       └── common/                 # Common utilities
-├── hooks/                          # Custom React hooks
-├── lib/                           # Utility functions
-├── providers/                     # React context providers
-└── store/                         # State management
+├── app/                    # Next.js App Router
+│   ├── (dashboard)/        # Dashboard route group
+│   ├── (pitch)/            # Pitch details and analysis
+│   └── api/                # API endpoints (evaluate, transcribe, questions)
+├── components/             # UI and shared components
+├── hooks/                  # Custom React hooks
+├── lib/                    # Utilities, types, constants, parsing
+├── providers/              # Context providers
+└── store/                  # State management
 ```
 
-## 🚀 Getting Started
+## Getting Started
 
-### Prerequisites
-
+Requirements
 - Node.js 18+ and npm
-- OpenAI API key
-- Clerk account for authentication
-- Convex account for backend services
+- Accounts/keys for your chosen auth and backend services
 
-### Installation
+Setup
+1) Install dependencies
+   - `npm install`
+2) Configure environment
+   - Copy `.env.example` to `.env.local` and fill values
+3) Start development
+   - `npm run dev` and open `http://localhost:3000`
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/your-username/startup-pitches.git
-   cd startup-pitches
-   ```
+## Commands
+- `npm run dev` — start the dev server
+- `npm run build` — create a production build
+- `npm start` — run the built app
+- `npm run lint` — run ESLint
+- `npm test` — run unit tests (Vitest)
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
+## Evaluation Details
 
-3. **Environment Setup**
-   Create a `.env.local` file in the root directory:
-   ```bash
-   cp .env.example .env.local
-   ```
-   
-   Configure the required environment variables (see `.env.example` for details).
+Pista uses a rubric with anchors and simple rules to avoid mid‑scale defaults and to prefer evidence. Scores are returned as structured data and aggregated with stable, documented weights. Prompts, model names, and temperatures are versioned in code so results are repeatable.
 
-4. **Setup Backend Services**
-   
-   **Convex Setup:**
-   ```bash
-   npx convex dev
-   ```
-   
-   **Clerk Setup:**
-   - Create a Clerk application
-   - Configure authentication providers
-   - Add your Clerk keys to `.env.local`
+## Security Notes
 
-5. **Start Development Server**
-   ```bash
-   npm run dev
-   ```
-   
-   Open [http://localhost:3000](http://localhost:3000) in your browser.
+- Authentication and organization scoping are enforced on protected routes.
+- API endpoints validate inputs and apply rate limits.
+- Responses include standard security headers.
 
-## 🔧 Development
+## Acknowledgements
 
-### Available Scripts
-
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run start` - Start production server
-- `npm run lint` - Run ESLint
-
-### Code Quality
-
-The project maintains high code quality standards through:
-
-- **TypeScript** for type safety
-- **ESLint** for code linting
-- **Conventional Commits** for semantic versioning
-
-## 📊 Features Deep Dive
-
-### Pitch Analysis Pipeline
-
-1. **Audio Upload & Transcription**
-   - Support for multiple audio formats
-   - AI-powered transcription using Whisper API
-   - Real-time processing feedback
-
-2. **Content Analysis**
-   - Multi-criteria evaluation framework
-   - Natural language processing for insights
-   - Structured scoring across dimensions
-
-3. **Visualization & Reporting**
-   - Interactive radar charts for performance metrics
-   - Detailed analysis breakdowns
-   - Exportable reports (PDF generation)
-
-### Dashboard Features
-
-- **Pitch Library**: Organized view of all pitches
-- **Search & Filtering**: Advanced search capabilities
-- **Team Management**: Organization-based access control
-- **Analytics**: Performance tracking and insights
-
-## 🔐 Security & Privacy
-
-- **Authentication**: Secure user management with Clerk
-- **Data Protection**: End-to-end encryption for sensitive data
-- **API Security**: Rate limiting and input validation
-
-## 🚀 Deployment
-
-### Production Build
-
-```bash
-npm run build
-```
-
-### Environment Variables
-
-Ensure all production environment variables are configured:
-
-- `NEXT_PUBLIC_CONVEX_URL` - Convex deployment URL
-- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` - Clerk public key
-- `CLERK_SECRET_KEY` - Clerk secret key
-- `OPENAI_API_KEY` - OpenAI API key
-
-
-
-<div align="center">
-  <strong>Built with ❤️ for the startup community</strong>
-</div>
+This project was built to support a bachelor thesis on automated, consistent pitch evaluation. The code and documentation favor clarity, reproducibility, and small, focused modules.
