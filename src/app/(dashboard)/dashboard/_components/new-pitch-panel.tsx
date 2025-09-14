@@ -14,6 +14,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Progress } from "@/components/ui/progress"
+import { Switch } from "@/components/ui/switch"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import { useEvaluationProgress } from "@/hooks/use-evaluation-progress"
 import { streamUpload } from "@/lib/utils"
 import { FileAudio2, FileText as FileTextIcon, Upload, Loader2, Mic } from "lucide-react"
@@ -41,6 +43,35 @@ export function NewPitchPanel() {
   const evalProg = useEvaluationProgress()
   const [stage, setStage] = useState<"compose" | "questions">("compose")
   const [qa, setQa] = useState<Array<{ text: string; answer: string }>>([])
+  const [enableQA, setEnableQA] = useState(true)
+  const [textFocused, setTextFocused] = useState(false)
+
+  // Persist user preference for Q&A
+  useEffect(() => {
+    try {
+      const stored = typeof window !== 'undefined' ? localStorage.getItem('pista_enable_qa') : null
+      if (stored !== null) setEnableQA(stored === 'true')
+    } catch {}
+  }, [])
+  useEffect(() => {
+    try {
+      if (typeof window !== 'undefined') localStorage.setItem('pista_enable_qa', String(enableQA))
+    } catch {}
+  }, [enableQA])
+
+  // Clear file when switching between incompatible tab types
+  useEffect(() => {
+    if (file) {
+      const isCurrentFileCompatible = 
+        (type === "audio" && file.type.startsWith("audio/")) ||
+        (type === "textFile" && (file.type === "text/plain" || file.name.toLowerCase().endsWith(".txt")))
+      
+      if (type === "text" || !isCurrentFileCompatible) {
+        setFile(null)
+        setPreview(null)
+      }
+    }
+  }, [type, file])
 
   const canSubmitBase = useMemo(() => {
     if (!title.trim()) return false
@@ -152,7 +183,7 @@ export function NewPitchPanel() {
       const normalized = normalizeTranscriptText(sourceText)
       setPreparedText(normalized)
 
-      if (stage === 'compose') {
+      if (stage === 'compose' && enableQA) {
         evalProg.setStep('analyzing', 'Generating follow-up questions...')
         const questions = await generateQuestionsForText(normalized)
         if (questions.length > 0) {
@@ -165,7 +196,7 @@ export function NewPitchPanel() {
       }
 
       evalProg.setStep('analyzing', 'Analyzing content...')
-      const evaluation = await evaluateText(normalized, qa)
+      const evaluation = await evaluateText(normalized, enableQA ? qa : [])
 
       const id = await createPitch({
         orgId: workspace.mode === "org" ? organization?.id : undefined,
@@ -188,7 +219,7 @@ export function NewPitchPanel() {
       setProcessing(false)
       setProgress(0)
     }
-  }, [canSubmit, processing, type, file, text, title, workspace.mode, organization?.id, createPitch, router, evalProg, transcribeAudio, generateQuestionsForText, qa, stage])
+  }, [canSubmit, processing, type, file, text, title, workspace.mode, organization?.id, createPitch, router, evalProg, transcribeAudio, generateQuestionsForText, qa, stage, enableQA])
 
   return (
     <div className="max-w-4xl mx-auto p-0 md:p-2">
@@ -204,6 +235,20 @@ export function NewPitchPanel() {
           </div>
         </div>
         <CardContent className="p-4 md:p-6 space-y-5">
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <Label htmlFor="improve-qa">Improve evaluation with follow-up questions</Label>
+              <p className="text-xs text-muted-foreground">Answering 1–3 questions can improve accuracy.</p>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-muted-foreground">{enableQA ? 'On' : 'Off'}</span>
+              <Switch
+                id="improve-qa"
+                checked={enableQA}
+                onCheckedChange={setEnableQA}
+              />
+            </div>
+          </div>
           <div className="space-y-2">
             <Label htmlFor="title">Title</Label>
             <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="My awesome pitch" />
@@ -226,12 +271,12 @@ export function NewPitchPanel() {
             </TabsList>
             <TabsContent value="text" className="space-y-2">
               <Label htmlFor="pitch-text">Pitch Content</Label>
-              <div className="min-h-96 border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-background rounded-lg p-4 relative overflow-hidden">
+              <div className="h-[480px] border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-background rounded-lg p-4 relative overflow-hidden">
                 <div className="absolute inset-0 [mask-image:radial-gradient(ellipse_at_center,white,transparent)]">
                   <GridPattern />
                 </div>
                 <div className="h-full flex flex-col relative z-10">
-                  {!text && (
+                  {!text && !textFocused && (
                     <div className="flex items-center justify-center h-20 mb-4">
                       <div className="text-center space-y-2">
                         <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
@@ -241,26 +286,32 @@ export function NewPitchPanel() {
                       </div>
                     </div>
                   )}
-                  <Textarea 
-                    id="pitch-text" 
-                    value={text} 
-                    onChange={(e) => setText(e.target.value)} 
-                    placeholder="Describe your startup idea, business model, target market, and competitive advantages..." 
-                    className={`flex-1 min-h-[280px] resize-none border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 ${text ? 'mt-0 text-left' : 'mt-auto text-center'} placeholder:text-center relative z-10`}
-                  />
+                  <ScrollArea className="flex-1">
+                    <Textarea 
+                      id="pitch-text" 
+                      value={text} 
+                      onChange={(e) => setText(e.target.value)}
+                      onFocus={() => setTextFocused(true)}
+                      onBlur={() => setTextFocused(false)}
+                      placeholder={textFocused || text ? "Describe your startup idea, business model, target market, and competitive advantages..." : ""}
+                      className={`min-h-[400px] w-full resize-none border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 ${text || textFocused ? 'text-left' : 'text-center'} ${textFocused || text ? 'placeholder:text-left' : 'placeholder:text-center'} relative z-10`}
+                    />
+                  </ScrollArea>
                 </div>
               </div>
             </TabsContent>
             <TabsContent value="textFile" className="space-y-2">
               <Label>Upload Text File</Label>
-              <div className="min-h-96 border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-background rounded-lg">
-                <PrettyFileUpload accept="text/plain,.txt" maxSize={5 * 1024 * 1024} onChange={handleFilesSelected} showList={false} />
+              <div className="h-[480px] border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-background rounded-lg overflow-hidden">
+                <div className="h-full [&>div]:h-full [&>div>div]:h-full [&>div>div]:!p-4 [&>div>div]:flex [&>div>div]:items-center [&>div>div]:justify-center">
+                  <PrettyFileUpload accept="text/plain,.txt" maxSize={5 * 1024 * 1024} onChange={handleFilesSelected} showList={false} />
+                </div>
               </div>
               {file && (
                 <div className="mt-3 rounded-lg border bg-muted/20 p-3 sm:p-4">
                   <FilePreview file={file} />
                   {preview?.text && (
-                    <div className="mt-3 max-h-32 sm:max-h-48 overflow-auto rounded bg-background p-2 sm:p-3 text-xs border" style={{ textAlign: 'justify' }}>
+                    <div className="mt-3 max-h-32 sm:max-h-48 overflow-auto rounded bg-background p-2 sm:p-3 text-sm border" style={{ textAlign: 'justify' }}>
                       {normalizeTranscriptText(preview.text).slice(0, 800)}
                       {file.size > 800 && "..."}
                     </div>
@@ -283,8 +334,10 @@ export function NewPitchPanel() {
             </TabsContent>
             <TabsContent value="audio" className="space-y-2">
               <Label>Upload Audio File</Label>
-              <div className="min-h-96 border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-background rounded-lg">
-                <PrettyFileUpload accept="audio/*" maxSize={25 * 1024 * 1024} onChange={handleFilesSelected} showList={false} />
+              <div className="h-[480px] border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-background rounded-lg overflow-hidden">
+                <div className="h-full [&>div]:h-full [&>div>div]:h-full [&>div>div]:!p-4 [&>div>div]:flex [&>div>div]:items-center [&>div>div]:justify-center">
+                  <PrettyFileUpload accept="audio/*" maxSize={25 * 1024 * 1024} onChange={handleFilesSelected} showList={false} />
+                </div>
               </div>
               {file && (
                 <div className="mt-3 rounded-lg border bg-muted/20 p-3 sm:p-4">
@@ -324,21 +377,40 @@ export function NewPitchPanel() {
           )}
 
           {stage === 'questions' && (
-            <div className="space-y-3 p-4 border rounded-lg bg-muted/10">
-              <h3 className="font-medium">Follow-up Questions</h3>
-              <p className="text-sm text-muted-foreground">Answer these to improve the evaluation quality.</p>
-              {qa.map((q, idx) => (
-                <div key={idx} className="space-y-1">
-                  <Label htmlFor={`qa-${idx}`}>{q.text}</Label>
-                  <Textarea
-                    id={`qa-${idx}`}
-                    value={q.answer}
-                    onChange={(e) => setQa(prev => prev.map((it, i) => i === idx ? { ...it, answer: e.target.value } : it))}
-                    placeholder="Your answer"
-                    className="min-h-[80px]"
-                  />
-                </div>
-              ))}
+            <div className="space-y-4 p-4 border rounded-lg bg-gradient-to-br from-primary/5 to-background">
+              <div className="space-y-1">
+                <h3 className="font-medium flex items-center gap-2">
+                  <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
+                  Follow-up Questions
+                </h3>
+                <p className="text-sm text-muted-foreground">Answer these questions to get a more accurate evaluation of your pitch.</p>
+              </div>
+              <div className="space-y-4">
+                {qa.map((q, idx) => (
+                  <div key={idx} className="space-y-2 p-3 border rounded-lg bg-background/50">
+                    <Label htmlFor={`qa-${idx}`} className="font-medium text-sm">
+                      {idx + 1}. {q.text}
+                    </Label>
+                    <Textarea
+                      id={`qa-${idx}`}
+                      value={q.answer}
+                      onChange={(e) => setQa(prev => prev.map((it, i) => i === idx ? { ...it, answer: e.target.value } : it))}
+                      placeholder="Share your thoughts here..."
+                      className="min-h-[100px] resize-none"
+                    />
+                    <div className="text-xs text-muted-foreground text-right">
+                      {q.answer.length > 0 ? (
+                        <span className="text-green-600 font-medium">✓ Answered</span>
+                      ) : (
+                        <span>Answer to improve evaluation</span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="text-xs text-muted-foreground bg-muted/30 p-2 rounded border-l-2 border-primary/30">
+                <strong>Tip:</strong> More detailed answers lead to better evaluations. You can always skip if you&apos;re in a hurry.
+              </div>
             </div>
           )}
 
@@ -361,6 +433,43 @@ export function NewPitchPanel() {
                 </div>
               )}
             </Button>
+            {stage === 'questions' && (
+              <Button
+                variant="outline"
+                disabled={!canSubmitBase || processing || pending}
+                onClick={async () => {
+                  // Skip Q&A: evaluate with empty answers
+                  if (!canSubmitBase || processing) return
+                  setProcessing(true)
+                  try {
+                    evalProg.start()
+                    evalProg.setStep('analyzing', 'Analyzing content...')
+                    const evaluation = await evaluateText(preparedText || normalizeTranscriptText(text), [])
+                    const id = await createPitch({
+                      orgId: workspace.mode === "org" ? organization?.id : undefined,
+                      title,
+                      text: preparedText || normalizeTranscriptText(text),
+                      type,
+                      status: "evaluated",
+                      evaluation,
+                      questions: [],
+                    })
+                    toast.success('Pitch created')
+                    evalProg.done()
+                    router.replace(`/pitch/${id}`)
+                  } catch (e: any) {
+                    const msg = e?.message || 'Failed to create pitch'
+                    toast.error(msg)
+                    evalProg.fail(msg)
+                  } finally {
+                    setProcessing(false)
+                  }
+                }}
+                className="w-full sm:w-auto h-11 text-sm font-medium"
+              >
+                Skip Q&A
+              </Button>
+            )}
           </div>
         </CardContent>
       </Card>

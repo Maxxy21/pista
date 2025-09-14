@@ -28,7 +28,8 @@
       "Bash(python:*)",
       "Bash(pip install:*)",
       "Bash(source:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(npx shadcn@latest add switch:*)"
     ],
     "deny": [],
     "ask": []
