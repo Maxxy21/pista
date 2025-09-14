@@ -82,7 +82,6 @@ type Question = {
   answer: string;
 };
 
-// Parsing moved to '@/lib/eval/parse' for testability
 
 async function makeOpenAIRequest(prompt: string, temperature = SCORING_TEMPERATURE) {
   const openai = getOpenAI();

@@ -2,7 +2,7 @@
 
 This chapter presents the design and implementation of the Pista system to address the challenges identified in startup pitch evaluation. A web-based platform was developed that provides consistent, accessible, and scalable pitch assessments using large language models and structured evaluation frameworks. The design philosophy focused on creating a system that would be simple enough to maintain and study while delivering reliable evaluation results.
 
-Throughout this chapter, the key design decisions are described along with explanations of why specific technologies and approaches were chosen. Pista was built to solve three main problems: the inconsistency of human evaluations, limited access to expert assessment, and the difficulty of scaling evaluation processes. The implementation combines modern web technologies with AI-powered analysis to create a system that researchers and practitioners can use to evaluate startup pitches systematically.
+Throughout this chapter, the key design decisions are described along with explanations of why specific technologies and approaches were chosen. Pista was built to solve three main problems: the inconsistency of human evaluations, limited access to expert assessment, and the difficulty of scaling evaluation processes. The implementation combines modern web technologies with GenAI-powered analysis to create a system that researchers and practitioners can use to evaluate startup pitches systematically.
 
 \section{Solution Approach and Design Philosophy} \label{sec:solution-approach}
 
@@ -51,7 +51,7 @@ Each dimension evaluates five specific aspects and produces both a numeric score
 These evaluation criteria were implemented as structured constants in the system code to ensure consistent application across all pitch assessments. Listing~\ref{lst:eval-criteria} shows the precise criteria and aspect definitions coded into the evaluation system.
 
 \begin{lstlisting}[
-  language=JavaScript,
+  language=TypeScript,
   caption={Evaluation criteria and weights implementation},
   label=lst:eval-criteria,
   basicstyle=\footnotesize\ttfamily,
@@ -133,7 +133,7 @@ The use of fixed criteria and weights ensures that all evaluation results follow
 Specific rubric anchors and scoring rules were designed to address the central tendency problem observed in early testing. These implementation details ensure consistent score distributions and evidence-based assessments. Listing~\ref{lst:scoring-rules} shows the exact rubric anchors and scoring methodology implemented.
 
 \begin{lstlisting}[
-  language=JavaScript,
+  language=TypeScript,
   caption={Rubric anchors and scoring rules implementation},
   label=lst:scoring-rules,
   basicstyle=\footnotesize\ttfamily,
@@ -174,7 +174,7 @@ These scoring rules solve the central tendency problem by requiring evidence for
   \label{fig:eval-flow}
 \end{figure}
 
-\subsection{AI Integration Strategy}\label{subsec:ai-integration-strategy}
+\subsection{GenAI Integration Strategy}\label{subsec:GenAI-integration-strategy}
 GPT-4 was integrated through OpenAI's API as the core evaluation engine for Pista after evaluating several large language model options. The system was designed to use structured prompts that return constrained JSON responses, which ensures reliable parsing and consistent data formatting across all evaluations. A single-provider approach was adopted instead of ensemble evaluation or multi-provider systems due to its architectural simplicity while maintaining consistent results. This design enables focus on optimizing one evaluation pathway thoroughly rather than managing multiple competing assessments.
 
 During development, initial evaluations showed a problematic central tendency, with most scores clustering around 7 out of 10. This issue was addressed through a systematic prompt calibration process that improved both the distribution and validity of evaluation scores. Specific rubric anchors were added for the 1-10 scale that clearly define what each score level represents, which helps the model differentiate between pitches of different quality levels. Evidence gating was implemented that caps aspect scores at 4 when specific supporting details are missing from the pitch content, ensuring that higher scores require substantive evidence.
@@ -184,7 +184,7 @@ The scoring methodology evaluates individual aspects first and then computes eac
 The core evaluation prompt was designed to ensure consistent, evidence-based assessments across all criteria. The implemented prompt structure guides GPT-4 through a systematic evaluation process that prevents unsupported claims and enforces the scoring rubric. Listing~\ref{lst:main-eval-prompt} shows the main evaluation prompt template created for each criterion.
 
 \begin{lstlisting}[
-  language=JavaScript,
+  language=TypeScript,
   caption={Main evaluation prompt template for structured assessment},
   label=lst:main-eval-prompt,
   basicstyle=\footnotesize\ttfamily,
@@ -235,7 +235,7 @@ This prompt template enforces evidence-based evaluation by explicitly instructin
 A separate question generation system was also developed to gather additional evidence before conducting the main evaluation. The question generation prompt focuses on identifying the most important information gaps that could materially impact the assessment quality. Listing~\ref{lst:question-prompt} shows the question generation prompt implemented.
 
 \begin{lstlisting}[
-  language=JavaScript,
+  language=TypeScript,
   caption={Question generation prompt for evidence gathering},
   label=lst:question-prompt,
   basicstyle=\footnotesize\ttfamily,
@@ -262,13 +262,13 @@ The data model stores question-and-answer pairs with each pitch and reuses this 
 The main \texttt{pitches} table was structured to store essential pitch information including title, normalized text content, submission type, and processing status. The table also persists structured evaluation results, question-and-answer pairs, organization identifiers, user identifiers, author names, and creation timestamps. Several database indexes were implemented including \texttt{by\_org}, \texttt{by\_user}, \texttt{by\_user\_org}, and \texttt{search\_title} to support efficient queries for different access patterns. A separate \texttt{userFavorites} table was also created that links users and pitches through composite indexes, allowing users to bookmark pitches of interest without affecting the main pitch data.
 
 \subsection{API Endpoints and Server Functions}\label{subsec:api-and-server}
-The system's API architecture was designed to separate concerns between Next.js API routes that handle AI processing and Convex functions that manage data persistence and retrieval. This separation allows each component to be optimized for its specific purpose while maintaining clean interfaces between different system layers.
+The system's API architecture was designed to separate concerns between Next.js API routes that handle GenAI processing and Convex functions that manage data persistence and retrieval. This separation allows each component to be optimized for its specific purpose while maintaining clean interfaces between different system layers.
 
-Several Next.js API routes were implemented that handle the AI-powered processing components of the evaluation pipeline. The \texttt{/api/evaluate} endpoint processes pitch text using GPT-4 and runs on the Edge runtime for improved performance and global distribution. The \texttt{/api/generate-questions} endpoint was created to produce up to three follow-up questions that help gather additional evidence for evaluation. An \texttt{/api/evaluate-answers} endpoint was also built that can update evaluations based on question responses, though this was not used in the primary user interface flow to keep the process streamlined. The \texttt{/api/transcribe} endpoint handles audio file transcription using OpenAI's Whisper model\footnote{\url{https://openai.com/research/whisper}}, which enables the system to process pitch videos and audio recordings.
+Several Next.js API routes were implemented that handle the GenAI-powered processing components of the evaluation pipeline. The \texttt{/api/evaluate} endpoint processes pitch text using GPT-4 and runs on the Edge runtime for improved performance and global distribution. The \texttt{/api/generate-questions} endpoint was created to produce up to three follow-up questions that help gather additional evidence for evaluation. An \texttt{/api/evaluate-answers} endpoint was also built that can update evaluations based on question responses, though this was not used in the primary user interface flow to keep the process streamlined. The \texttt{/api/transcribe} endpoint handles audio file transcription using OpenAI's Whisper model\footnote{\url{https://openai.com/research/whisper}}, which enables the system to process pitch videos and audio recordings.
 
 Several Convex functions were developed in \texttt{convex/pitches.ts} that handle all data operations for the application. The mutation functions include \texttt{create}, \texttt{update}, \texttt{remove}, \texttt{favorite}, \texttt{unfavorite}, and \texttt{prefetch}, which cover all the data modification operations users can perform. Query functions were implemented including \texttt{get}, \texttt{getPitch}, \texttt{getFilteredPitches}, \texttt{getPitchStats}, and \texttt{exportCSV} to support different data access patterns needed by the user interface.
 
-The question generation system was designed to request one to three high-priority, evidence-seeking questions that target specific gaps in the original pitch content. The system returns a structured JSON response where each question is tagged to a specific evaluation dimension, which helps ensure comprehensive coverage of all assessment criteria. This endpoint was configured to use a lower sampling temperature for improved stability and consistency in question generation. A fallback parser was also implemented that can extract questions from plain text responses if the model doesn't return properly formatted JSON, which makes the system more robust to variations in AI model behavior. This question generation approach improves evidence capture for the calibrated scoring rubric without modifying the original pitch content.
+The question generation system was designed to request one to three high-priority, evidence-seeking questions that target specific gaps in the original pitch content. The system returns a structured JSON response where each question is tagged to a specific evaluation dimension, which helps ensure comprehensive coverage of all assessment criteria. This endpoint was configured to use a lower sampling temperature for improved stability and consistency in question generation. A fallback parser was also implemented that can extract questions from plain text responses if the model doesn't return properly formatted JSON, which makes the system more robust to variations in GenAI model behavior. This question generation approach improves evidence capture for the calibrated scoring rubric without modifying the original pitch content.
 
 The complete evaluation pipeline follows a clear sequence: transcribe audio content if needed, generate targeted questions, collect answers, perform comprehensive evaluation, and store results in the database.
 
@@ -356,7 +356,16 @@ The user interface was designed to provide an intuitive and efficient experience
 
 The component architecture was structured to promote reusability and maintainability by separating shared UI primitives under \texttt{src/components/ui} from feature-specific components under \texttt{src/components/shared}. This organization allows consistent design patterns to be maintained while building complex user interface functionality. Comprehensive list management features were implemented that support user favorites, text-based search, and filtering by evaluation scores or submission dates. The individual pitch view renders both numeric scores and qualitative feedback alongside the generated follow-up questions, providing users with complete evaluation information in a clear, structured format.
 
-Figure~\ref{fig:user-flow-pitch} illustrates the pitch creation flow designed to guide users through the evaluation process systematically. The flow handles both text input and audio file uploads, manages question generation and response collection, performs evaluation processing, and stores results in the Convex database. The question-and-answer step was made mandatory in production use because it significantly improves evaluation quality by capturing evidence that might be missing from the original pitch content. This requirement ensures that all evaluations benefit from the additional context gathering that improves scoring accuracy.
+Figure~\ref{fig:dashboard} shows the main dashboard interface where users manage their evaluated pitches. The dashboard provides an overview of all pitch submissions with their evaluation scores, search and filtering capabilities, and direct access to detailed evaluation results.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{img/dashboard}
+\caption{Main dashboard interface showing pitch management and evaluation scores}
+  \label{fig:dashboard}
+\end{figure}
+
+Figure~\ref{fig:user-flow-pitch} illustrates the pitch creation flow designed to guide users through the evaluation process systematically. The flow handles both text input and audio file uploads, manages question generation and response collection, performs evaluation processing, and stores results in the Convex database. The question-and-answer step is optional but enabled by default, as it significantly improves evaluation quality by capturing evidence that might be missing from the original pitch content. Users can choose to skip the Q&A phase if they prefer faster processing, though this may result in less comprehensive evaluations when key information is absent from the original pitch.
 
 \begin{figure}[H]
   \centering
@@ -369,7 +378,7 @@ The user interface guides users through a streamlined, consistent evaluation pro
 
 \section{Performance, Deployment, and Reliability}
 
-The system's performance characteristics were designed to handle the computational demands of AI-powered evaluation while maintaining responsive user interactions. Virtualized lists were implemented that keep the interface responsive even when users work with large datasets of evaluated pitches. Code splitting techniques were used to defer loading of non-critical user interface components, which reduces initial page load times and improves the perceived performance of the application. The reactive query system eliminates manual polling by automatically updating the interface when evaluation results become available, which provides immediate feedback to users without requiring page refreshes.
+The system's performance characteristics were designed to handle the computational demands of GenAI-powered evaluation while maintaining responsive user interactions. Virtualized lists were implemented that keep the interface responsive even when users work with large datasets of evaluated pitches. Code splitting techniques were used to defer loading of non-critical user interface components, which reduces initial page load times and improves the perceived performance of the application. The reactive query system eliminates manual polling by automatically updating the interface when evaluation results become available, which provides immediate feedback to users without requiring page refreshes.
 
 The deployment architecture was configured to optimize both performance and reliability across different environments. Critical API routes run on Vercel's Edge runtime where configured, which provides global distribution and reduced latency for evaluation requests. System configuration is managed through environment variables including the Convex database URL, Clerk authentication keys, and OpenAI API credentials. Identical code paths were ensured to execute in both development and production environments, which maintains comparability of evaluation results across different deployment contexts and enables reliable testing of system behavior.
 
