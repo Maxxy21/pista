@@ -21,11 +21,11 @@ export function DashboardLayoutClient({ children, defaultOpen }: DashboardLayout
     return (
         <SidebarProvider defaultOpen={defaultOpen}>
             <AppSidebar />
-            <SidebarInset className="overflow-hidden">
+            <SidebarInset className="overflow-hidden flex flex-col">
                 <Navbar title="Dashboard" searchValue={searchValue} setSearchValue={setSearchValue} />
-                <main className="flex min-h-0 flex-1 flex-col overflow-hidden">
+                <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
                     {children}
-                </main>
+                </div>
             </SidebarInset>
         </SidebarProvider>
     )

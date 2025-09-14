@@ -172,7 +172,7 @@ export function usePitchSubmission() {
         questions: [],
       })
       
-      toast.success('Pitch created')
+      toast.success('Pitch created successfully!')
       evalProg.done()
       router.replace(`/pitch/${id}`)
       

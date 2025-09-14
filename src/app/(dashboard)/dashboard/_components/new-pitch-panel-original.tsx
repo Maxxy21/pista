@@ -18,11 +18,13 @@ import { Switch } from "@/components/ui/switch"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useEvaluationProgress } from "@/hooks/use-evaluation-progress"
 import { streamUpload } from "@/lib/utils"
-import { FileAudio2, FileText as FileTextIcon, Upload, Loader2, Mic } from "lucide-react"
+import { FileAudio2, FileText as FileTextIcon, Upload, Mic } from "lucide-react"
 import { FileUpload as PrettyFileUpload, GridPattern } from "@/components/ui/file-upload"
 import { normalizeTranscriptText } from "@/lib/utils/text"
 import { AudioPreview } from "@/components/ui/previews/audio-preview"
 import { FilePreview } from "@/components/ui/previews/file-preview"
+import { LoadingSpinner } from "@/components/ui/loading-spinner"
+import LogoIcon from "@/components/ui/logo-icon"
 
 type PitchType = "text" | "textFile" | "audio"
 
@@ -355,25 +357,34 @@ export function NewPitchPanel() {
           </Tabs>
 
           {processing && (
-            <div className="space-y-4 p-4 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 rounded-lg border border-primary/20">
-              <div className="flex items-center gap-3">
-                <div className="relative">
-                  <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-                    <Loader2 className="w-5 h-5 text-primary animate-spin" />
-                  </div>
-                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-primary rounded-full animate-pulse" />
+            <div className="space-y-4 p-6 bg-gradient-to-br from-primary/5 via-primary/10 to-primary/5 rounded-lg border border-primary/20 backdrop-blur-sm">
+              <div className="flex items-center gap-4">
+                <div className="relative flex items-center gap-2">
+                  <LogoIcon />
+                  <div className="absolute -inset-1 bg-primary/20 rounded-full blur-sm animate-pulse-subtle" />
                 </div>
                 <div className="flex-1">
-                  <p className="font-medium text-sm">Processing your pitch...</p>
-                  <p className="text-xs text-muted-foreground">This may take a few moments</p>
+                  <p className="font-semibold text-sm">Processing your pitch</p>
+                  <p className="text-xs text-muted-foreground">
+                    {progress < 25 ? "Initializing processing..." 
+                     : progress < 50 ? "Analyzing content..." 
+                     : progress < 75 ? "Generating evaluation..." 
+                     : "Finalizing results..."}
+                  </p>
                 </div>
+                <LoadingSpinner variant="minimal" size="md" />
               </div>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <div className="flex justify-between text-xs">
                   <span className="text-muted-foreground">Progress</span>
-                  <span className="font-medium text-primary">{Math.round(progress)}%</span>
+                  <span className="font-semibold text-primary">{Math.round(progress)}%</span>
                 </div>
-                <Progress value={progress} className="h-2 bg-primary/10" />
+                <Progress value={progress} className="h-3 bg-primary/10" />
+                
+                {/* Loading dots indicator */}
+                <div className="flex justify-center pt-2">
+                  <LoadingSpinner variant="dots" size="sm" />
+                </div>
               </div>
             </div>
           )}
@@ -425,7 +436,7 @@ export function NewPitchPanel() {
             >
               {processing || pending ? (
                 <div className="flex items-center gap-2">
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <LoadingSpinner variant="minimal" size="sm" />
                   {stage === 'questions' ? 'Evaluating...' : 'Creating...'}
                 </div>
               ) : (

@@ -128,6 +128,29 @@ body,
     body {
         @apply bg-background text-foreground;
     }
+
+    /* Custom scrollbar styling */
+    * {
+        scrollbar-width: thin;
+        scrollbar-color: hsl(var(--border)) transparent;
+    }
+
+    *::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    *::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    *::-webkit-scrollbar-thumb {
+        background: hsl(var(--border));
+        border-radius: 9999px;
+    }
+
+    *::-webkit-scrollbar-thumb:hover {
+        background: hsl(var(--border) / 0.8);
+    }
 }
 
 /* Add softer transitions */
@@ -261,6 +284,12 @@ body,
     }
 }
 
+@keyframes shimmer {
+    100% {
+        transform: translateX(100%);
+    }
+}
+
 .animate-float {
     animation: float 5s ease-in-out infinite;
 }
@@ -272,4 +301,8 @@ body,
 .animate-gradient {
     animation: gradient-shift 8s ease infinite;
     background-size: 200% 200%;
+}
+
+.animate-shimmer {
+    animation: shimmer 2s infinite;
 }

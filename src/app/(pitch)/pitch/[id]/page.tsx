@@ -5,7 +5,7 @@ import { useParams } from "next/navigation"
 import { useQuery } from "convex/react"
 import { Id } from "@/convex/_generated/dataModel"
 import { api } from "@/convex/_generated/api"
-import { Loading } from "@/components/shared/auth/loading"
+import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { SidebarInset } from "@/components/ui/sidebar"
 import { SkeletonCard } from "@/components/ui/skeleton-card"
@@ -25,16 +25,61 @@ const QuestionsSection = lazy(() => import("./_components/sections/questions-sec
 const StructuredEvaluationSummary = lazy(() => import("./_components/analysis/structured-evaluation-summary").then(mod => ({ default: mod.StructuredEvaluationSummary })))
 const StructuredDetailedAnalysis = lazy(() => import("./_components/analysis/structured-detailed-analysis").then(mod => ({ default: mod.StructuredDetailedAnalysis })))
 
-// Skeleton components for lazy-loaded sections
-const TranscriptSkeleton = () => <SkeletonCard className="h-[200px] mb-6" />
-const QuestionsSkeleton = () => <SkeletonCard className="h-[300px] mb-10" />
-const ScoreOverviewSkeleton = () => <SkeletonCard className="h-[250px] mb-10" />
-const EvaluationSummarySkeleton = () => <SkeletonCard className="h-[200px] mb-10" />
+// Enhanced skeleton components for lazy-loaded sections
+const TranscriptSkeleton = () => (
+  <div className="space-y-4">
+    <div className="flex items-center gap-2 mb-4">
+      <div className="w-5 h-5 bg-muted rounded animate-pulse" />
+      <div className="h-6 w-24 bg-muted rounded animate-pulse" />
+    </div>
+    <SkeletonCard className="h-[200px]" variant="simple" />
+  </div>
+)
+
+const QuestionsSkeleton = () => (
+  <div className="space-y-6">
+    <div className="h-7 w-48 bg-muted rounded animate-pulse" />
+    <div className="space-y-4">
+      {Array.from({ length: 3 }).map((_, i) => (
+        <div key={i} className="space-y-2">
+          <div className="h-4 w-full bg-muted rounded animate-pulse" />
+          <div className="h-6 w-3/4 bg-muted/70 rounded animate-pulse" />
+        </div>
+      ))}
+    </div>
+  </div>
+)
+
+const ScoreOverviewSkeleton = () => (
+  <div className="space-y-6">
+    <div className="h-7 w-36 bg-muted rounded animate-pulse" />
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {Array.from({ length: 4 }).map((_, i) => (
+        <SkeletonCard key={i} variant="stat" className="h-[120px]" />
+      ))}
+    </div>
+  </div>
+)
+
+const EvaluationSummarySkeleton = () => (
+  <div className="space-y-6">
+    <div className="h-7 w-44 bg-muted rounded animate-pulse" />
+    <div className="space-y-4">
+      <div className="h-4 w-full bg-muted rounded animate-pulse" />
+      <div className="h-4 w-5/6 bg-muted/80 rounded animate-pulse" />
+      <div className="h-4 w-4/6 bg-muted/60 rounded animate-pulse" />
+    </div>
+  </div>
+)
+
 const DetailedAnalysisSkeleton = () => (
-  <div className="grid gap-6 md:grid-cols-2">
-    {Array.from({ length: 4 }).map((_, i) => (
-      <SkeletonCard key={i} className="h-[200px]" />
-    ))}
+  <div className="space-y-6">
+    <div className="h-7 w-40 bg-muted rounded animate-pulse" />
+    <div className="grid gap-6 md:grid-cols-2">
+      {Array.from({ length: 4 }).map((_, i) => (
+        <SkeletonCard key={i} className="h-[200px]" variant="pitch" />
+      ))}
+    </div>
   </div>
 )
 
@@ -44,7 +89,13 @@ const PitchDetails = () => {
         id: id as Id<"pitches">,
     })
 
-    if (!data) return <Loading />
+    if (!data) return (
+        <SidebarInset className="h-screen bg-background">
+            <div className="flex items-center justify-center h-full">
+                <LoadingSpinner variant="logo" size="lg" text="Loading pitch details..." />
+            </div>
+        </SidebarInset>
+    )
 
     // Determine if we should use structured or legacy components
     const useStructuredComponents = isStructuredEvaluationData(data.evaluation)

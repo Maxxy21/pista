@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { useEvaluationProgress } from '@/hooks/use-evaluation-progress'
 import { cn } from '@/lib/utils'
 import LogoIcon from '@/components/ui/logo-icon'
+import { LoadingSpinner } from '@/components/ui/loading-spinner'
 
 const steps: { key: ReturnType<typeof useEvaluationProgress.getState>['step']; label: string }[] = [
   { key: 'uploading', label: 'Uploading' },
@@ -16,36 +17,68 @@ export function EvaluationProgressOverlay() {
   const { visible, step, message, progress } = useEvaluationProgress()
   if (!visible) return null
 
+  const getStatusText = (currentStep: string, currentMessage?: string, currentProgress?: number) => {
+    if (currentMessage) return currentMessage;
+    
+    switch (currentStep) {
+      case 'uploading': return currentProgress !== undefined ? `Uploading... ${Math.round(currentProgress)}%` : 'Uploading...'
+      case 'transcribing': return 'Transcribing audio...'
+      case 'analyzing': return 'Analyzing content...'
+      default: return 'Processing...'
+    }
+  }
+
+  const getProgressValue = () => {
+    if (step === 'uploading' && typeof progress === 'number') return progress
+    if (step === 'transcribing') return 33
+    if (step === 'analyzing') return 66
+    if (step === 'complete') return 100
+    return 0
+  }
+
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4">
-      <div className="w-full max-w-md rounded-lg bg-white dark:bg-neutral-900 shadow-lg p-4">
-        <div className="flex items-center gap-2 mb-2">
-          <div className="animate-pulse"><LogoIcon /></div>
-          <span className="text-sm font-semibold">Pista</span>
+    <div className="fixed inset-0 z-50 grid place-items-center bg-black/20 backdrop-blur-sm p-4">
+      <div className="w-full max-w-md bg-card border border-border rounded-lg shadow-lg p-8 space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="relative flex items-center gap-2">
+              <LogoIcon />
+              <div className="absolute -inset-1 bg-primary/20 rounded-full blur-sm animate-pulse-subtle" />
+            </div>
+            <span className="text-lg font-semibold text-foreground">Pista</span>
+          </div>
           <DismissButton className="ml-auto" />
         </div>
-        <p className="text-sm text-neutral-600 dark:text-neutral-300 mb-3">Pitch processing</p>
-        <ol className="flex items-center w-full text-xs text-neutral-500 dark:text-neutral-400">
-          {steps.map((s, idx) => (
-            <li key={s.key} className={cn('flex-1 flex items-center', idx !== steps.length - 1 && 'mr-2') }>
-              <div className={cn(
-                'h-2 w-full rounded-full bg-neutral-200 dark:bg-neutral-800',
-                step === s.key && 'bg-sky-200 dark:bg-sky-900',
-                (step === 'complete' || steps.findIndex(ss => ss.key === step) > idx) && 'bg-sky-500'
-              )} />
-            </li>
-          ))}
-        </ol>
-        <div className="mt-4">
-          {step === 'uploading' && typeof progress === 'number' && (
-            <div>
-              <div className="h-2 bg-neutral-200 dark:bg-neutral-800 rounded">
-                <div className="h-2 bg-sky-500 rounded transition-all" style={{ width: `${progress}%` }} />
-              </div>
-              <p className="mt-2 text-xs text-neutral-500">{Math.round(progress)}%</p>
+
+        {/* Main content */}
+        <div className="text-center space-y-4">
+          <div className="space-y-2">
+            <h3 className="font-semibold text-lg text-foreground">Processing your pitch</h3>
+            <p className="text-sm text-muted-foreground">
+              {getStatusText(step, message, progress)}
+            </p>
+          </div>
+          
+          {/* Progress bar */}
+          <div className="space-y-3">
+            <div className="flex justify-between text-xs">
+              <span className="text-muted-foreground">Progress</span>
+              <span className="font-semibold text-primary">{Math.round(getProgressValue())}%</span>
             </div>
-          )}
-          <TypedMessage text={message || ''} />
+            <div className="w-full bg-muted/30 rounded-full h-3">
+              <div 
+                className="bg-primary h-3 rounded-full transition-all duration-300 ease-out"
+                style={{ width: `${getProgressValue()}%` }}
+              />
+            </div>
+          </div>
+
+          {/* Loading indicators */}
+          <div className="flex justify-center items-center gap-4 pt-2">
+            <LoadingSpinner variant="minimal" size="md" />
+            <LoadingSpinner variant="dots" size="sm" />
+          </div>
         </div>
       </div>
     </div>
@@ -58,10 +91,15 @@ function DismissButton({ className }: { className?: string }) {
     <button
       type="button"
       onClick={reset}
-      className={cn('rounded p-1 text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200', className)}
+      className={cn(
+        'rounded-full p-2 text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors',
+        className
+      )}
       aria-label="Dismiss"
     >
-      ×
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+      </svg>
     </button>
   )
 }

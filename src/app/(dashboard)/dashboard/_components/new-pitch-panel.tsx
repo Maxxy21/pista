@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Switch } from "@/components/ui/switch"
-import { FileAudio2, FileText as FileTextIcon, Upload, Loader2, Mic } from "lucide-react"
+import { FileAudio2, FileText as FileTextIcon, Upload, Mic } from "lucide-react"
 import { useNewPitchForm, type PitchType } from "@/hooks/use-new-pitch-form"
 import { useFileHandling } from "@/hooks/use-file-handling"
 import { usePitchSubmission } from "@/hooks/use-pitch-submission"
@@ -17,6 +17,7 @@ import { TextInputTab } from "./new-pitch/text-input-tab"
 import { FileUploadTab } from "./new-pitch/file-upload-tab"
 import { QuestionsSection } from "./new-pitch/questions-section"
 import { ProcessingStatus } from "./new-pitch/processing-status"
+import { LoadingSpinner } from "@/components/ui/loading-spinner"
 
 export function NewPitchPanel() {
   const { organization } = useOrganization()
@@ -167,7 +168,7 @@ export function NewPitchPanel() {
             >
               {submission.processing || submission.pending ? (
                 <div className="flex items-center gap-2">
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <LoadingSpinner variant="minimal" size="sm" />
                   {form.stage === 'questions' ? 'Evaluating...' : 'Creating...'}
                 </div>
               ) : (
