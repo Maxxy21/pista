@@ -12,7 +12,7 @@ import { toast } from "sonner";
 import { useDebounceValue } from "usehooks-ts";
 import { useTheme } from "next-themes";
 
-import { ArrowLeft, Star, FileText, Folder, PlusCircle } from "lucide-react";
+import { ArrowLeft, Star, FileText, Folder, PlusCircle, Share2, Download, Search } from "lucide-react";
 import {
     Sidebar,
     SidebarHeader,
@@ -35,29 +35,34 @@ import { api } from "@/convex/_generated/api";
 import { useApiMutation } from "@/hooks/use-api-mutation";
 import { useWorkspace } from "@/hooks/use-workspace";
 import { type UniversalPitchData } from "@/lib/types/pitch";
-import { downloadCsvFromRows } from "@/lib/utils/pitch-export";
+import { getOverallFeedback } from "@/lib/utils/evaluation-utils";
 
 import { SearchForm } from "../forms/search-form";
 import { InviteButton } from "../common/invite-button";
 import { CurrentPitchBanner } from "./pitch-current-banner";
 import { PitchListItem } from "./pitch-list-item";
 
-// Using shared pitch type from lib/types
 
 export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>) {
+    // Router and navigation
     const router = useRouter();
     const params = useParams();
     const searchParams = useSearchParams();
+    
+    // Authentication and workspace context
     const { organization } = useOrganization();
     const workspace = useWorkspace();
     const { isLoaded: isAuthLoaded, isSignedIn } = useAuth();
     const { user } = useUser();
+    
+    // UI state
     const { resolvedTheme } = useTheme();
     const isDark = resolvedTheme === "dark";
     const [search, setSearch] = React.useState("");
     const [debouncedSearch] = useDebounceValue(search, 500);
     const { state } = useSidebar();
 
+    // Sync search state with URL
     React.useEffect(() => {
         const searchQuery = searchParams.get("search") || "";
         if (searchQuery) {
@@ -65,6 +70,7 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
         }
     }, [searchParams]);
 
+    // Update URL when search changes
     React.useEffect(() => {
         const url = qs.stringifyUrl(
             {
@@ -84,79 +90,38 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
         setSearch(value);
     }, []);
 
+    // Query parameters based on workspace context
     const queryParams = isAuthLoaded && isSignedIn
         ? (workspace.mode === 'org' && workspace.orgId
             ? { orgId: workspace.orgId, search: debouncedSearch, sortBy: "date" as const }
             : user?.id ? { ownerUserId: user.id, search: debouncedSearch, sortBy: "date" as const } : "skip")
         : "skip";
-    const pitches = useQuery(api.pitches.getFilteredPitches, queryParams);
     
-
+    // Data queries
+    const pitches = useQuery(api.pitches.getFilteredPitches, queryParams);
     const currentPitch = useQuery(
         api.pitches.getPitch,
         isAuthLoaded && isSignedIn && params.id
-            ? {
-                  id: params.id as Id<"pitches">,
-              }
+            ? { id: params.id as Id<"pitches"> }
             : "skip"
     );
 
-    const { mutate: updatePitch, pending: updating } = useApiMutation(api.pitches.update);
-    const { mutate: createPitch, pending: duplicating } = useApiMutation(api.pitches.create);
+    // API mutations
+    const { mutate: updatePitch } = useApiMutation(api.pitches.update);
+    const { mutate: onFavorite, pending: pendingFavorite } = useApiMutation(api.pitches.favorite);
+    const { mutate: onUnfavorite, pending: pendingUnfavorite } = useApiMutation(api.pitches.unfavorite);
 
-    const onReevaluate = React.useCallback(async () => {
-        try {
-            if (!currentPitch) return;
-            toast.loading("Re-evaluating…", { id: "reeval" });
-            const res = await fetch("/api/evaluate", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ text: currentPitch.text, questions: currentPitch.questions ?? [] }),
-            });
-            if (!res.ok) throw new Error("Evaluation failed");
-            const evaluation = await res.json();
-            await updatePitch({ id: currentPitch._id, evaluation, status: "evaluated" });
-            toast.success("Pitch re-evaluated", { id: "reeval" });
-        } catch (e: any) {
-            toast.error(e?.message || "Failed to re-evaluate", { id: "reeval" });
-        }
-    }, [currentPitch, updatePitch]);
 
-    const onDuplicate = React.useCallback(async () => {
-        try {
-            if (!currentPitch) return;
-            toast.loading("Duplicating…", { id: "dup" });
-            const newId = await createPitch({
-                orgId: currentPitch.orgId || undefined,
-                title: `${currentPitch.title} (Copy)`,
-                text: currentPitch.text,
-                type: currentPitch.type,
-                status: currentPitch.status,
-                evaluation: currentPitch.evaluation,
-                questions: currentPitch.questions || [],
-            });
-            toast.success("Pitch duplicated", { id: "dup" });
-            router.push(`/pitch/${newId}`);
-        } catch (e: any) {
-            toast.error(e?.message || "Failed to duplicate", { id: "dup" });
-        }
-    }, [currentPitch, createPitch, router]);
-
+    // Export current pitch as CSV
     const onExport = React.useCallback(() => {
         try {
             if (!currentPitch) return;
+            
             const headers = [
-                "id",
-                "title",
-                "type",
-                "author",
-                "createdAt",
-                "overallScore",
-                "evaluatedAt",
-                "modelVersion",
-                "promptVersion",
-                "policyVersion",
+                "id", "title", "type", "author", "createdAt",
+                "overallScore", "evaluatedAt", "modelVersion", "promptVersion", "policyVersion"
             ];
+            
             const ev: any = currentPitch.evaluation || {};
             const meta: any = ev.metadata || {};
             const row = [
@@ -169,8 +134,9 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
                 meta.evaluatedAt ?? "",
                 JSON.stringify(meta.modelVersion ?? ""),
                 JSON.stringify(meta.promptVersion ?? ""),
-                JSON.stringify(meta.policyVersion ?? ""),
+                JSON.stringify(meta.policyVersion ?? "")
             ];
+            
             const csv = [headers.join(","), row.join(",")].join("\n");
             const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
             const url = URL.createObjectURL(blob);
@@ -186,6 +152,46 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
         }
     }, [currentPitch]);
 
+    // Toggle favorite status for current pitch
+    const toggleFavorite = React.useCallback(() => {
+        if (!currentPitch) return;
+        
+        const action = currentPitch.isFavorite ? onUnfavorite : onFavorite;
+        const payload = workspace.mode === 'org' 
+            ? { id: currentPitch._id, orgId: currentPitch.orgId } 
+            : { id: currentPitch._id };
+            
+        action(payload as any)
+            .then(() => {
+                toast.success(`Pitch ${currentPitch.isFavorite ? "removed from" : "added to"} favorites`);
+            })
+            .catch(() => {
+                toast.error(`Failed to ${currentPitch.isFavorite ? "unfavorite" : "favorite"} pitch`);
+            });
+    }, [currentPitch, onFavorite, onUnfavorite, workspace.mode]);
+
+    const copyToClipboard = React.useCallback(async (text: string) => {
+        try {
+            await navigator.clipboard.writeText(text);
+            toast.success("Copied to clipboard");
+        } catch (err) {
+            toast.error("Failed to copy text");
+        }
+    }, []);
+
+    // Share pitch feedback by copying to clipboard
+    const onShare = React.useCallback(() => {
+        if (!currentPitch) return;
+        
+        const feedback = getOverallFeedback(currentPitch.evaluation);
+        const feedbackText = typeof feedback === 'string' 
+            ? feedback 
+            : feedback.overallAssessment.summary;
+            
+        copyToClipboard(feedbackText);
+    }, [currentPitch, copyToClipboard]);
+
+    // Filter and limit pitches for display
     const displayPitches = React.useMemo(() => {
         if (!pitches) {
             return [] as UniversalPitchData[];
@@ -199,6 +205,7 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
         return limited as unknown as UniversalPitchData[];
     }, [pitches, params.id, debouncedSearch]);
 
+    // Redirect to sign-in if not authenticated
     React.useEffect(() => {
         if (isAuthLoaded && !isSignedIn) {
             router.push("/sign-in");
@@ -231,7 +238,7 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
         [router, searchParams]
     );
 
-    // Loading state
+    // Loading state while authentication is being verified
     if (!isAuthLoaded) {
         return (
             <Sidebar collapsible="icon" className="border-r" {...props}>
@@ -246,8 +253,7 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
         );
     }
 
-    // Helper for pitch type badge
-    const renderTypeBadge = (type: string) => {
+    const renderTypeBadge = React.useCallback((type: string) => {
         switch (type) {
             case "audio":
                 return <Badge variant="secondary" className="bg-emerald-500/15 text-emerald-700 border-emerald-500/25 hover:bg-emerald-500/20 font-medium">Audio</Badge>;
@@ -256,7 +262,7 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
             default:
                 return <Badge variant="secondary" className="bg-purple-500/15 text-purple-700 border-purple-500/25 hover:bg-purple-500/20 font-medium">Text</Badge>;
         }
-    };
+    }, []);
 
     return (
         <Sidebar collapsible="icon" className="border-r" {...props}>
@@ -324,14 +330,12 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
                                         <span className="font-medium">Back to Dashboard</span>
                                     </Button>
                                 </motion.div>
-                                <div className="relative">
-                                    <SearchForm
-                                        value={search}
-                                        onChange={handleSearchChange}
-                                        placeholder="Search all pitches..."
-                                        variant="sidebar"
-                                    />
-                                </div>
+                                <SearchForm
+                                    value={search}
+                                    onChange={handleSearchChange}
+                                    placeholder="Search all pitches..."
+                                    variant="sidebar"
+                                />
                             </div>
                         )}
                     </div>
@@ -351,9 +355,10 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
                                       const pitchOrg = currentPitch.orgId;
                                       const inOrg = workspace.mode === 'org' && !!workspace.orgId;
                                       const mismatch = (inOrg && !pitchOrg) || (!inOrg && !!pitchOrg);
-                                      const note = mismatch
+                                      const contextNote = mismatch
                                         ? `Viewing a ${pitchOrg ? 'organization' : 'personal'} pitch in ${inOrg ? 'organization' : 'personal'} context.`
                                         : null;
+                                      
                                       return (
                                         <CurrentPitchBanner
                                           title={currentPitch.title}
@@ -362,7 +367,7 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
                                           typeBadge={renderTypeBadge(currentPitch.type)}
                                           authorName={currentPitch.authorName}
                                           userImageUrl={user?.imageUrl || null}
-                                          contextNote={note}
+                                          contextNote={contextNote}
                                         />
                                       );
                                     })()}
@@ -428,22 +433,36 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
                                 <SidebarMenuItem>
                                     <SidebarMenuButton 
                                         className="rounded-lg transition-all duration-200 hover:shadow-sm"
-                                        tooltip="Favorite Pitch"
-                                        aria-label="Favorite Pitch"
+                                        tooltip="Search pitches"
+                                        aria-label="Search pitches"
+                                        onClick={() => {
+                                            // Expand sidebar to show search
+                                            const sidebarTrigger = document.querySelector('[data-sidebar="trigger"]') as HTMLButtonElement;
+                                            if (sidebarTrigger) {
+                                                sidebarTrigger.click();
+                                            }
+                                        }}
                                     >
-                                        <Star className="h-4 w-4" />
+                                        <Search className="h-4 w-4" />
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>
-                                <SidebarMenuItem>
-                                    <SidebarMenuButton 
-                                        className="rounded-lg transition-all duration-200 hover:shadow-sm"
-                                        tooltip="All Pitches"
-                                        onClick={handleBack}
-                                        aria-label="All Pitches"
-                                    >
-                                        <FileText className="h-4 w-4" />
-                                    </SidebarMenuButton>
-                                </SidebarMenuItem>
+                                {currentPitch && (
+                                    <SidebarMenuItem>
+                                        <SidebarMenuButton 
+                                            className={`rounded-lg transition-all duration-200 hover:shadow-sm ${
+                                                currentPitch.isFavorite 
+                                                    ? "bg-yellow-500/15 text-yellow-700 border-yellow-500/25 hover:bg-yellow-500/20" 
+                                                    : ""
+                                            }`}
+                                            tooltip={currentPitch.isFavorite ? "Remove from favorites" : "Add to favorites"}
+                                            aria-label={currentPitch.isFavorite ? "Remove from favorites" : "Add to favorites"}
+                                            onClick={toggleFavorite}
+                                            disabled={pendingFavorite || pendingUnfavorite}
+                                        >
+                                            <Star className={`h-4 w-4 ${currentPitch.isFavorite ? "fill-yellow-400 text-yellow-400" : ""}`} />
+                                        </SidebarMenuButton>
+                                    </SidebarMenuItem>
+                                )}
                             </SidebarMenu>
                         </div>
                     )}
@@ -455,30 +474,50 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
             </div>
 
             <SidebarFooter className="p-2 space-y-2">
-                {organization && (
-                    <>
-                        {/* Action Buttons */}
-                        <SidebarMenu className="space-y-1">
+                {/* Action Buttons */}
+                <SidebarMenu className="space-y-1">
+                    {currentPitch && (
+                        <>
                             <SidebarMenuItem>
                                 <SidebarMenuButton 
-                                    className="bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary/80 text-primary-foreground font-medium shadow-sm transition-all duration-200"
-                                    onClick={() => {
-                                        router.push('/dashboard?create=pitch');
-                                    }}
-                                    tooltip={state === "collapsed" ? "New Pitch" : undefined}
+                                    className="hover:bg-muted/50 transition-all duration-200"
+                                    onClick={onShare}
+                                    tooltip={state === "collapsed" ? "Share feedback" : undefined}
                                 >
-                                    <PlusCircle />
-                                    <span>New Pitch</span>
+                                    <Share2 />
+                                    <span>Share</span>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                             <SidebarMenuItem>
-                                <InviteButton isDark={isDark} />
+                                <SidebarMenuButton 
+                                    className="hover:bg-muted/50 transition-all duration-200"
+                                    onClick={onExport}
+                                    tooltip={state === "collapsed" ? "Export CSV" : undefined}
+                                >
+                                    <Download />
+                                    <span>Export</span>
+                                </SidebarMenuButton>
                             </SidebarMenuItem>
-                        </SidebarMenu>
-                        
-                        {/* User Profile and Organization switcher moved to top avatar menu for consistency */}
-                    </>
-                )}
+                        </>
+                    )}
+                    <SidebarMenuItem>
+                        <SidebarMenuButton 
+                            className="bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary/80 text-primary-foreground font-medium shadow-sm transition-all duration-200"
+                            onClick={() => {
+                                router.push('/dashboard?create=pitch');
+                            }}
+                            tooltip={state === "collapsed" ? "New Pitch" : undefined}
+                        >
+                            <PlusCircle />
+                            <span>New Pitch</span>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                    {organization && (
+                        <SidebarMenuItem>
+                            <InviteButton isDark={isDark} />
+                        </SidebarMenuItem>
+                    )}
+                </SidebarMenu>
             </SidebarFooter>
             <SidebarRail />
         </Sidebar>

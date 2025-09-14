@@ -123,7 +123,20 @@ export const getPitch = query({
         if (pitch.userId !== identity.subject) {
             throw new ConvexError("Unauthorized");
         }
-        return pitch;
+
+        // Check if pitch is favorited
+        const favorite = await ctx.db
+            .query("userFavorites")
+            .filter((q) => q.and(
+                q.eq(q.field("userId"), identity.subject),
+                q.eq(q.field("pitchId"), id)
+            ))
+            .first();
+
+        return {
+            ...pitch,
+            isFavorite: !!favorite,
+        };
     },
 });
 
