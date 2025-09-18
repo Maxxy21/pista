@@ -1,7 +1,7 @@
 \chapter{Conclusion and Future Work}
 \label{ch:conclusion}
 
-This thesis presents Pista, a complete GenAI-powered startup pitch evaluation platform, and conducted a supervisor-facilitated statistical comparison with Winds2Ventures (W2V) to understand how different GenAI evaluation systems perform. Twenty-two university startup pitches were evaluated using both systems and the agreement patterns were analyzed using Cohen's kappa statistics.
+This thesis explored and implemented the development of Pista, a  GenAI-powered startup pitch evaluation platform, and conducted a supervisor-facilitated statistical comparison with Winds2Ventures (W2V) to understand how different GenAI evaluation systems perform. Twenty-two university startup pitches were evaluated using both systems and the agreement patterns were analyzed using Cohen's kappa statistics.
 
 \section{System Development and Key Findings}
 \label{sec:accomplishments}
@@ -10,9 +10,9 @@ This section presents the system development outcomes and key research findings 
 
 \textbf{Complete Functional System}: Pista was developed and deployed as a full-stack web application using Next.js 15, Convex database, and Clerk authentication. The system integrates GPT-4 for GenAI analysis across four evaluation dimensions. Pista supports text uploads, file processing, and audio transcription with real-time evaluation progress. The platform is live at https://pista-app.vercel.app and provides structured feedback with specific improvement recommendations.
 
-\textbf{Statistical Comparison Results}: Moderate agreement was found between the two GenAI systems with a Cohen's kappa coefficient of 0.450 and 63.6\% observed agreement. Pista averaged 0.17 points higher than W2V (5.36 vs 5.20 out of 10), showing systematic differences in evaluation approaches. The statistical analysis reveals that different GenAI systems bring distinct perspectives to startup evaluation, even when analyzing identical pitch content.
+\textbf{Statistical Comparison Results}: Moderate agreement was found between the two GenAI systems with a Cohen's kappa coefficient of 0.505 and 77.3\% observed agreement. The statistical analysis reveals that different GenAI systems bring distinct perspectives to startup evaluation, even when analyzing identical pitch content.
 
-\textbf{Practical Performance Insights}: Pista delivers evaluations in 30-60 seconds at \$0.10-0.15 per assessment, compared to traditional manual evaluation processes. The system provides 24/7 availability and consistent evaluation criteria across all pitches. The research found that GenAI evaluation works best for Problem-Solution Fit assessment but has limitations when evaluating team capabilities and execution potential.
+\textbf{Practical Performance Insights}: Pista delivers evaluations in 30-60 seconds at \$0.10-0.15 per assessment, compared to traditional manual evaluation processes. The system provides 24/7 availability and consistent evaluation criteria across all pitches. The research found that GenAI evaluation works best for problem-solution Fit assessment but has limitations when evaluating team capabilities and execution potential.
 
 \section{Research Contributions}
 \label{sec:contributions}
@@ -37,11 +37,13 @@ The research found that different GenAI systems serve different purposes based o
 
 This section outlines the current limitations of this research and potential directions for future work.
 
-\textbf{Current Limitations}: The evaluation used 22 university competition pitches, which represents a limited sample size and specific context. The comparison involved only two GenAI platforms, so broader patterns across multiple GenAI systems remain unknown. University pitches may not reflect the complexity and variety found in professional startup environments. These limitations mean the findings provide initial insights rather than comprehensive understanding of GenAI evaluation system performance.
+\begin{itemize}
+    \item \textbf{Current Limitations}: I tested the evaluation using 22 university competition pitches, which gives a limited sample size from one specific setting. I compared only two GenAI platforms, so I cannot make broader claims about how GenAI systems work in general. University pitches may be simpler than real startup pitches that investors see every day. These limits mean my findings show early insights rather than complete understanding of how GenAI evaluation systems perform.
 
-\textbf{Technical Enhancement Opportunities}: Future versions of Pista could incorporate multimodal analysis including video and audio evaluation capabilities. Real-time interactive features where the GenAI asks clarifying questions could improve assessment depth. Integration with pitch presentation tools could provide seamless evaluation workflows. Enhanced machine learning models trained on larger datasets could improve evaluation accuracy and reduce score clustering patterns.
+    \item \textbf{Technical Enhancement Opportunities}: Future versions of Pista could analyze video and audio files alongside text. The system could ask follow-up questions during evaluation to get deeper insights about each pitch. Integration with presentation software could make the evaluation process smoother for users. Better machine learning models trained on larger datasets could improve accuracy and fix the problem where scores cluster together.
 
-\textbf{Research Extensions}: Longitudinal studies tracking startup success rates could validate whether GenAI evaluation scores predict actual business outcomes. Comparative studies including more GenAI platforms would reveal broader patterns in automated evaluation approaches. Professional startup pitch datasets would test whether university pitch patterns apply to investment contexts. Human evaluator comparison studies could establish benchmarks for GenAI system performance against expert assessment.
+    \item \textbf{Research Extensions}: Studies that track startup success over time could test whether GenAI evaluation scores predict real business outcomes. Comparing more GenAI platforms would show broader patterns in how automated evaluation works. Testing with professional startup pitch datasets would reveal whether university pitch patterns apply to real investment settings. Studies comparing human expert evaluators could establish benchmarks for how well GenAI systems perform against professional assessment.
+\end{itemize}
 
 \section{Final Reflections}
 \label{sec:final-thoughts}

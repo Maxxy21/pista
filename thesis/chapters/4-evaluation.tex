@@ -2,11 +2,11 @@
 \chapter{Evaluation and Results}
 \label{ch:evaluation}
 
-This chapter compares the Pista system with an existing GenAI-powered evaluation platform called Winds2Ventures (W2V)\footnote{\url{https://w2v.network/}}. The research addresses a key question: how do different GenAI evaluation systems compare when rating the same startup pitches, and what can we learn from their agreement patterns?
+This chapter evaluates how well the Pista system performs compared to Winds2Ventures (W2V). The research addresses a key question: how do different GenAI evaluation systems compare when rating the same startup pitches, and what can we learn from their agreement patterns?
 
 To answer this question, both GenAI systems were compared on how they scored the same startup pitches. The analysis examined whether the two systems agreed on which pitches were good, average, or below average. The comparison focuses on the final overall scores that each system produces. Statistical measures of agreement were analyzed to understand how well different GenAI evaluation approaches align with each other.
 
-Twenty-two startup pitches from university competitions were analyzed using statistical methods to measure agreement between the systems. The results show that the systems agree moderately well, but there are some systematic differences in their evaluation approaches. Pista tends to give slightly higher scores than W2V, which appears to use more conservative evaluation criteria. The Cohen's kappa coefficient shows moderate agreement at 0.450, indicating the systems align much better than random chance.
+Twenty-two startup pitches from university competitions were analyzed using statistical methods to measure agreement between the systems. The results show that the systems agree moderately well, but there are some systematic differences in their evaluation approaches. Pista tends to give slightly higher scores than W2V, which appears to use more conservative evaluation criteria. The Cohen's kappa coefficient shows moderate agreement at 0.505, indicating the systems align much better than random chance.
 
 This comparison helps us understand how different GenAI evaluation approaches perform and what we can learn from comparing automated assessment systems. The findings suggest that different GenAI evaluation systems can have distinct characteristics and evaluation patterns, even when assessing the same content. The results provide insights into the variety that exists within automated evaluation systems and how different algorithmic approaches can lead to different assessment outcomes. These findings are important for understanding the current diversity and future potential of GenAI-powered evaluation platforms.
 
@@ -24,13 +24,16 @@ The pitches cover different areas like technology, healthcare, agriculture, and 
 
 To illustrate the dataset variety, here are representative examples from different sectors:
 
-\textbf{Coontent} (Marketing Technology): An GenAI-powered marketing automation platform that generates, publishes, and analyzes marketing campaigns. The team consists of software engineering students targeting marketing agencies in South Tyrol, with plans to expand beyond the region in 2025.
+\begin{itemize}
+    \item \textbf{Coontent} (Marketing Technology): A GenAI-powered marketing automation platform that generates, publishes, and analyzes marketing campaigns. The team consists of software engineering students targeting marketing agencies in South Tyrol, with plans to expand beyond the region in 2025.
 
-\textbf{Serenity} (Digital Health): A mental wellbeing platform designed for young adults, offering GenAI-driven mood tracking, personalized wellness resources, and 24/7 chatbot support. The team targets the growing mental wellness app market valued at \$139.9 billion.
+    \item \textbf{Serenity} (Digital Health): A mental wellbeing platform designed for young adults, offering GenAI-driven mood tracking, personalized wellness resources, and 24/7 chatbot support. The team targets the growing mental wellness app market valued at \$139.9 billion.
 
-\textbf{Corptech} (Industrial Technology): An GenAI-powered methane leak detection system for industrial monitoring, addressing both financial losses and environmental concerns. The team already secured traction with distribution partners and interest from major gas companies.
+    \item \textbf{Corptech} (Industrial Technology): A GenAI-powered methane leak detection system for industrial monitoring, addressing both financial losses and environmental concerns. The team already secured traction with distribution partners and interest from major gas companies.
 
-\textbf{Rideshare} (Transportation): A ridesharing platform focused on short-distance commutes in areas with limited public transportation, using a transaction-based model with 10\% fees to help reduce traffic congestion.
+    \item \textbf{Rideshare} (Transportation): A ridesharing platform focused on short-distance commutes in areas with limited public transportation, using a transaction-based model with 10\% fees to help reduce traffic congestion.
+\end{itemize}
+
 
 Each pitch includes the standard parts you expect: the problem they're solving, their solution, market analysis, team information, and how they plan to make money. Since all pitches follow the same format, both evaluation systems get the same type of information to work with.
 
@@ -66,45 +69,64 @@ The key difference is that W2V uses a different algorithmic approach compared to
 Given the different methodologies employed by each system, a standardized comparison approach was required. The analysis focuses on the final overall scores that each system produces as the primary basis for comparison. This approach allows the systems' ultimate assessments to be compared regardless of their different internal processes. The comparison method focuses on whether both systems reach similar conclusions about pitch quality.
 
 Both systems give final scores on a 1-10 scale, which makes it possible to compare them directly. Pista creates its final score by combining its four area scores with weights, while W2V gives an overall "Investibility" rating based on its nine criteria. Even though they calculate scores differently, the common 1-10 scale lets me compare how well they agree.
+The final scores from both systems were compared using statistical analysis. 
+To calculate agreement levels, the following steps were taken:
+
+\begin{enumerate}
+    \item Continuous scores were converted into three categories: 
+    \textit{Below Average} (1.0--4.9), \textit{Average} (5.0--6.9), 
+    and \textit{Good} (7.0--10.0). By using this categorization, 
+    the focus was placed on meaningful quality differences rather than minor variations in scoring.
+
+    \item Cohen's kappa coefficient was employed as the primary 
+    agreement measure, since random chance agreement is accounted for by 
+    this statistic. The kappa coefficient is defined as:
+    \[
+    \kappa = \frac{p_o - p_e}{1 - p_e}
+    \]
+    where $p_o$ represents observed agreement and $p_e$ represents 
+    expected agreement by chance.
+
+    \item Descriptive statistics were calculated to provide insight into score distributions and to reveal potential systematic differences  between the systems.
+\end{enumerate}
+
 
 \section{Results and Analysis}
 \label{sec:inter-rater-reliability}
 
-This section presents the statistical analysis of how well Pista and W2V agree with each other. Cohen's kappa coefficient was used as the main statistical measure, which is better than just looking at percentages because it accounts for agreements that happen by chance.
-
-The scores were grouped into three levels to make the comparison easier: Below Average (1.0-4.9), Average (5.0-6.9), and Good (7.0-10.0). This categorization reveals whether both systems consistently identify pitch quality levels.
+This section presents the comparison results between Pista and Winds2Ventures. The analysis shows moderate agreement between the systems with interesting patterns in how they evaluate startup pitches
 
 The following table shows the complete statistical analysis of the 22 pitches:
 
 \begin{table}[h]
 \centering
-\caption{Cohen's Kappa Analysis: Pista vs Winds2Ventures}
-\label{tab:cohens-kappa}
+\caption{Statistical Analysis: Pista vs Winds2Ventures Comparison}
+\label{tab:comprehensive-results}
 \begin{tabular}{lr}
 \hline
-\textbf{Metric} & \textbf{Value} \\
+\textbf{Agreement Metrics} & \textbf{Value} \\
 \hline
 Cohen's Kappa & 0.505 \\
 Interpretation & Moderate Agreement \\
-Observed Agreement & 77.3\% (17/22 pitches) \\
-Mean Score Difference & 0.22 (Pista higher) \\
+Observed Agreement & 77.3\% (17/22) \\
+Expected Agreement (Random) & 54.1\% \\
 95\% Confidence Interval & [0.144, 0.865] \\
 \hline
-\textbf{Pista Scores} & \\
-Mean & 5.37 \\
-Range & 4.0 - 6.3 \\
+\textbf{Score Statistics} & \\
 \hline
-\textbf{W2V Scores} & \\
-Mean & 5.15 \\
-Range & 4.3 - 6.4 \\
+\textbf{Pista System} & \\
+Mean Score & 5.36 \\
+Standard Deviation & 0.71 \\
+Score Range & 4.0 -- 6.3 \\
 \hline
-\textbf{Category Distribution} & \\
-Pista Below Average (1.0-4.9) & 6 pitches \\
-Pista Average (5.0-6.9) & 16 pitches \\
-Pista Good (7.0-10.0) & 0 pitches \\
-W2V Below Average (1.0-4.9) & 9 pitches \\
-W2V Average (5.0-6.9) & 13 pitches \\
-W2V Good (7.0-10.0) & 0 pitches \\
+\textbf{Winds2Ventures} & \\
+Mean Score & 5.20 \\
+Standard Deviation & 0.67 \\
+Score Range & 4.3 -- 6.4 \\
+\hline
+\textbf{System Comparison} & \\
+Mean Difference & +0.16 (Pista higher) \\
+Correlation Coefficient & 0.612 \\
 \hline
 \end{tabular}
 \end{table}

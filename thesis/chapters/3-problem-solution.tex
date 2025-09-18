@@ -1,29 +1,28 @@
 \chapter{System Design and Implementation} \label{ch:problem-solution}
 
-This chapter presents the design and implementation of the Pista system to address the challenges identified in startup pitch evaluation. A web-based platform was developed that provides consistent, accessible, and scalable pitch assessments using large language models and structured evaluation frameworks. The design philosophy focused on creating a system that would be simple enough to maintain and study while delivering reliable evaluation results.
+This chapter presents the design and implementation of the Pista system to address the challenges identified in startup pitch evaluation. The fundamental aspects of the system architecture are explained, along with the technical decisions made during development, and how each component works together to provide consistent, GenAI-powered startup evaluations.
 
-Throughout this chapter, the key design decisions are described along with explanations of why specific technologies and approaches were chosen. Pista was built to solve three main problems: the inconsistency of human evaluations, limited access to expert assessment, and the difficulty of scaling evaluation processes. The implementation combines modern web technologies with GenAI-powered analysis to create a system that researchers and practitioners can use to evaluate startup pitches systematically.
+The chapter is organized around the key technical elements that make Pista work. The solution approach and design philosophy that guided development are explained first. The system architecture and technical implementation are then covered, including the evaluation framework, GenAI integration, and data models. Authentication and user interface implementation are discussed next. Finally, the performance characteristics and deployment approach that make the system reliable for research use are presented.
 
 \section{Solution Approach and Design Philosophy} \label{sec:solution-approach}
 
-The Pista solution was designed to address three fundamental limitations observed in startup pitch evaluation: inconsistency, limited access, and scalability challenges. The approach centers on standardized evaluation criteria that reduce subjective variance between different assessments of the same pitch. A web-based interface was implemented to broaden access beyond traditional gatekeepers, allowing more entrepreneurs to receive structured feedback on their pitches. Automated processing capabilities were built that can scale evaluation efforts without the fatigue effects that impact human evaluators over time.
+The Pista system was designed to solve three main problems in startup pitch evaluation: inconsistency between different evaluators, limited access to expert-level assessment, and scalability challenges. These problems were addressed by creating a system that uses GenAI to provide standardized evaluations based on research-backed criteria.
 
-GPT-4 was selected as the core evaluation engine because it can produce structured, repeatable assessments across multiple dimensions while providing actionable feedback. The system evaluates pitches using four distinct dimensions that were selected based on established venture capital and entrepreneurship research. A question-and-answer component was included in the evaluation process to gather additional evidence before making final assessments, which improves the quality and reliability of the evaluation results. This design helps both founders who need feedback and researchers who require consistent evaluation data.
+The core design philosophy focuses on evidence-based assessment rather than subjective opinions. Traditional pitch evaluations often vary widely because different evaluators focus on different aspects or use different standards. Pista addresses this by using a fixed evaluation framework with clear criteria and requiring evidence to support higher scores.
 
-The system applies a structured four-dimension evaluation framework combined with an evidence-gathering step to address the three core challenges of inconsistency, access, and scale in startup pitch assessment.
+The system was built around four key design principles. First, the evaluation framework uses standardized criteria derived from venture capital research to ensure assessments focus on factors that actually predict startup success. Second, the system requires concrete evidence for all scoring decisions to prevent unsupported claims from receiving high ratings. Third, the architecture prioritizes simplicity and reliability over complex features to maintain research data quality. Fourth, the user interface guides users through a consistent process while presenting results in a clear, structured format.
+
+The system works by taking a startup pitch (either text or audio), generating targeted questions to fill information gaps, processing the complete content through a structured evaluation framework, and returning both numeric scores and detailed qualitative feedback. This approach combines the speed and consistency of automated assessment with the depth and insight that entrepreneurs need for improvement.
 
 \section{System Architecture and Technical Implementation} \label{sec:system-design}
 
-This section describes the technical architecture and key technology choices made during development. The section describes how data flows through the system from initial user input through evaluation processing to final storage and presentation.
+This section explains how the technical architecture was built to support reliable GenAI-powered evaluations. The overall architecture design, evaluation framework implementation, GenAI integration, data models, and API structure are covered.
 
 \subsection{Architecture Overview}\label{subsec:architecture-overview}
-Pista was implemented as a three-tier web application architecture that separates concerns cleanly while enabling rapid development and deployment. Next.js 15\footnote{\url{https://nextjs.org}} with React and the App Router was selected for the presentation layer due to its server-side rendering capabilities and developer experience for building interactive web applications. The framework's built-in API routes feature enabled the creation of an application layer that handles evaluation requests, audio transcription, and question generation without requiring a separate backend service.
 
-For the data layer, Convex\footnote{\url{https://www.convex.dev}} was chosen as the database and real-time backend service following evaluation of several alternatives. Convex provides reactive queries that automatically update the user interface when data changes, real-time storage capabilities, and server functions that run in the cloud. This approach eliminated the need to manage database connections, implement real-time synchronization, or handle server deployment complexities. Clerk\footnote{\url{https://clerk.com}} was integrated for authentication and organization management because it provides complete user management features while supporting multi-tenant applications where different organizations can maintain separate data.
+Modern web technologies were selected that work well together for rapid development while supporting the real-time features needed for research applications. The architecture uses Next.js 15 with React for the frontend, Convex for the database and backend functions, and OpenAI's API for GenAI processing.\footnote{The complete technology stack includes: Next.js 15 (React framework), TypeScript (type safety), Tailwind CSS (styling), Shadcn/ui (UI components), Convex (backend-as-a-service), Clerk (authentication), OpenAI API (GPT-4 and Whisper), Zustand (state management), Vitest (testing), and React Testing Library (component testing).} This technology stack was chosen after evaluating several alternatives based on development speed, real-time capabilities, and research data reliability requirements. The combination provides server-side rendering for fast initial page loads, automatic real-time synchronization for live evaluation updates, and robust API integrations for GenAI processing. TypeScript was used throughout the implementation to ensure type safety and reduce runtime errors, which is critical for maintaining research data integrity.
 
-The evaluation engine uses OpenAI GPT-4\footnote{\url{https://platform.openai.com}} through their API, which was chosen after testing different large language models for consistency and quality of startup pitch analysis. This technology stack replaced earlier experiments with NextAuth for authentication and PostgreSQL for data storage. This change was made because the new stack significantly simplified system complexity and improved development iteration speed, enabling focus on the evaluation logic rather than infrastructure management.
-
-The overall workflow from user input to output is shown in Figure~\ref{fig:user-flow}. It shows the main steps and how data moves through the system.
+Figure~\ref{fig:user-flow} shows the complete user workflow and how data moves through the system. Users can upload either text pitches or audio files, which the system processes through transcription (if needed), question generation, evaluation, and results storage. The workflow was designed to handle both synchronous and asynchronous operations, with audio transcription running separately from evaluation processing to prevent interface blocking. Real-time progress updates are provided throughout each step using Convex's reactive query system, allowing users to monitor processing status without manual page refreshes. This architecture ensures consistent data flow regardless of input type while maintaining responsive user experience during computationally intensive operations.
 
 \begin{figure}[H]
   \centering
@@ -32,10 +31,19 @@ The overall workflow from user input to output is shown in Figure~\ref{fig:user-
   \label{fig:user-flow}
 \end{figure}
 
-\subsection{Evaluation Framework}\label{subsec:evaluation-framework}
-The evaluation framework was designed to combine standardized assessment criteria with carefully crafted prompts that ensure consistent evaluation results across different pitches. The framework uses four main dimensions that were selected based on venture capital research and startup evaluation best practices. Specific weights were assigned to each dimension based on their relative importance in startup success, with the most critical factors receiving higher weights.
+Next.js was chosen because it provides server-side rendering, built-in API routes, and excellent developer experience for building interactive applications. The App Router in Next.js 15 makes it easy to organize different parts of the application (dashboard, pitch pages, authentication) while maintaining clean code structure. This architecture supports the route groups used in the implementation, including `(dashboard)`, `(pitch)`, and `(auth)` directories that separate functional areas without affecting URL routing.
 
-The evaluation was structured around these four dimensions with their corresponding weights:
+For the backend, Convex was selected after comparing it with traditional databases like PostgreSQL and other backend-as-a-service options. Convex provides real-time data synchronization, built-in schema validation, and server functions that run in the cloud. This eliminates the complexity of managing database connections, implementing real-time updates, or handling server deployment, allowing focus on the evaluation logic.
+
+The authentication layer uses Clerk, which provides complete user management including organizations for multi-tenant data separation. This is important for research applications where different groups need to maintain separate data while using the same system. Clerk handles user registration, login, password management, and organization membership without requiring custom authentication logic.
+
+For GenAI processing, OpenAI's GPT-4 API is used for all evaluation tasks and Whisper for audio transcription. This single-provider approach was chosen after testing multiple alternatives, as it provides the most consistent results while keeping the architecture simple. The system uses GPT-4 for structured evaluation, question generation, and answer processing, while Whisper handles audio file transcription with support for multiple audio formats.
+
+\subsection{Evaluation Framework}\label{subsec:evaluation-framework}
+
+The evaluation framework is the core of how Pista assesses startup pitches. This framework was developed by analyzing venture capital research and startup success factors to identify the most important evaluation criteria. The framework evaluates pitches systematically across multiple dimensions using standardized criteria and weighted scoring to ensure consistent assessments.
+
+The framework evaluates pitches across four main dimensions, each with specific weights based on their importance for startup success:
 
 \begin{itemize}
   \item \textbf{Problem\mbox{-}Solution Fit} (0.30)
@@ -44,11 +52,30 @@ The evaluation was structured around these four dimensions with their correspond
   \item \textbf{Pitch Quality} (0.15)
 \end{itemize}
 
-Problem-Solution Fit and Business Model \& Market were weighted most heavily because these factors are typically the strongest predictors of startup success according to entrepreneurship research. Team \& Execution receives the next highest weight since execution capability is crucial for turning ideas into successful businesses. The lowest weight was assigned to Pitch Quality because while presentation skills matter for raising capital, they are less predictive of actual business success than the fundamental business factors.
+The highest weights were assigned to Problem-Solution Fit and Business Model \& Market because research consistently shows these factors are the strongest predictors of startup success. Team \& Execution receives the next highest weight since execution capability is crucial for converting good ideas into successful businesses. Pitch Quality has the lowest weight because while presentation skills matter for raising capital, they are less predictive of actual business outcomes.
 
-Each dimension evaluates five specific aspects and produces both a numeric score and qualitative feedback including strengths and areas for improvement. Table~\ref{tab:criteria} summarizes the detailed criteria and aspects that were implemented for each evaluation dimension.
+Each dimension evaluates five specific aspects, creating a comprehensive 20-aspect evaluation framework. For example, Problem-Solution Fit examines problem definition clarity, solution innovation, market understanding, competitive advantage, and value proposition. This systematic breakdown ensures thorough coverage of all critical elements.
 
-These evaluation criteria were implemented as structured constants in the system code to ensure consistent application across all pitch assessments. Listing~\ref{lst:eval-criteria} shows the precise criteria and aspect definitions coded into the evaluation system.
+Figure~\ref{fig:eval-flow} illustrates how each pitch moves through the evaluation pipeline. The system analyzes the content against each dimension's criteria using GPT-4, then combines the results using the predetermined weights to calculate final scores.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{img/eval-flow}
+\caption{Evaluation and processing flow across four criteria}
+  \label{fig:eval-flow}
+\end{figure}
+
+The scoring system uses a 1-10 scale with specific rubric anchors to ensure consistent evaluation. Evidence-based scoring rules were implemented that prevent pitches from receiving high scores without supporting data. The rubric anchors define clear requirements for each score level:
+
+- Scores 1-2: No concrete evidence, claims only
+- Scores 3-4: Weak or indirect evidence, plan not validated
+- Scores 5-6: Mixed evidence, partial validation or unclear metrics
+- Scores 7-8: Strong evidence, credible metrics, risks addressed
+- Scores 9-10: Exceptional evidence, repeated traction, benchmarks exceeded
+
+This evidence-gating approach addresses the central tendency problem where evaluations cluster around mid-scale scores without meaningful discrimination between pitch quality levels. The rubric was developed through iterative testing to ensure scores reflect actual business validation rather than presentation quality alone. These scoring rules prevent unsupported claims from receiving high ratings while rewarding pitches with concrete evidence of market traction and business validation.
+
+Listing~\ref{lst:eval-criteria} shows how the evaluation criteria and weights were implemented as TypeScript constants to ensure consistency across all assessments.
 
 \begin{lstlisting}[
   language=TypeScript,
@@ -108,80 +135,15 @@ const WEIGHTS: Record<string, number> = {
 };
 \end{lstlisting}
 
-This code implementation ensures that every evaluation follows exactly the same criteria structure and weighting scheme. The criteria were defined as TypeScript constants to prevent runtime modifications and ensure consistent evaluation behavior. The system processes each criterion separately using these aspect definitions, then combines the results using the specified weights to calculate final scores.
+This implementation ensures every evaluation follows exactly the same criteria and weighting scheme. The criteria are defined as constants to prevent runtime modifications and maintain evaluation consistency. The TypeScript type system enforces proper usage of these constants throughout the codebase, preventing inadvertent changes to evaluation criteria during development.
 
-\begin{table}[H]
-  \centering
-  \caption{Evaluation criteria and aspects (summary)}
-  \label{tab:criteria}
-  \begin{tabular}{p{4cm} p{9cm}}
-    \toprule
-    \textbf{Criterion} & \textbf{Aspects} \\
-    \midrule
-    Problem\mbox{-}Solution Fit & Problem definition clarity; solution innovation; market understanding; competitive advantage; value proposition \\
-    Business Model \& Market & Revenue model; market size \& growth; go-to-market strategy; customer acquisition; scalability potential \\
-    Team \& Execution & Team capability; domain expertise; track record; resource management; implementation plan \\
-    Pitch Quality & Clarity \& structure; data \& evidence; story \& engagement; Q\&A performance; overall persuasiveness \\
-    \bottomrule
-  \end{tabular}
-\end{table}
+\subsection{GenAI Integration Strategy}\label{subsec:genai-integration-strategy}
 
-Figure~\ref{fig:eval-flow} illustrates the four-dimensional processing flow implemented in the system. This diagram shows how each pitch moves through the evaluation pipeline, with the GPT-4 model analyzing the content against each dimension's specific criteria. This single-provider evaluation approach was designed to ensure consistency across all assessments while maintaining the ability to trace how each final score was calculated.
+GPT-4 was integrated as the core evaluation engine after systematic testing showed it provided the most consistent and high-quality assessments. The integration uses structured prompts that return constrained JSON responses, ensuring reliable data parsing and consistent formatting. All API interactions include strict JSON schema validation to prevent malformed responses from corrupting evaluation data.
 
-The use of fixed criteria and weights ensures that all evaluation results follow the same methodology, which enables meaningful comparisons between different pitches and supports reproducible research findings.
+The prompt engineering process involved several iterations to optimize evaluation quality. A central tendency problem was identified in early testing where evaluations clustered around 7 out of 10, failing to discriminate between pitches of different quality levels. This was solved by implementing evidence-based scoring rules and explicit rubric anchors.
 
-Specific rubric anchors and scoring rules were designed to address the central tendency problem observed in early testing. These implementation details ensure consistent score distributions and evidence-based assessments. Listing~\ref{lst:scoring-rules} shows the exact rubric anchors and scoring methodology implemented.
-
-\begin{lstlisting}[
-  language=TypeScript,
-  caption={Rubric anchors and scoring rules implementation},
-  label=lst:scoring-rules,
-  basicstyle=\footnotesize\ttfamily,
-  breaklines=true
-]
-export const RUBRIC_ANCHORS = `Rubric anchors (apply to every aspect):
-1-2: no concrete evidence; claims only
-3-4: weak/indirect evidence; plan not validated
-5-6: mixed evidence; partial validation or unclear metrics
-7-8: strong evidence; credible metrics; risks addressed
-9-10: exceptional evidence; repeated traction; benchmarks exceeded`;
-
-export const SCORING_RULES = `Scoring rules:
-- Start with aspect scoring; compute the criterion "score" as the 
-  rounded average of aspect scores.
-- If there are no numbers or specific evidence for an aspect, cap it 
-  at 4 and note the gap in the rationale.
-- Avoid mid-scale defaults; justify any mid-scale scores against the 
-  rubric anchors.`;
-
-export const SCORING_SYSTEM_PROMPT = 
-  "You are an experienced venture capitalist. Follow the rubric strictly, " +
-  "return valid JSON only, and avoid unsupported claims. Use the full " +
-  "1-10 scale based on evidence.";
-
-// Model configuration constants
-export const MODEL_NAME = "gpt-4";
-export const SCORING_TEMPERATURE = 0.2; // low variance for scoring
-export const PROMPT_VERSION = "criteria-v1.2"; // rubric anchors + evidence gating
-\end{lstlisting}
-
-These scoring rules solve the central tendency problem by requiring evidence for higher scores and preventing unsupported mid-scale defaults. The evidence threshold was set at score 4, meaning pitches without concrete supporting data cannot score above this level regardless of how well-written their claims might be. The low temperature setting of 0.2 reduces randomness in scoring decisions, improving consistency between evaluations of the same content.
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.9\textwidth]{img/eval-flow}
-\caption{Evaluation and processing flow across four criteria}
-  \label{fig:eval-flow}
-\end{figure}
-
-\subsection{GenAI Integration Strategy}\label{subsec:GenAI-integration-strategy}
-GPT-4 was integrated through OpenAI's API as the core evaluation engine for Pista after evaluating several large language model options. The system was designed to use structured prompts that return constrained JSON responses, which ensures reliable parsing and consistent data formatting across all evaluations. A single-provider approach was adopted instead of ensemble evaluation or multi-provider systems due to its architectural simplicity while maintaining consistent results. This design enables focus on optimizing one evaluation pathway thoroughly rather than managing multiple competing assessments.
-
-During development, initial evaluations showed a problematic central tendency, with most scores clustering around 7 out of 10. This issue was addressed through a systematic prompt calibration process that improved both the distribution and validity of evaluation scores. Specific rubric anchors were added for the 1-10 scale that clearly define what each score level represents, which helps the model differentiate between pitches of different quality levels. Evidence gating was implemented that caps aspect scores at 4 when specific supporting details are missing from the pitch content, ensuring that higher scores require substantive evidence.
-
-The scoring methodology evaluates individual aspects first and then computes each criterion score as the rounded average of its component aspects. The system was configured to use a lower sampling temperature for scoring requests, which reduces randomness and improves consistency between evaluations of the same content. The current prompt configuration is tracked as \texttt{PROMPT\_VERSION = criteria\textrm{-}v1.2} and this version information is recorded in all evaluation metadata to ensure reproducibility and enable future refinements.
-
-The core evaluation prompt was designed to ensure consistent, evidence-based assessments across all criteria. The implemented prompt structure guides GPT-4 through a systematic evaluation process that prevents unsupported claims and enforces the scoring rubric. Listing~\ref{lst:main-eval-prompt} shows the main evaluation prompt template created for each criterion.
+Listing~\ref{lst:main-eval-prompt} shows the main evaluation prompt template that was developed for structured assessment:
 
 \begin{lstlisting}[
   language=TypeScript,
@@ -198,7 +160,7 @@ function buildStructuredPrompt(
   return `
 As an expert evaluator, score ONLY the criterion: ${criteriaName}.
 
-Work from the content below without inventing facts. If evidence is 
+Work from the content below without inventing facts. If evidence is
 missing for an aspect, score that aspect <= 4 and note what is missing.
 
 Aspects to score (each 1-10 with a one sentence rationale):
@@ -230,9 +192,11 @@ ${SCORING_RULES}
 }
 \end{lstlisting}
 
-This prompt template enforces evidence-based evaluation by explicitly instructing the model to avoid inventing facts and to cap scores at 4 when supporting evidence is missing. The prompt was structured to require JSON responses with specific fields for strengths, improvements, and detailed aspect-level scoring with rationales. The template ensures consistent evaluation across all four criteria while maintaining the flexibility needed for different types of startup pitches.
+This prompt template enforces evidence-based evaluation by explicitly instructing the model to avoid inventing facts and to cap scores at 4 when supporting evidence is missing. The structured JSON response ensures consistent data format across all evaluations.
 
-A separate question generation system was also developed to gather additional evidence before conducting the main evaluation. The question generation prompt focuses on identifying the most important information gaps that could materially impact the assessment quality. Listing~\ref{lst:question-prompt} shows the question generation prompt implemented.
+A separate question generation system was also implemented to identify information gaps in pitch content. This system analyzes the pitch and generates up to 3 targeted questions that would materially improve evaluation quality if answered. The questions focus on specific evidence gaps that prevent confident evaluation rather than general business development advice.
+
+Listing~\ref{lst:question-prompt} shows the question generation prompt:
 
 \begin{lstlisting}[
   language=TypeScript,
@@ -244,119 +208,51 @@ A separate question generation system was also developed to gather additional ev
 const prompt = [
   `Analyze the following pitch and identify the most important gaps that prevent a confident evaluation. Select up to 3 questions that, if answered, would materially improve the assessment.`,
   `Pitch:\n"${truncate(text, MAX_PROMPT_CHARS)}"`,
-  `\nReturn valid JSON only with this schema:\n{\n  "items": [\n    {\n      "dimension": "Problem-Solution Fit" | "Business Model & Market" | "Team & Execution" | "Pitch Quality",\n      "question": "one specific question, no multi-part prompts",\n      "why_needed": "why this matters for evaluation",\n      "suggested_format": "how to answer: numbers, metrics, bullets, examples",\n      "priority": "Critical" | "Important"\n    }\n  ]\n}\n\nConstraints:\n- Ask 1–3 questions total.\n- Make each question specific and evidence-seeking.\n- Do not request sensitive data (PII, secrets, internal docs).\n- Avoid duplicates and multi-part questions.`,
+  `\nReturn valid JSON only with this schema:\n{\n  "items": [\n    {\n "dimension": "Problem-Solution Fit" | "Business Model & Market" | "Team & Execution" | "Pitch Quality",\n      "question": "one specific question, no multi-part prompts",\n      "why_needed": "why this matters for evaluation",\n      "suggested_format": "how to answer: numbers, metrics, bullets, examples",\n      "priority": "Critical" | "Important"\n    }\n  ]\n}\n\nConstraints:\n- Ask 1-3 questions total.\n- Make each question specific and evidence-seeking.\n- Do not request sensitive data.\n- Avoid duplicates and multi-part questions.`,
 ].join("\n\n");
-
-const QUESTION_SYSTEM_PROMPT = `You are an experienced venture capitalist. Ask only the highest-priority follow-up questions that close information gaps. Questions must be specific, evidence-seeking, and answerable by a typical pitch. Return valid JSON only.`;
 \end{lstlisting}
 
-This question generation approach systematically identifies evidence gaps across the four evaluation dimensions before conducting the final assessment. The prompt was designed to prioritize questions that would have the highest impact on evaluation accuracy while ensuring the questions remain answerable within a typical pitch context. The structured JSON response format allows the system to tag each question to its corresponding evaluation dimension, ensuring comprehensive coverage of all assessment criteria.
 
-Robust error handling was implemented for all OpenAI API interactions using retries with exponential backoff to manage rate limits and transient network failures. The system validates all API responses against strict application schemas before persisting any evaluation data, which prevents corrupted or malformed evaluations from entering the database.
+This question generation approach systematically identifies evidence gaps before conducting the final assessment, improving evaluation accuracy while ensuring questions remain answerable within a typical pitch context. The system constrains questions to avoid requesting sensitive data or internal documentation that would not be available in standard pitch scenarios. Each generated question includes priority levels and suggested answer formats to guide users toward providing the most valuable additional information for evaluation improvement.
+
+For reliability, exponential backoff retries were implemented for API interactions and strict JSON validation before data persistence. The system uses a low temperature setting (0.2) for all evaluation requests to reduce randomness while maintaining appropriate response variation. Error handling includes comprehensive logging for debugging while ensuring user-facing error messages remain clear and actionable without exposing system internals.
 
 \subsection{Data Models and Storage Architecture}\label{subsec:data-models-and-storage-architecture}
-The data storage architecture was designed using Convex to provide both robust data persistence and real-time user interface updates without the complexity of traditional database management. Convex was chosen because it combines database functionality with built-in schema validation and indexed access patterns, which simplifies development while ensuring data integrity. A multi-tenant architecture was implemented where each document is automatically scoped by user and organization identifiers, providing secure data isolation without requiring complex authorization logic.
 
-The data model stores question-and-answer pairs with each pitch and reuses this information when building evaluation input, which allows the system to gather additional context that improves assessment quality. The system was designed so that user interface queries update reactively whenever underlying data changes, eliminating the need for manual polling or refresh operations. This approach provides a responsive user experience where evaluation results appear immediately after processing completes.
+The data architecture was designed to support both real-time user interactions and research data collection. The system uses Convex, which combines database functionality with built-in schema validation and real-time synchronization. Convex provides automatic schema enforcement and type safety that prevents data corruption while eliminating the need for separate database migration management.
 
-The main \texttt{pitches} table was structured to store essential pitch information including title, normalized text content, submission type, and processing status. The table also persists structured evaluation results, question-and-answer pairs, organization identifiers, user identifiers, author names, and creation timestamps. Several database indexes were implemented including \texttt{by\_org}, \texttt{by\_user}, \texttt{by\_user\_org}, and \texttt{search\_title} to support efficient queries for different access patterns. A separate \texttt{userFavorites} table was also created that links users and pitches through composite indexes, allowing users to bookmark pitches of interest without affecting the main pitch data.
+The main data model centers around the `pitches` table, which stores essential pitch information including title, content, submission type, processing status, structured evaluation results, question-answer pairs, and organizational metadata. Each document is automatically scoped by user and organization identifiers, providing secure data isolation for multi-tenant use.
+
+The database schema implements several indexes to optimize query performance: g \texttt{by\_org}, \texttt{by\_user}, \texttt{by\_user\_org}, and \texttt{search\_title} These indexes support efficient data access for both user interface operations and research analysis. A separate \texttt{userFavorites} table manages bookmark functionality without affecting the main research data structure.
+
+The data model stores both structured evaluation results and complete audit trails for research reproducibility. Question-and-answer pairs are stored with each pitch and reused when building evaluation input, allowing systematic gathering of additional context that improves assessment quality. The system stores structured evaluation data with detailed scoring breakdowns and improvement recommendations for comprehensive analysis.
 
 \subsection{API Endpoints and Server Functions}\label{subsec:api-and-server}
-The system's API architecture was designed to separate concerns between Next.js API routes that handle GenAI processing and Convex functions that manage data persistence and retrieval. This separation allows each component to be optimized for its specific purpose while maintaining clean interfaces between different system layers.
 
-Several Next.js API routes were implemented that handle the GenAI-powered processing components of the evaluation pipeline. The \texttt{/api/evaluate} endpoint processes pitch text using GPT-4 and runs on the Edge runtime for improved performance and global distribution. The \texttt{/api/generate-questions} endpoint was created to produce up to three follow-up questions that help gather additional evidence for evaluation. An \texttt{/api/evaluate-answers} endpoint was also built that can update evaluations based on question responses, though this was not used in the primary user interface flow to keep the process streamlined. The \texttt{/api/transcribe} endpoint handles audio file transcription using OpenAI's Whisper model\footnote{\url{https://openai.com/research/whisper}}, which enables the system to process pitch videos and audio recordings.
+The API architecture was structured using Next.js API routes for GenAI processing and Convex functions for data management. This separation allows each component to be optimized for its specific computational requirements. Next.js API routes handle external integrations with OpenAI while Convex functions manage all database operations with built-in real-time synchronization.
 
-Several Convex functions were developed in \texttt{convex/pitches.ts} that handle all data operations for the application. The mutation functions include \texttt{create}, \texttt{update}, \texttt{remove}, \texttt{favorite}, \texttt{unfavorite}, and \texttt{prefetch}, which cover all the data modification operations users can perform. Query functions were implemented including \texttt{get}, \texttt{getPitch}, \texttt{getFilteredPitches}, \texttt{getPitchStats}, and \texttt{exportCSV} to support different data access patterns needed by the user interface.
+The GenAI processing endpoints include:
+\begin{itemize}
+  \item \texttt{/api/evaluate}: Processes pitch text using GPT-4 for comprehensive evaluation
+  \item \texttt{/api/generate-questions}: Produces targeted follow-up questions using evidence-gap analysis
+  \item \texttt{/api/transcribe}: Handles audio file transcription using OpenAI's Whisper model
+  \item \texttt{/api/evaluate-answers}: Supports evaluation updates based on question responses
+\end{itemize}
 
-The question generation system was designed to request one to three high-priority, evidence-seeking questions that target specific gaps in the original pitch content. The system returns a structured JSON response where each question is tagged to a specific evaluation dimension, which helps ensure comprehensive coverage of all assessment criteria. This endpoint was configured to use a lower sampling temperature for improved stability and consistency in question generation. A fallback parser was also implemented that can extract questions from plain text responses if the model doesn't return properly formatted JSON, which makes the system more robust to variations in GenAI model behavior. This question generation approach improves evidence capture for the calibrated scoring rubric without modifying the original pitch content.
+These endpoints run on Vercel's Edge runtime for improved performance and global distribution. All API responses are validated against strict schemas before data persistence to ensure research data integrity.
 
-The complete evaluation pipeline follows a clear sequence: transcribe audio content if needed, generate targeted questions, collect answers, perform comprehensive evaluation, and store results in the database.
-
-Precise TypeScript interfaces were defined to ensure consistent data structures across all API responses and database storage. These type definitions enforce the structured evaluation format and prevent data inconsistencies during processing. Listing~\ref{lst:response-schema} shows the key response schema types implemented for the evaluation system.
-
-\begin{lstlisting}[
-  language=TypeScript,
-  caption={Structured evaluation response schema types},
-  label=lst:response-schema,
-  basicstyle=\footnotesize\ttfamily,
-  breaklines=true
-]
-export interface StructuredEvaluation {
-  criteria: string;
-  score: number;
-  breakdown: {
-    strengths: Array<{
-      point: string;
-      impact: "High" | "Medium" | "Low";
-    }>;
-    improvements: Array<{
-      area: string;
-      priority: "Critical" | "Important" | "Nice to Have";
-      actionable: string;
-    }>;
-    aspectScores: Array<{
-      aspect: string;
-      score: number;
-      rationale: string;
-    }>;
-  };
-  summary: string;
-  recommendations: string[];
-}
-
-export interface StructuredEvaluationData {
-  evaluations: StructuredEvaluation[];
-  overallScore: number;
-  overallFeedback: StructuredFeedback;
-  metadata: {
-    evaluatedAt: string;
-    modelVersion: string;
-    processingTime?: number;
-    promptVersion?: string;
-    policyVersion?: string;
-  };
-}
-
-export interface StructuredFeedback {
-  overallAssessment: {
-    summary: string;
-    keyHighlights: string[];
-    primaryConcerns: string[];
-  };
-  investmentThesis: {
-    viability: "Strong" | "Moderate" | "Weak" | "Not Applicable";
-    reasoning: string;
-    potentialReturns: string;
-  };
-  riskAssessment: {
-    majorRisks: Array<{
-      risk: string;
-      severity: "High" | "Medium" | "Low";
-      mitigation: string;
-    }>;
-    riskScore: number; // 1-10, lower is better
-  };
-  // Additional fields: nextSteps, competitivePosition, foundersAssessment
-}
-\end{lstlisting}
-
-These TypeScript interfaces enforce strict typing throughout the evaluation system, preventing runtime errors and ensuring consistent data structures. The schema was designed to capture both quantitative scores and qualitative feedback at multiple levels of detail, from individual aspect rationales to comprehensive investment assessments. The metadata fields track evaluation timestamps, model versions, and processing times, which supports reproducibility and system monitoring for research applications.
+The Convex functions handle all data lifecycle operations including create, update, remove, favorite, unfavorite, and export operations. Query functions support diverse access patterns needed for both user interface functionality and research data analysis, including filtered searches, statistics, and CSV export for external analysis.
 
 \section{Authentication and Authorization Implementation}
 
-Authentication and authorization were implemented using Clerk to handle user sign-in, session management, and organization contexts throughout the application. Clerk was chosen because it provides complete authentication infrastructure without requiring the building and maintenance of complex user management systems. The service handles password security, email verification, multi-factor authentication, and organization management features that would take significant development time to implement correctly.
+The authentication system uses Clerk to provide complete user management with multi-tenant organization support. This design ensures secure data isolation between different research groups while maintaining a simple security model. The implementation includes Next.js middleware that protects all dashboard routes to identify protected paths and automatically redirects unauthenticated users to the sign-in page. Security headers are applied to all responses through the middleware layer, providing additional protection against common web vulnerabilities. The Clerk integration handles user registration, login, password management, and organization membership without requiring custom authentication logic, reducing security risks while maintaining a professional user experience.
 
-Next.js middleware was configured to protect application routes and inject user identity information on the server side, which ensures that only authenticated users can access the evaluation system. The authorization model was designed using row-level scoping where all Convex database reads and writes are automatically filtered by \texttt{userId} and \texttt{orgId} parameters. This approach provides complete data isolation between different users and organizations without requiring the implementation of custom role-based access control systems or management of complex permission tables. The scoping happens automatically at the database query level, which prevents data leakage and simplifies the security model.
-
-Middleware route protection combined with database-level row scoping enforces secure data isolation without complex role management systems.
 
 \section{User Interface Implementation}
 
-The user interface was designed to provide an intuitive and efficient experience for users evaluating startup pitches while maintaining the consistency needed for research applications. Next.js 15 with React 18 and Tailwind CSS\footnote{\url{https://tailwindcss.com}} was chosen as the frontend technology stack because it enables rapid development of responsive interfaces with modern user experience patterns. The application was organized using Next.js route groups that separate the interface into distinct areas: dashboard for pitch management, individual pitch pages for detailed evaluation views, and authentication areas for user management.
+The user interface was built using Next.js 15 with React 18 and Tailwind CSS to provide a responsive, modern experience optimized for research applications. The application was organized using route groups to separate functional areas: dashboard for pitch management, individual pitch pages for detailed evaluation views, and authentication areas.
 
-The component architecture was structured to promote reusability and maintainability by separating shared UI primitives under \texttt{src/components/ui} from feature-specific components under \texttt{src/components/shared}. This organization allows consistent design patterns to be maintained while building complex user interface functionality. Comprehensive list management features were implemented that support user favorites, text-based search, and filtering by evaluation scores or submission dates. The individual pitch view renders both numeric scores and qualitative feedback alongside the generated follow-up questions, providing users with complete evaluation information in a clear, structured format.
-
-Figure~\ref{fig:dashboard} shows the main dashboard interface where users manage their evaluated pitches. The dashboard provides an overview of all pitch submissions with their evaluation scores, search and filtering capabilities, and direct access to detailed evaluation results.
+Figure~\ref{fig:dashboard} shows the main dashboard interface, which provides overview of all pitch submissions with evaluation scores, search and filtering capabilities, and direct access to detailed results.
 
 \begin{figure}[H]
   \centering
@@ -365,7 +261,9 @@ Figure~\ref{fig:dashboard} shows the main dashboard interface where users manage
   \label{fig:dashboard}
 \end{figure}
 
-Figure~\ref{fig:user-flow-pitch} illustrates the pitch creation flow designed to guide users through the evaluation process systematically. The flow handles both text input and audio file uploads, manages question generation and response collection, performs evaluation processing, and stores results in the Convex database. The question-and-answer step is optional but enabled by default, as it significantly improves evaluation quality by capturing evidence that might be missing from the original pitch content. Users can choose to skip the Q&A phase if they prefer faster processing, though this may result in less comprehensive evaluations when key information is absent from the original pitch.
+The component architecture separates shared UI primitives from feature-specific components to promote reusability and consistent design patterns. The dashboard implements comprehensive list management with user favorites, text-based search, and filtering by evaluation scores or submission dates. Components are organized into logical directories with `src/components/ui/` containing base Shadcn/ui primitives and `src/components/shared/` housing feature-specific components grouped by domain including navigation, forms, modals, and authentication. The multi-step pitch upload process uses a dedicated component hierarchy in `src/components/shared/forms/add-pitches/steps/` that manages state progression, validation, and user guidance throughout the evaluation workflow. This architectural separation ensures consistent design language while enabling independent development and testing of complex features like the question generation and evaluation display components.
+
+Figure~\ref{fig:user-flow-pitch} illustrates the pitch creation workflow that was designed to guide users through the evaluation process efficiently. The flow handles both text input and audio file uploads, manages question generation and response collection, and performs evaluation processing with complete metadata storage.
 
 \begin{figure}[H]
   \centering
@@ -374,24 +272,24 @@ Figure~\ref{fig:user-flow-pitch} illustrates the pitch creation flow designed to
   \label{fig:user-flow-pitch}
 \end{figure}
 
-The user interface guides users through a streamlined, consistent evaluation process while presenting comprehensive scores and feedback in an accessible format.
+The question-and-answer step is optional but enabled by default based on testing that showed significant evaluation quality improvements. Users can skip this step for faster processing, though this may result in less comprehensive evaluations when key information is missing from the original pitch. The questions component implements a multi-step interface that presents one question at a time with visual progress indicators, helping users maintain focus while providing targeted responses that address specific evaluation criteria gaps. The system dynamically generates up to three questions using GPT-4's analysis of the pitch content, with each question targeting critical missing information needed for accurate assessment. The component includes explanatory text stating ``These questions help improve your evaluation accuracy'' to guide user understanding of the purpose and value of providing additional context during the evaluation process.
+
+The individual pitch view renders both numeric scores and qualitative feedback alongside generated follow-up questions, providing users with complete evaluation information in a clear, structured format optimized for review and improvement planning. The pitch page implementation uses lazy loading to optimize performance by loading components like `ScoreOverview`, `EvaluationSummary`, `DetailedAnalysis`, and `QuestionsSection` only when needed, while maintaining responsive skeleton placeholders during content loading. The system supports both legacy and structured evaluation formats through conditional rendering that automatically detects the evaluation data type and displays the appropriate analysis components. This modular architecture enables rich data visualization with transcript sections, comprehensive score breakdowns, and targeted improvement recommendations while maintaining fast initial page loads and smooth user interactions throughout the evaluation review process.
 
 \section{Performance, Deployment, and Reliability}
 
-The system's performance characteristics were designed to handle the computational demands of GenAI-powered evaluation while maintaining responsive user interactions. Virtualized lists were implemented that keep the interface responsive even when users work with large datasets of evaluated pitches. Code splitting techniques were used to defer loading of non-critical user interface components, which reduces initial page load times and improves the perceived performance of the application. The reactive query system eliminates manual polling by automatically updating the interface when evaluation results become available, which provides immediate feedback to users without requiring page refreshes.
+System performance was optimized to handle the computational demands of GenAI processing while maintaining responsive user interactions. The implementation uses virtualized lists to maintain interface responsiveness with large datasets, code splitting to reduce initial page load times, and reactive queries that eliminate manual polling by automatically updating the interface when results become available.
 
-The deployment architecture was configured to optimize both performance and reliability across different environments. Critical API routes run on Vercel's Edge runtime where configured, which provides global distribution and reduced latency for evaluation requests. System configuration is managed through environment variables including the Convex database URL, Clerk authentication keys, and OpenAI API credentials. Identical code paths were ensured to execute in both development and production environments, which maintains comparability of evaluation results across different deployment contexts and enables reliable testing of system behavior.
+The deployment architecture uses Vercel for hosting with environment variables for configuration including database URLs, authentication keys, and API credentials. Critical API routes run on Vercel's Edge runtime for global distribution and reduced latency. The deployment pipeline ensures identical code paths across development and production environments to maintain evaluation result consistency.
 
-Comprehensive error handling and reliability measures were implemented throughout the system architecture. API routes return clear, actionable error messages that help users understand what went wrong and how to resolve issues without exposing sensitive internal system details. The user interface presents error information in a way that guides users toward successful task completion while maintaining security by not revealing system internals that could be exploited.
-
-Performance optimizations and deployment strategies prioritize system responsiveness and maintain consistent behavior across all environments.
+For reliability, comprehensive error handling was implemented throughout the system. API routes return clear, actionable error messages that help users resolve problems without exposing sensitive system details. The system includes exponential backoff retries for external API interactions and strict JSON validation before data persistence to prevent corrupted evaluations from entering the research database.
 
 \section{Implementation Results and User Experience}\label{sec:results}
 
-The system's performance characteristics and user experience were measured to validate that the implementation meets the design objectives established for responsive and consistent startup pitch evaluation. Text-based pitch evaluations typically complete within 30 to 60 seconds from submission to final results, which provides users with timely feedback without creating lengthy waiting periods. Audio-based submissions require additional processing time for transcription using the Whisper model, but the total evaluation time remains reasonable for practical use in both research and educational contexts.
+The implemented system achieves the design goals of providing consistent, evidence-based startup pitch evaluations. Text-based pitch evaluations typically complete within 30 to 60 seconds, providing timely feedback without disrupting research workflows. Audio-based submissions require additional processing time for transcription but remain within acceptable bounds for practical use.
 
-The user interface was designed to provide immediate visual feedback throughout the evaluation process, with reactive updates that make list changes visible without requiring manual page refreshes. Users can see evaluation progress in real time and access results immediately after processing completes. The system maintains responsive performance even when handling multiple simultaneous evaluations, which supports both individual use and classroom scenarios where multiple students might submit pitches concurrently.
+The user interface provides immediate visual feedback throughout the evaluation process with real-time updates that make data changes visible without manual page refreshes. The system maintains responsive performance during concurrent usage, supporting both individual use and classroom scenarios where multiple students submit pitches simultaneously.
 
-The performance and user experience characteristics demonstrate achievement of the design goals established for creating a system that provides responsive, consistent pitch assessments suitable for academic research and iterative development work. The combination of reasonable processing times, reactive interface updates, and reliable performance enables the system to serve both research and practical evaluation needs effectively.
+The systematic development approach ensured all components integrate properly while maintaining research data integrity. The evidence-based evaluation framework successfully addresses the central tendency problem identified in initial testing, producing meaningful score distributions that discriminate between pitches of different quality levels.
 
-The implemented Pista system is documented as currently operational. Emphasis was placed on the working system rather than covering earlier experimental approaches with NextAuth and PostgreSQL, industry-specific weight profiles, or ensemble evaluation using multiple model providers. Those alternative approaches represent potential future extensions that are referenced in the discussion chapter as opportunities for continued research and development.
+The complete implementation represents a working system that combines GenAI capabilities with research-quality data collection, providing both immediate user value and a foundation for continued evaluation methodology research.

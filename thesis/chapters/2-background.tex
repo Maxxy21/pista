@@ -1,23 +1,27 @@
 \chapter{Background and Related Work}
 \label{ch:soa}
-This chapter reviews previous research on pitch evaluation and GenAI-based assessment systems. The problems with traditional pitch evaluation methods are first examined, followed by an exploration of how GenAI systems address these issues. The need for better evaluation methods is demonstrated, and current GenAI evaluation systems and their capabilities are examined.
+This chapter examines existing research on startup pitch evaluation methods and GenAI-driven assessment systems. The problems with traditional pitch evaluation methods are first examined, followed by an exploration of how GenAI systems address these issues. The need for better evaluation methods is demonstrated, and current GenAI evaluation systems and their capabilities are examined.
 
 \section{Limitations of Traditional Pitch Evaluation Methods}
 \label{sec:traditional-methods}
 
-This section explains the main problems with traditional evaluation methods. Three key issues are identified: poor scalability, limited reliability, and restricted access for many entrepreneurs.
+Startup pitch evaluation has traditionally relied on human experts and standardized frameworks to assess entrepreneurial ventures. This section examines these established approaches and identifies their key limitations that motivate the development of automated evaluation systems.
 
-For decades, startup pitch evaluation has relied on experts using their judgment and experience. Most evaluation happens through expert panels or standardized scoring frameworks. Both methods remain important in how investors make decisions. However, research shows three main problems with these traditional approaches: they don't scale well, they're not consistent, and they're hard for many entrepreneurs to access. Both expert panels and standardized frameworks are examined to better understand these challenges.
+Startup pitch evaluation is the systematic process of assessing entrepreneurial venture presentations to determine their viability, potential, and investment worthiness. Investors and stakeholders use these evaluations to make funding decisions by analyzing business models, market opportunities, team capabilities, and financial projections. For decades, this evaluation process has been dominated by two main approaches: expert panels that rely on human judgment and experience, and standardized frameworks that apply consistent criteria across different pitches.
+
+Understanding these traditional methods is important because they form the foundation for most current investment decisions. However, recent research has identified three fundamental limitations that challenge their effectiveness: scalability constraints, consistency problems, and accessibility barriers. These limitations affect both the quality of evaluations and the fairness of access to funding opportunities.
 
 \subsection{Expert Panels}\label{subsec:expert-panels}
-Expert panels use industry professionals, investors, and entrepreneurs to evaluate startup pitches. These panels watch live presentations and give feedback based on specific criteria about market opportunity and team quality. Proponents of this approach argue that human insight is valuable for judging aspects that are difficult to measure computationally, such as founder passion, confidence levels, and presentation quality.
+
+Expert panels represent the most traditional approach to startup pitch evaluation. These panels consist of industry professionals, experienced investors, and successful entrepreneurs who assess startup presentations based on their domain expertise and practical experience. These panels watch live presentations and give feedback based on specific criteria about market opportunity and team quality. Proponents of this approach argue that human insight is valuable for judging aspects that are difficult to measure computationally, such as founder passion, confidence levels, and presentation quality.
 
 However, research shows that expert panels have consistency problems. Gius (2024) looked at data from 67 startup competitions and found that expert judges often disagree when evaluating the same pitches \cite{Gius2024}. This disagreement is actually common and can even predict which startups will succeed. The variation in expert opinions raises questions about whether these evaluations are reliable and fair.
 
 Bias is another serious problem with expert panels. Balachandra et al. (2019) found clear gender differences in how investors evaluate pitches \cite{Balachandra2019}. They showed that the same business idea gets different treatment depending on who presents it. Female entrepreneurs get more questions about risks and potential problems, while male entrepreneurs get questions focused on growth opportunities. This shows that even experienced evaluators have unconscious biases that affect their judgments.
 
 \subsection{Standardized Frameworks}\label{subsec:standardized-frameworks}
-To fix the consistency problems with expert panels, many organizations have created standardized evaluation criteria and scoring systems. These frameworks usually look at four main areas:
+Standardized evaluation frameworks emerged as a response to the consistency problems inherent in expert panel assessments. These frameworks represent systematic methodologies that apply uniform evaluation criteria and scoring systems across all pitch assessments. The goal is to reduce subjective variability and improve evaluation reliability by providing structured assessment protocols that all evaluators follow.
+These frameworks usually look at four main areas:
 \begin{itemize}
     \item Market opportunity (market size, growth potential)
     \item Team capability (team experience, diversity)
@@ -30,7 +34,7 @@ Structured scoring systems have been shown to provide better consistency between
 These four areas are commonly emphasized in standardized frameworks due to their demonstrated predictive value for startup success \cite{Kalvapalle2024}.
 
 \subsection{Key Limitations}\label{subsec:key-limitations}
-Traditional evaluation methods face three main problems that work together to make evaluation difficult:
+Despite their widespread use, traditional evaluation methods face three fundamental limitations that affect both the quality and fairness of startup assessments. These limitations represent inherent constraints in human-centered evaluation processes that create systematic barriers to effective pitch assessment:
 
 \begin{enumerate}
     \item \textbf{Scalability}: Human evaluators can only review so many pitches before they get tired and make worse decisions. Hirshleifer et al. (2019) showed that financial analysts become less accurate when they have to evaluate too many things in one day \cite{Hirshleifer2019}. When analysts get tired, they start making more basic mistakes. This means that during busy periods, the quality of evaluations goes down because people can't handle the workload.
