@@ -45,16 +45,7 @@ next-env.d.ts
 .env.development.local
 .env.test.local
 .env.production.local
-.cursor
 
-
-
-
-# clerk configuration (can include secrets)
-/.clerk/
-.claude
-.claude.md
-claude.md
 
 # IDE files
 .idea/
@@ -62,11 +53,12 @@ claude.md
 *.swp
 *.swo
 *~
+ *.iml
+ modules.xml
+ .idea/misc.xml
+ *.ipr
 
-# Development artifacts
-RESTRUCTURE_PLAN.md
-diagram.mmd
-flow-diagram.mermaid
+# Development artifact
 
 # Build cache
 tsconfig.tsbuildinfo
@@ -74,16 +66,3 @@ tsconfig.tsbuildinfo
 # Temporary files
 undefined
 
-AGENTS.md
-GEMINI.md
-CLAUDE.md
-/fixes
-
-SECURITY_AUDIT_REPORT.md
-/.claude/
-.claude/
-/.claude
-
-claude
-
-/claude
