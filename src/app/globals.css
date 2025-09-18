@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Tailwind v3 setup restored (no @plugin/@theme blocks) */
 
 html,
 body,
@@ -165,7 +164,7 @@ body,
 }
 
 @layer utilities {
-    /* Minimal line-clamp utilities (plugin-free) */
+    /* Minimal line-clamp utilities */
     .line-clamp-1 {
         overflow: hidden;
         display: -webkit-box;
