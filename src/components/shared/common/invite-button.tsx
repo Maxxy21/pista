@@ -43,8 +43,7 @@ export const InviteButton = ({ isDark }: InviteButtonProps) => {
             </Dialog>
         );
     }
-
-    // Personal context: open the shared CreateOrganization modal with themed Clerk UI
+    
     return (
         <>
             <SidebarMenuButton

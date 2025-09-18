@@ -4,7 +4,7 @@ export const Loading = () => {
     return (
         <div className="h-full w-full flex flex-col justify-center items-center bg-background">
             <div className="flex flex-col items-center justify-center space-y-6">
-                {/* Logo with enhanced animation */}
+                {/* Logo with animation */}
                 <div className="relative">
                     <div className="animate-pulse duration-1000 flex items-center gap-3">
                         <LogoIcon size="lg"/>
