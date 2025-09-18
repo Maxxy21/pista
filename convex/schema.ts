@@ -8,7 +8,8 @@ const questionAnswer = v.object({
     answer: v.string(),
 });
 
-const evaluation = v.object({
+// Legacy evaluation structure for backward compatibility
+const legacyEvaluation = v.object({
     criteria: v.string(),
     comment: v.string(),
     score: v.number(),
@@ -17,11 +18,92 @@ const evaluation = v.object({
     aspects: v.array(v.string()),
 });
 
-const evaluationData = v.object({
-    evaluations: v.array(evaluation),
-    overallScore: v.number(),
-    overallFeedback: v.string(),
+// New structured evaluation
+const structuredBreakdown = v.object({
+    strengths: v.array(v.object({
+        point: v.string(),
+        impact: v.union(v.literal("High"), v.literal("Medium"), v.literal("Low"))
+    })),
+    improvements: v.array(v.object({
+        area: v.string(),
+        priority: v.union(v.literal("Critical"), v.literal("Important"), v.literal("Nice to Have")),
+        actionable: v.string()
+    })),
+    aspectScores: v.array(v.object({
+        aspect: v.string(),
+        score: v.number(),
+        rationale: v.string()
+    }))
 });
+
+const structuredEvaluation = v.object({
+    criteria: v.string(),
+    score: v.number(),
+    breakdown: structuredBreakdown,
+    summary: v.string(),
+    recommendations: v.array(v.string())
+});
+
+const structuredFeedback = v.object({
+    overallAssessment: v.object({
+        summary: v.string(),
+        keyHighlights: v.array(v.string()),
+        primaryConcerns: v.array(v.string())
+    }),
+    investmentThesis: v.object({
+        viability: v.union(v.literal("Strong"), v.literal("Moderate"), v.literal("Weak"), v.literal("Not Applicable")),
+        reasoning: v.string(),
+        potentialReturns: v.string()
+    }),
+    riskAssessment: v.object({
+        majorRisks: v.array(v.object({
+            risk: v.string(),
+            severity: v.union(v.literal("High"), v.literal("Medium"), v.literal("Low")),
+            mitigation: v.string()
+        })),
+        riskScore: v.number()
+    }),
+    nextSteps: v.object({
+        immediateActions: v.array(v.string()),
+        longTermRecommendations: v.array(v.string()),
+        followUpQuestions: v.array(v.string())
+    }),
+    competitivePosition: v.object({
+        strengths: v.array(v.string()),
+        weaknesses: v.array(v.string()),
+        marketOpportunity: v.string()
+    }),
+    foundersAssessment: v.object({
+        teamStrengths: v.array(v.string()),
+        experienceGaps: v.array(v.string()),
+        executionCapability: v.union(v.literal("Excellent"), v.literal("Good"), v.literal("Fair"), v.literal("Poor"))
+    })
+});
+
+const evaluationMetadata = v.object({
+    evaluatedAt: v.string(),
+    modelVersion: v.string(),
+    processingTime: v.optional(v.number()),
+    promptVersion: v.optional(v.string()),
+    policyVersion: v.optional(v.string())
+});
+
+// Union type to support both legacy and new structured evaluations
+const evaluationData = v.union(
+    // Legacy format
+    v.object({
+        evaluations: v.array(legacyEvaluation),
+        overallScore: v.number(),
+        overallFeedback: v.string(),
+    }),
+    // New structured format
+    v.object({
+        evaluations: v.array(structuredEvaluation),
+        overallScore: v.number(),
+        overallFeedback: structuredFeedback,
+        metadata: evaluationMetadata
+    })
+);
 
 // Table definitions
 const pitches = defineTable({
@@ -38,6 +120,7 @@ const pitches = defineTable({
     updatedAt: v.number(),
 })
     .index("by_org", ["orgId"])
+    .index("by_user", ["userId"]) 
     .index("by_user_org", ["userId", "orgId"])
     .searchIndex("search_title", {
         searchField: "title",
@@ -63,6 +146,7 @@ export default defineSchema({
 
 export {
     questionAnswer,
-    evaluation,
+    legacyEvaluation,
+    structuredEvaluation,
     evaluationData,
 };

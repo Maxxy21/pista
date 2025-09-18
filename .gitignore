@@ -8,6 +8,10 @@
 
 # testing
 /coverage
+/__tests__
+TESTING.md
+/src/test
+vitest.config.ts
 
 # next.js
 /.next/
@@ -41,5 +45,24 @@ next-env.d.ts
 .env.development.local
 .env.test.local
 .env.production.local
-.cursor
 
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+ *.iml
+ modules.xml
+ .idea/misc.xml
+ *.ipr
+
+# Development artifact
+
+# Build cache
+tsconfig.tsbuildinfo
+
+# Temporary files
+undefined
+blob
