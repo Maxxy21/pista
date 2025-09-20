@@ -1,48 +1,39 @@
 # Pista — Startup Pitch Evaluator
 
-Pista is a web application that helps teams review startup pitches in a consistent way. It supports text input, audio transcription, structured evaluation, and clear reports. The focus is on reproducibility and simple, transparent scoring.
+Pista evaluates startup pitches using structured criteria and clear scoring rules. Users upload text or audio files, receive detailed feedback, and can compare results across multiple pitches.
 
-## Overview
+## What It Does
 
-- Upload a pitch as text, a text file, or an audio file.
-- Get a structured evaluation across four criteria with transparent rules.
-- See summaries, strengths, and areas for improvement.
-- Export results and review past pitches in a clean dashboard.
+Upload a pitch in three ways: type directly, upload a text file, or record audio for automatic transcription. The system evaluates four areas: Problem-Solution Fit, Business Model & Market, Team & Execution, and Pitch Quality. Results include numerical scores, written feedback, and suggested improvements.
 
-## How It Works
+The dashboard shows all previous evaluations with search and filtering. Export options include PDF reports and raw data for further analysis.
 
-- Input: type or paste text, upload a `.txt` file, or upload audio for transcription.
-- Processing: the app prepares the content and applies a rubric with clear anchors and scoring rules.
-- Output: JSON results are rendered as charts and summaries, and can be exported as PDF.
+## Technical Setup
+
+Built with Next.js 15, TypeScript, and Tailwind CSS. Uses Convex for real-time data and Clerk for user authentication. OpenAI handles text analysis and audio transcription.
+
+**Requirements:**
+- Node.js 18+
+- OpenAI API key
+- Clerk authentication keys
+- Convex backend deployment
+
+**Installation:**
+```bash
+npm install
+cp .env.example .env.local  # Add your API keys
+npm run dev
+```
 
 ## Project Structure
 
 ```
 src/
-├── app/                    # Next.js App Router
-│   ├── (dashboard)/        # Dashboard route group
-│   ├── (pitch)/            # Pitch details and analysis
-│   └── api/                # API endpoints (evaluate, transcribe, questions)
-├── components/             # UI and shared components
-├── hooks/                  # Custom React hooks
-├── lib/                    # Utilities, types, constants, parsing
-├── providers/              # Context providers
-└── store/                  # State management
+├── app/           # Next.js pages and API routes
+├── components/    # UI components and forms
+├── lib/           # Evaluation logic and utilities
+└── providers/     # Authentication and state management
 ```
-
-## Getting Started
-
-Requirements
-- Node.js 18+ and npm
-- Accounts/keys for your chosen auth and backend services
-
-Setup
-1) Install dependencies
-   - `npm install`
-2) Configure environment
-   - Copy `.env.example` to `.env.local` and fill values
-3) Start development
-   - `npm run dev` and open `http://localhost:3000`
 
 ## Commands
 - `npm run dev` — start the dev server
@@ -51,16 +42,14 @@ Setup
 - `npm run lint` — run ESLint
 - `npm test` — run unit tests (Vitest)
 
-## Evaluation Details
+## How Evaluation Works
 
-Pista uses a rubric with anchors and simple rules to avoid mid‑scale defaults and to prefer evidence. Scores are returned as structured data and aggregated with stable, documented weights. Prompts, model names, and temperatures are versioned in code so results are repeatable.
+The system uses fixed scoring criteria with clear anchor points. Each dimension receives a score from 1-10 based on specific evidence requirements. Prompts and scoring weights are version-controlled to ensure consistent results.
 
-## Security Notes
+All evaluations store structured data including individual scores, aggregate ratings, and qualitative feedback. This supports both single-pitch analysis and cross-pitch comparison studies.
 
-- Authentication and organization scoping are enforced on protected routes.
-- API endpoints validate inputs and apply rate limits.
-- Responses include standard security headers.
+## Research Context
 
-## Acknowledgements
+This application supports a bachelor thesis examining automated pitch evaluation systems. The implementation prioritizes transparent methodology, reproducible results, and measurable agreement with human evaluators.
 
-This project was built to support a bachelor thesis on automated, consistent pitch evaluation. The code and documentation favor clarity, reproducibility, and small, focused modules.
+The codebase emphasizes clarity over complexity, with documented evaluation criteria and traceable scoring decisions.
