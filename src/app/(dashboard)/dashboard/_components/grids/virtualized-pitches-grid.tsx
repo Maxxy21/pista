@@ -60,7 +60,7 @@ export const VirtualizedPitchesGrid: React.FC<VirtualizedPitchesGridProps> = ({
 
     const LIST_CARD_HEIGHT = 200;  // fixed card height in list view
     const GRID_CARD_HEIGHT = 250;  // fixed card height in grid view
-    const ROW_GAP_PX = 24;         // matches `py-3` vertical padding per row
+    const ROW_GAP_PX = 24;
 
     const rowVirtualizer = useVirtualizer({
         count: rowCount,

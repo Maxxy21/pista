@@ -163,7 +163,7 @@ export const ExportPDFButton = ({ data }: ExportPDFButtonProps) => {
         doc.setPage(i)
         doc.setFontSize(10)
         doc.setTextColor(127, 140, 141)
-        doc.text(`PitchPerfect Evaluation Report - Page ${i} of ${pageCount}`, 105, 287, { align: 'center' })
+        doc.text(`Pista Evaluation Report - Page ${i} of ${pageCount}`, 105, 287, { align: 'center' })
       }
       
       // Save the PDF

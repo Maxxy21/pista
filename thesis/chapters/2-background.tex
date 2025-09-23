@@ -1,0 +1,94 @@
+\chapter{Background and Related Work}
+\label{ch:soa}
+This chapter examines existing research on startup pitch evaluation methods and GenAI-driven assessment systems. The problems with traditional pitch evaluation methods are first examined, followed by an exploration of how GenAI systems address these issues. The need for better evaluation methods is demonstrated, and current GenAI evaluation systems and their capabilities are examined.
+
+\section{Limitations of Traditional Pitch Evaluation Methods}
+\label{sec:traditional-methods}
+
+Startup pitch evaluation has traditionally relied on human experts and standardized frameworks to assess entrepreneurial ventures. This section examines these established approaches and identifies their key limitations that motivate the development of automated evaluation systems.
+
+Startup pitch evaluation is a systematic process of assessing entrepreneurial venture presentations to determine their viability, potential, and investment worthiness. Investors and stakeholders use these evaluations to make funding decisions by analyzing business models, market opportunities, team capabilities, and financial projections. For decades, this evaluation process has been dominated by two main approaches: expert panels that rely on human judgment and experience, and standardized frameworks that apply consistent criteria across different pitches.
+
+Understanding these traditional methods is important because they form the foundation for most current investment decisions. However, recent research has identified three fundamental limitations that challenge their effectiveness: scalability constraints, consistency problems, and accessibility barriers. These limitations affect both the quality of evaluations and the fairness of access to funding opportunities.
+
+\subsection{Expert Panels}\label{subsec:expert-panels}
+
+Expert panels represent the most traditional approach to startup pitch evaluation. These panels consist of industry professionals, experienced investors, and successful entrepreneurs who assess startup presentations based on their domain expertise and practical experience. These panels watch live presentations and give feedback based on specific criteria about market opportunity and team quality. Proponents of this approach argue that human insight is valuable for judging aspects that are difficult to measure computationally, such as founder passion, confidence levels, and presentation quality.
+
+However, research shows that expert panels have consistency problems. Gius (2024) looked at data from 67 startup competitions and found that expert judges often disagree when evaluating the same pitches \cite{Gius2024}. This disagreement is actually common and can even predict which startups will succeed. The variation in expert opinions raises questions about whether these evaluations are reliable and fair.
+
+Bias is another serious problem with expert panels. Balachandra et al. (2019) found clear gender differences in how investors evaluate pitches \cite{Balachandra2019}. They showed that the same business idea gets different treatment depending on who presents it. Female entrepreneurs often receive more questions about risks and potential problems, while male entrepreneurs receive inquires focused on growth opportunities. This indicates that even experienced evaluators have unconscious biases that affect their judgments.
+
+\clearpage
+\subsection{Standardized Evaluation Frameworks}\label{subsec:standardized-frameworks}
+Standardized evaluation frameworks emerged as a response to the inconsistency issues inherent in expert panel assessments. These frameworks represent systematic methodologies that apply uniform evaluation criteria and scoring systems across all pitch assessments. The goal is to reduce subjective variability and improve evaluation reliability by providing structured assessment protocols that all evaluators follow.
+These frameworks usually examine four main areas:
+\begin{itemize}
+    \item Market opportunity (market size, growth potential)
+    \item Team capability (team experience, diversity)
+    \item Product innovation (uniqueness, technical feasibility)
+    \item Business model (revenue streams, scalability)
+\end{itemize}
+
+Structured scoring systems have been shown to provide better consistency between evaluators compared to unstructured approaches \cite{Tsay2021VISUALSDI}. However, challenges still exist. A 2020 survey by Gompers et al.\cite{Gompers2020} found significant differences in how venture capital firms evaluate startups. There's no single evaluation framework that everyone in the industry uses. Standardization helps, but the main evaluation problems are still present.
+
+These four areas are commonly emphasized in standardized frameworks due to their demonstrated predictive value for startup success \cite{Kalvapalle2024}.
+
+\subsection{Key Limitations}\label{subsec:key-limitations}
+Despite their widespread use, traditional evaluation methods face three fundamental limitations that affect both the quality and fairness of startup assessments. These limitations represent inherent constraints in human-centered evaluation processes that create systematic barriers to effective pitch assessment:
+
+\begin{enumerate}
+    \item \textbf{Scalability}: Human evaluators can only review a finite number of pitches before they become tired and make worse decisions. Research by Hirshleifer et al. (2019) showed that financial analysts become less accurate when \cite{Hirshleifer2019} evaluating too many things in one day. When analysts get tired, they start making more basic mistakes. During busy periods, the quality of evaluations decreases because people struggle to manage the workload.
+
+    \item \textbf{Geographic Access Barriers}: Most expert evaluators reside in specific cities and regions, making it challenging for startups in other areas to receive good feedback. Colombo et al. (2019) studied how distance affects startup funding in Europe \cite{Colombo2019}. They found that startups far from major investment centers are less likely to seek funding because they feel like they cannot access the right evaluators. This clustering of experts in certain places creates problems for entrepreneurs in remote areas who want quality evaluation.
+
+    \item \textbf{Consistency Challenges}: Traditional evaluation methods struggle to balance subjective feelings with objective facts in a consistent manner. Different evaluators prioritize different levels of importance on personal impressions versus hard data when predicting which startups will succeed \cite{Tsay2021VISUALSDI}. This inconsistency makes it difficult to determine what really matters in evaluation.
+\end{enumerate}
+
+These problems disproportionately affect early-stage startups and underrepresented founders. They demonstrate the need for more systematic and fair ways to evaluate pitches. Traditional methods struggle to be both consistent and contextual at the same time. GenAI systems might help solve this problem because they can apply the same criteria consistently while providing detailed feedback. These limitations motivated the system design described in Chapter~\ref{ch:problem-solution}.
+
+\clearpage
+\section{GenAI-Driven Evaluation Systems}
+\label{sec:GenAI-systems}
+
+This section reviews GenAI-based evaluation systems and compares their capabilities and limitations to traditional methods.
+
+The problems with traditional evaluation methods have led to growing interest in GenAI-based systems. These new systems use large language models and automated text analysis to solve the scalability, consistency, and accessibility problems described above.
+
+\subsection{Current Approaches}\label{subsec:current-approaches}
+The limitations of traditional evaluation methods have sparked growing interest in GenAI-based solutions, leading to diverse approaches that address specific challenges. These approaches can be categorized into several key types, each targeting different aspects of the evaluation process:
+
+\begin{itemize}
+    \item \textbf{Machine Learning-Based Assessment}: Researchers have built systems that learn from data about past startups to make better evaluation decisions. Arroyo et al. \cite{Arroyo2019} (2019)  showed how machine learning can help venture capital firms make decisions . These systems examine patterns in successful and failed startups to figure out what makes startups succeed.
+
+    \item \textbf{Text-Based Evaluation Systems}: These systems use automated text analysis to read and evaluate pitch content, business plans, and presentation materials. They can judge things like how clear the value proposition is, how well the team understands the market, and how they position themselves against competitors.
+
+    \item \textbf{GenAI Evaluation Platforms}: Several GenAI-powered evaluation systems have emerged in this area. Winds2Ventures (W2V), developed within the same research group, provides startup evaluations based on multiple criteria and gives structured feedback \cite{w2v}. This platform was made available for comparison through supervisor facilitation, enabling benchmarking against different GenAI evaluation approaches.
+
+    \item \textbf{Large Language Model Integration}: Recent advances in large language models have made it possible to create more sophisticated systems that understand text better. These systems can read pitch content and provide detailed feedback on many different aspects of the pitch at once.
+\end{itemize}
+
+
+\subsection{Performance Considerations}\label{subsec:performance-considerations}
+GenAI systems have several advantages compared to traditional evaluation methods:
+
+\begin{itemize}
+    \item \textbf{Scalability}: GenAI systems can evaluate many pitches without getting tired like human evaluators do. This means they can maintain consistent quality even when processing large volumes of pitches.
+
+    \item \textbf{Consistency}: Automated systems apply the same evaluation criteria every time, which reduces the variability that happens with human expert panels.
+
+    \item \textbf{Accessibility}: GenAI-based evaluation can provide quality feedback to entrepreneurs anywhere in the world. This solves the access problems that come with expert panels that are only available in certain locations.
+
+    \item \textbf{Structured Feedback}: GenAI systems provide detailed, organized feedback on multiple aspects of a pitch. This helps entrepreneurs understand exactly what they need to improve.
+\end{itemize}
+
+However, GenAI systems still have important limitations. Humans are still needed to check the context and make final investment decisions \cite{Steyvers2024}. GenAI systems might have trouble understanding subtle aspects of entrepreneurship that require deep knowledge about specific industries or market dynamics that go beyond what they can learn from text.
+
+\clearpage
+\subsection{Diversity in GenAI Evaluation Approaches}\label{subsec:GenAI-evaluation-diversity}
+As GenAI evaluation systems develop, different platforms have appeared with different ways of assessing pitches. Understanding these differences positions the comparison research within the broader world of automated evaluation systems; GenAI systems differ in their evaluation criteria, algorithms, and feedback mechanisms. Some platforms focus on analyzing many different criteria at once, while others emphasize specific areas like market validation or team assessment. These differences create opportunities to study how different GenAI evaluation approaches compare when they look at the same pitches.
+
+The growing diversity of GenAI evaluation systems creates both opportunities and challenges. This diversity motivates comparative studies that examine how different automated approaches agree or disagree in their assessments. This comparison guides the evaluation design in Chapter~\ref{ch:evaluation}.
+
+
+
