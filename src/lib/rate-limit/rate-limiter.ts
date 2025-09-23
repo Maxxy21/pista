@@ -1,4 +1,4 @@
-import { NextRequest } from "next/server";
+import {NextRequest} from "next/server";
 
 interface RateLimitStore {
   [key: string]: {
@@ -32,18 +32,16 @@ class RateLimiter {
   }
 
   private getClientIdentifier(req: NextRequest): string {
-    // Try to get IP from various headers (for proxy setups)
+    // Try to get IP from various headers for proxy setups
     const forwarded = req.headers.get('x-forwarded-for');
     const realIp = req.headers.get('x-real-ip');
     const cfConnectingIp = req.headers.get('cf-connecting-ip');
     
     // Extract first IP if comma-separated
-    const ip = forwarded?.split(',')[0]?.trim() || 
-               realIp || 
-               cfConnectingIp || 
-               '127.0.0.1';
-    
-    return ip;
+      return forwarded?.split(',')[0]?.trim() ||
+        realIp ||
+        cfConnectingIp ||
+        '127.0.0.1';
   }
 
   isRateLimited(req: NextRequest): { limited: boolean; remaining?: number; resetTime?: number } {
@@ -64,7 +62,6 @@ class RateLimiter {
       };
     }
 
-    // Increment count
     this.store[key].count++;
 
     // Check if limit exceeded
@@ -117,8 +114,7 @@ export function withRateLimit(limiter: RateLimiter) {
 
       // Add rate limit headers to successful responses
       const response = await handler(req, context);
-      
-      // Clone response to add headers
+
       const newResponse = new Response(response.body, {
         status: response.status,
         statusText: response.statusText,

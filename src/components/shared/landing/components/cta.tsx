@@ -23,8 +23,8 @@ const CTA = () => {
                                 Ready to Perfect Your Pitch?
                             </h2>
                             <p className="mb-8 text-xl text-muted-foreground max-w-2xl mx-auto">
-                                Join thousands of startups who have improved their pitch decks with our
-                                AI-powered platform. Get started today.
+                                Join startups who have improved their pitch decks with our
+                                GenAI-powered platform. Get started today.
                             </p>
                             <motion.div whileHover={{scale: 1.05}} whileTap={{scale: 0.95}}>
                                 <Link href="/sign-up">

@@ -13,9 +13,6 @@ export function hasMetadata(evaluation: UniversalEvaluationData): evaluation is 
   return isStructuredEvaluationData(evaluation) && !!evaluation.metadata
 }
 
-export function getEvaluationMetadata(evaluation: UniversalEvaluationData) {
-  return hasMetadata(evaluation) ? evaluation.metadata : null
-}
 
 export function getOverallFeedback(evaluation: UniversalEvaluationData): StructuredFeedback | string {
   if (isStructuredEvaluationData(evaluation)) {

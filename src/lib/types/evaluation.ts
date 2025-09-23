@@ -17,7 +17,7 @@ export interface StructuredFeedback {
       severity: "High" | "Medium" | "Low";
       mitigation: string;
     }>;
-    riskScore: number; // 1-10, lower is better
+    riskScore: number;
   };
   nextSteps: {
     immediateActions: string[];

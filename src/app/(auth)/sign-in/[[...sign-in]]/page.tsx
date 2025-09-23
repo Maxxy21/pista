@@ -15,10 +15,9 @@ const SignInPage = () => {
                 <div className="relative z-20 mt-auto">
                     <blockquote className="space-y-2">
                         <p className="text-lg">
-                            &quot;Join thousands of startups who have improved their pitch decks with our AI-powered
-                            platform.&quot;
+                            &quot;Pista: A GenAI-powered system for automated startup pitch evaluation.&quot;
                         </p>
-                        <footer className="text-sm">Join our community today</footer>
+                        <footer className="text-sm">Welcome back</footer>
                     </blockquote>
                 </div>
             </div>

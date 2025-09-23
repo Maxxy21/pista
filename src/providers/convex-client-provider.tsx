@@ -21,7 +21,6 @@ export const ConvexClientProvider = ({
     const convex = useMemo(() => new ConvexReactClient(convexUrl), []);
     const pathname = usePathname();
 
-    // Check if we're on an auth page
     const isAuthPage = pathname === '/sign-in' || pathname === '/sign-up';
 
     const { resolvedTheme } = useTheme();

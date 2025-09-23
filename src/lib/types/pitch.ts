@@ -1,5 +1,3 @@
-// lib/types/pitch.ts
-
 import { Id } from "@/convex/_generated/dataModel";
 import { UniversalEvaluationData } from "@/lib/utils/evaluation-utils";
 

@@ -2,7 +2,7 @@
 import { RateLimiter } from "limiter";
 
 const limiter = new RateLimiter({
-    tokensPerInterval: 5, // Adjust based on your needs
+    tokensPerInterval: 5, // Allow 5 requests
     interval: "minute"
 });
 

@@ -35,9 +35,7 @@ export const FILE_VALIDATION_CONFIGS: Record<string, FileValidationOptions> = {
   }
 };
 
-/**
- * Validates a single file against the provided options
- */
+
 export function validateFile(file: File, options: FileValidationOptions): FileValidationResult {
   // Check file size
   if (file.size > options.maxSize) {
@@ -49,7 +47,7 @@ export function validateFile(file: File, options: FileValidationOptions): FileVa
     };
   }
 
-  // Check file type (MIME type)
+  // Check file type
   if (!options.allowedTypes.includes(file.type)) {
     return {
       valid: false,
@@ -79,31 +77,8 @@ export function validateFile(file: File, options: FileValidationOptions): FileVa
   return { valid: true };
 }
 
-/**
- * Validates multiple files
- */
-export function validateFiles(files: File[], options: FileValidationOptions): FileValidationResult {
-  if (options.maxFiles && files.length > options.maxFiles) {
-    return {
-      valid: false,
-      error: `Too many files. Maximum allowed: ${options.maxFiles}`,
-      code: 'TOO_MANY_FILES'
-    };
-  }
 
-  for (const file of files) {
-    const result = validateFile(file, options);
-    if (!result.valid) {
-      return result;
-    }
-  }
 
-  return { valid: true };
-}
-
-/**
- * Performs additional security checks on the file
- */
 function performSecurityChecks(file: File): FileValidationResult {
   // Check for suspicious file names
   const suspiciousPatterns = [
@@ -122,7 +97,7 @@ function performSecurityChecks(file: File): FileValidationResult {
     }
   }
 
-  // Check for empty files (usually suspicious)
+  // Check for empty files (0 bytes)
   if (file.size === 0) {
     return {
       valid: false,
@@ -142,24 +117,3 @@ function getFileExtension(filename: string): string {
   return lastDotIndex === -1 ? '' : filename.slice(lastDotIndex).toLowerCase();
 }
 
-/**
- * Sanitizes a filename for safe storage
- */
-export function sanitizeFilename(filename: string): string {
-  // Remove or replace dangerous characters
-  return filename
-    .replace(/[^a-zA-Z0-9.-]/g, '_') // Replace non-alphanumeric chars with underscore
-    .replace(/_{2,}/g, '_') // Replace multiple underscores with single
-    .replace(/^_+|_+$/g, '') // Remove leading/trailing underscores
-    .slice(0, 255); // Limit filename length
-}
-
-/**
- * Higher-order function to validate files in API routes
- */
-export function withFileValidation(options: FileValidationOptions) {
-  return function(files: File | File[]): FileValidationResult {
-    const fileArray = Array.isArray(files) ? files : [files];
-    return validateFiles(fileArray, options);
-  };
-}

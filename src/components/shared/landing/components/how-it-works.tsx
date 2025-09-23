@@ -15,7 +15,7 @@ const HowItWorks = () => {
                 </div>
 
                 <div className="relative">
-                    {/* Connection Line */}
+
                     <div
                         className="hidden lg:block absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/10 via-primary/30 to-primary/10 transform -translate-y-1/2 z-0"/>
 
