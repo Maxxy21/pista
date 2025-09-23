@@ -25,7 +25,7 @@ const Hero = () => {
                         variants={animations.fadeIn}
                         className="inline-block px-4 py-1.5 mb-6 rounded-full bg-primary/10 text-primary text-sm font-medium"
                     >
-                        Transform your startup pitch with AI
+                        Transform your startup pitch with GenAI
                     </motion.div>
                     <motion.h1
                         variants={animations.fadeIn}

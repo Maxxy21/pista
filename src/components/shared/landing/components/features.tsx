@@ -11,7 +11,7 @@ const Features = () => {
                         <div className="text-center mb-16">
                             <h2 className="text-3xl font-bold mb-4">Transform Your Pitch with AI</h2>
                             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                                Our platform leverages advanced AI to analyze every aspect of your pitch
+                                Our platform leverages GenAI to analyze every aspect of your pitch
                                 and provide actionable insights.
                             </p>
                         </div>

@@ -4,56 +4,56 @@ export const features = [
     {
         title: "AI-Powered Analysis",
         description:
-            "Our advanced AI evaluates your pitch across multiple dimensions, providing comprehensive feedback that highlights strengths and areas for improvement.",
+            "AI evaluates your pitch content and structure, providing feedback on key areas like clarity, flow, and business fundamentals.",
         icon: Sparkles,
     },
     {
-        title: "Instant Feedback",
+        title: "Fast Feedback",
         description:
-            "Get detailed feedback in minutes, not days. Make improvements in real-time and iterate quickly on your pitch deck.",
+            "Get feedback within minutes of submitting your pitch. No waiting for human reviewers or scheduling calls.",
         icon: Zap,
     },
     {
-        title: "Expert Insights",
+        title: "Business-Focused Review",
         description:
-            "Our AI is trained on thousands of successful pitch decks and investor feedback to provide industry-specific recommendations.",
+            "Receive feedback on essential pitch elements including problem definition, solution clarity, market opportunity, and business model.",
         icon: Award,
     },
     {
-        title: "Comprehensive Evaluation",
+        title: "Detailed Scoring",
         description:
-            "Receive scores and detailed analysis on your problem-solution fit, business model, team capabilities, and presentation quality.",
+            "Get scores across different pitch dimensions with specific feedback on what works well and what could be improved.",
         icon: Target,
     },
     {
-        title: "Follow-up Q&A",
+        title: "Investor Questions",
         description:
-            "Get AI-generated questions that investors might ask and practice your responses for a more complete pitch evaluation.",
+            "Get potential investor questions based on your pitch content to help you prepare for real pitch meetings.",
         icon: MessageSquareText,
     },
     {
-        title: "Multiple Upload Options",
+        title: "Text Input",
         description:
-            "Upload audio recordings, text files, or type your pitch directly. Our flexible system works with your preferred format.",
+            "Submit your pitch by typing directly or uploading a text file. Simple and straightforward process.",
         icon: CheckCircle2,
     },
 ];
 
 export const steps = [
     {
-        title: "Upload Your Pitch",
+        title: "Submit Your Pitch",
         description:
-            "Simply upload your pitch as audio, text file, or type it directly into our platform. We support multiple formats for your convenience.",
+            "Type your pitch directly or upload a text file. The system processes text-based pitch content.",
     },
     {
         title: "AI Analysis",
         description:
-            "Our AI analyzes your pitch across key dimensions including problem-solution fit, business model, team capabilities, and presentation quality.",
+            "AI analyzes your pitch content for structure, clarity, and key business elements like problem-solution fit and market opportunity.",
     },
     {
-        title: "Get Detailed Feedback",
+        title: "Review Feedback",
         description:
-            "Receive a comprehensive evaluation with specific scores, strengths, improvements, and actionable recommendations to enhance your pitch.",
+            "Get scores and specific feedback on different aspects of your pitch, plus potential investor questions to consider.",
     },
 ];
 
