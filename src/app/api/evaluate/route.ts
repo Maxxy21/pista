@@ -24,7 +24,7 @@ import {
 } from "@/lib/constants/eval";
 
 // export const runtime = "edge";
-export const maxDuration = 300;
+export const maxDuration = 60;
 const MAX_CONTENT_CHARS = CONTENT_LIMITS.evaluateChars;
 
 const EVALUATION_CRITERIA = {

@@ -5,7 +5,7 @@ import { withRateLimit, transcriptionRateLimiter } from '@/lib/rate-limit/rate-l
 import { validateFile, FILE_VALIDATION_CONFIGS } from '@/lib/validation/file-validator';
 import { z } from 'zod';
 
-export const runtime = 'edge';
+// export const runtime = 'edge';
 
 export const POST = withRateLimit(transcriptionRateLimiter)(withAuth(async (req: AuthenticatedRequest) => {
     let formData: FormData | null = null;

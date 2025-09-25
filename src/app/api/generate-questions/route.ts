@@ -5,7 +5,7 @@ import { withRateLimit, apiRateLimiter } from "@/lib/rate-limit/rate-limiter";
 import { z } from "zod";
 import { MODEL_NAME } from "@/lib/constants/eval";
 
-export const runtime = "edge";
+// export const runtime = "edge";
 export const maxDuration = 60;
 const MAX_PROMPT_CHARS = 4000;
 const truncate = (text: string, max: number) =>

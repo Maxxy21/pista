@@ -5,8 +5,8 @@ import { withAuth, AuthenticatedRequest } from "@/lib/auth/api-auth";
 import { withRateLimit, apiRateLimiter } from "@/lib/rate-limit/rate-limiter";
 import { z } from "zod";
 
-export const runtime = "edge";
-export const maxDuration = 120;
+// export const runtime = "edge";
+export const maxDuration = 60;
 
 interface QA {
     question: string;
