@@ -6,6 +6,7 @@ import { withRateLimit, apiRateLimiter } from "@/lib/rate-limit/rate-limiter";
 import { z } from "zod";
 
 export const runtime = "edge";
+export const maxDuration = 120;
 
 interface QA {
     question: string;

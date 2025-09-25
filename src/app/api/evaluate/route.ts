@@ -23,7 +23,7 @@ import {
   SCORING_SYSTEM_PROMPT,
 } from "@/lib/constants/eval";
 
-export const runtime = "edge";
+// export const runtime = "edge";
 export const maxDuration = 300;
 const MAX_CONTENT_CHARS = CONTENT_LIMITS.evaluateChars;
 

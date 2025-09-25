@@ -123,6 +123,7 @@ export function usePitchSubmission() {
       const evaluation = await evaluateText(normalized, enableQA ? qa : [])
 
       // Create pitch
+      evalProg.setStep('saving', 'Saving pitch...')
       const id = await createPitch({
         orgId: workspace.mode === "org" ? organization?.id : undefined,
         title,
