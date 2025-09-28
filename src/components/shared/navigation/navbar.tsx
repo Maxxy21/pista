@@ -36,7 +36,7 @@ export function Navbar({ title = "Dashboard", rateLimit, searchValue, setSearchV
   return (
     <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex h-16 items-center gap-3 px-3 md:px-6 lg:px-8">
-        {/* Left section */}
+
         <div className="flex items-center gap-2 min-w-0">
           <SidebarTrigger className="-ml-1" />
           <Separator orientation="vertical" className="h-5 hidden sm:block" />
@@ -45,7 +45,7 @@ export function Navbar({ title = "Dashboard", rateLimit, searchValue, setSearchV
           </h1>
         </div>
 
-        {/* Center section - Search (Miro-style) */}
+
         {searchValue !== undefined && setSearchValue && (
           <div className="flex flex-1 justify-center mx-2 md:mx-4 min-w-0 max-w-full md:max-w-2xl">
             <SearchForm

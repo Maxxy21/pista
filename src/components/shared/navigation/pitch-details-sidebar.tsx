@@ -36,6 +36,7 @@ import { useApiMutation } from "@/hooks/use-api-mutation";
 import { useWorkspace } from "@/hooks/use-workspace";
 import { type UniversalPitchData } from "@/lib/types/pitch";
 import { getOverallFeedback } from "@/lib/utils/evaluation-utils";
+import { exportPitchToPDF } from "@/lib/utils/pdf-export";
 
 import { SearchForm } from "../forms/search-form";
 import { InviteButton } from "../common/invite-button";
@@ -112,43 +113,15 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
     const { mutate: onUnfavorite, pending: pendingUnfavorite } = useApiMutation(api.pitches.unfavorite);
 
 
-    // Export current pitch as CSV
+    // Export current pitch as PDF
     const onExport = React.useCallback(() => {
         try {
             if (!currentPitch) return;
-            
-            const headers = [
-                "id", "title", "type", "author", "createdAt",
-                "overallScore", "evaluatedAt", "modelVersion", "promptVersion", "policyVersion"
-            ];
-            
-            const ev: any = currentPitch.evaluation || {};
-            const meta: any = ev.metadata || {};
-            const row = [
-                String(currentPitch._id),
-                JSON.stringify(currentPitch.title ?? ""),
-                JSON.stringify(currentPitch.type ?? ""),
-                JSON.stringify(currentPitch.authorName ?? ""),
-                new Date(currentPitch.createdAt).toISOString(),
-                String(ev.overallScore ?? ""),
-                meta.evaluatedAt ?? "",
-                JSON.stringify(meta.modelVersion ?? ""),
-                JSON.stringify(meta.promptVersion ?? ""),
-                JSON.stringify(meta.policyVersion ?? "")
-            ];
-            
-            const csv = [headers.join(","), row.join(",")].join("\n");
-            const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = `pitch-${String(currentPitch._id)}.csv`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+
+            exportPitchToPDF(currentPitch);
+            toast.success("PDF exported successfully");
         } catch (e) {
-            toast.error("Failed to export");
+            toast.error("Failed to export PDF");
         }
     }, [currentPitch]);
 
@@ -490,10 +463,10 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                             <SidebarMenuItem>
-                                <SidebarMenuButton 
+                                <SidebarMenuButton
                                     className="hover:bg-muted/50 transition-all duration-200"
                                     onClick={onExport}
-                                    tooltip={state === "collapsed" ? "Export CSV" : undefined}
+                                    tooltip={state === "collapsed" ? "Export PDF" : undefined}
                                 >
                                     <Download />
                                     <span>Export</span>

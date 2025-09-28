@@ -40,7 +40,7 @@ export function createSecurityHeaders() {
     // Prevent DNS prefetching
     'X-DNS-Prefetch-Control': 'off',
     
-    // Permissions Policy (formerly Feature Policy)
+    // Permissions Policy
     'Permissions-Policy': [
       'camera=()',
       'microphone=(self)',

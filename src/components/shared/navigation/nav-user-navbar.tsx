@@ -1,12 +1,11 @@
 "use client"
 
-import { LogOut, User, Download, Check } from 'lucide-react'
+import { LogOut, User, Download } from 'lucide-react'
 import { toast } from "sonner";
-import {useClerk, useUser, useOrganization, useOrganizationList} from "@clerk/nextjs"
+import {useClerk, useUser} from "@clerk/nextjs"
 import {useTheme} from "next-themes"
 import React, { useEffect, useState } from "react";
-import Link from "next/link";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+
 
 import {
     Avatar,
@@ -20,24 +19,16 @@ import {
     DropdownMenuItem,
     DropdownMenuLabel,
     DropdownMenuSeparator,
-    DropdownMenuSub,
-    DropdownMenuSubContent,
-    DropdownMenuSubTrigger,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {Button} from "@/components/ui/button"
-import {dark} from "@clerk/themes"
 import { getClerkAppearance } from "@/lib/utils/clerk-appearance";
-// import {useRouter} from "next/navigation";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { CreateOrganizationModal } from "./create-organization-modal";
 import { useWorkspace } from "@/hooks/use-workspace";
 import { ThemeMenu } from "./theme-menu";
-import { exportPitchesCsv } from "@/lib/utils/pitch-export";
+import { exportPitchesCsv } from "@/lib/utils/csv-export";
 
 interface NavUserNavbarProps {
     isDark?: boolean
@@ -48,26 +39,12 @@ export function NavUserNavbar({isDark, className}: NavUserNavbarProps) {
     const {user} = useUser()
     const {signOut, openUserProfile} = useClerk()
     const {setTheme, theme} = useTheme()
-    const router = useRouter()
-    const pathname = usePathname()
-    const searchParams = useSearchParams()
-    const { organization } = useOrganization()
     const workspace = useWorkspace()
     const [exportRequested, setExportRequested] = useState(false)
-    const { userMemberships, setActive } = useOrganizationList({ userMemberships: { infinite: true } })
     const pitches = useQuery(
       api.pitches.getFilteredPitches,
       workspace.mode === 'org' && workspace.orgId ? { orgId: workspace.orgId } : (workspace.userId ? { ownerUserId: workspace.userId } : "skip")
     ) as any[] | "skip" | undefined
-
-
-    const setCtx = (mode: 'user' | 'org') => {
-        const current = new URLSearchParams(Array.from(searchParams.entries()))
-        if (mode === 'user') current.delete('ctx')
-        else current.set('ctx', 'org')
-        const q = current.toString()
-        router.replace(`${pathname}${q ? `?${q}` : ''}`)
-    }
 
     const handleSignOut = async () => {
         try {
@@ -79,7 +56,7 @@ export function NavUserNavbar({isDark, className}: NavUserNavbarProps) {
 
     useEffect(() => {
         if (!exportRequested) return
-        if (!organization || !Array.isArray(pitches)) return
+        if (!Array.isArray(pitches)) return
 
         const toastId = toast.loading("Preparing CSV…")
         const { data, error } = exportPitchesCsv(pitches as any[])
@@ -89,7 +66,7 @@ export function NavUserNavbar({isDark, className}: NavUserNavbarProps) {
           toast.success(`Exported ${data?.rows ?? 0} rows`, { id: toastId })
         }
         setExportRequested(false)
-    }, [exportRequested, organization, pitches])
+    }, [exportRequested, pitches])
 
     if (!user) return null
 
@@ -129,12 +106,6 @@ export function NavUserNavbar({isDark, className}: NavUserNavbarProps) {
                                 <span className="truncate font-semibold">
                                     {user.fullName}
                                 </span>
-                                <Badge
-                                    variant="outline"
-                                    className="h-5 text-[10px] bg-primary/5 text-primary border-primary/20 font-medium"
-                                >
-                                    Pro
-                                </Badge>
                             </div>
                             <span className="truncate text-xs text-muted-foreground">
                                 {user.primaryEmailAddress?.emailAddress}
@@ -143,8 +114,7 @@ export function NavUserNavbar({isDark, className}: NavUserNavbarProps) {
                     </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator/>
-                
-                {/* Organization submenu removed; use organization switcher in sidebar */}
+
                 <DropdownMenuItem
                     onClick={() => openUserProfile({appearance: getClerkAppearance(isDark)})}
                     className="gap-2"
@@ -155,7 +125,7 @@ export function NavUserNavbar({isDark, className}: NavUserNavbarProps) {
                 <DropdownMenuItem
                     className="gap-2"
                     onClick={() => setExportRequested(true)}
-                    disabled={!organization || !Array.isArray(pitches)}
+                    disabled={!Array.isArray(pitches) || pitches.length === 0}
                 >
                     <Download className="mr-2 h-4 w-4 text-muted-foreground"/>
                     Export CSV
