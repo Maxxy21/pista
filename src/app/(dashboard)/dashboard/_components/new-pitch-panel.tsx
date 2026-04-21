@@ -95,7 +95,7 @@ export function NewPitchPanel() {
               id="title" 
               value={form.title} 
               onChange={(e) => form.setTitle(e.target.value)} 
-              placeholder="My awesome pitch" 
+              placeholder='e.g. "AI-powered inventory management for SMBs"'
             />
           </div>
 
@@ -147,9 +147,10 @@ export function NewPitchPanel() {
           </Tabs>
 
           {/* Processing Status */}
-          <ProcessingStatus 
-            processing={submission.processing} 
-            progress={submission.progress} 
+          <ProcessingStatus
+            processing={submission.processing}
+            progress={submission.progress}
+            onRetry={submission.retry}
           />
 
           {/* Q&A Section */}

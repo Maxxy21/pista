@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getOpenAI, OpenAIConfigError } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 import { withAuth, AuthenticatedRequest } from '@/lib/auth/api-auth';
 import { withRateLimit, transcriptionRateLimiter } from '@/lib/rate-limit/rate-limiter';
 import { validateFile, FILE_VALIDATION_CONFIGS } from '@/lib/validation/file-validator';
@@ -42,7 +43,7 @@ export const POST = withRateLimit(transcriptionRateLimiter)(withAuth(async (req:
 
         return NextResponse.json({ text: transcription });
     } catch (error: any) {
-        console.error('Transcription error:', error);
+        logger.error("transcribe", "Transcription failed:", error);
 
         if (error instanceof OpenAIConfigError) {
             return NextResponse.json({

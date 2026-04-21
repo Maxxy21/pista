@@ -1,21 +1,20 @@
-import { motion } from "framer-motion";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { cn, getScoreColor } from "../utils";
 import { ScoreBarChart } from "../charts/score-bar-chart";
 import { UniversalPitchData } from "@/lib/types/pitch";
 import { getEvaluations } from "@/lib/utils/evaluation-utils";
+import { Badge } from "@/components/ui/badge";
 
 interface ScoreOverviewProps {
     data: UniversalPitchData;
 }
 
 const getScoreDescription = (score: number) => {
-    if (score >= 8) return "Excellent pitch! Ready for investors.";
-    if (score >= 6) return "Good pitch with minor improvements needed.";
-    if (score >= 4) return "Average pitch requiring refinement.";
-    return "Needs significant improvements before presenting to investors.";
+    if (score >= 8) return "Strong pitch. Ready to present to investors.";
+    if (score >= 6) return "Solid pitch with a few areas to sharpen.";
+    if (score >= 4) return "Promising concept, but needs meaningful refinement.";
+    return "Needs significant work before presenting to investors.";
 };
 
 export const ScoreOverview = ({ data }: ScoreOverviewProps) => {
@@ -23,46 +22,47 @@ export const ScoreOverview = ({ data }: ScoreOverviewProps) => {
     const overallScore = data.evaluation.overallScore;
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-4">
             <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
-                <motion.div whileHover={{ y: -5 }} transition={{ duration: 0.2 }}>
-                    <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20 h-full">
-                        <CardContent className="p-6">
-                            <div className="flex flex-col h-full justify-between">
-                                <div className="flex justify-between items-start">
-                                    <h3 className="text-lg font-semibold">Overall Score</h3>
-                                    <Badge
-                                        className={cn(
-                                            "text-lg font-semibold px-3 py-1",
-                                            getScoreColor(overallScore)
-                                        )}
-                                    >
-                                        {overallScore.toFixed(1)}
-                                    </Badge>
-                                </div>
-                                <Progress value={overallScore * 10} className="my-6 h-2" />
-                                <p className="text-muted-foreground mt-2">
-                                    {getScoreDescription(overallScore)}
-                                </p>
+                {/* Overall score card */}
+                <Card className="h-full">
+                    <CardContent className="p-6 flex flex-col justify-between h-full">
+                        <div>
+                            <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-4">
+                                Overall Score
+                            </p>
+                            <div className="flex items-end gap-3 mb-2">
+                                <span className="text-5xl font-bold tabular-nums">
+                                    {overallScore.toFixed(1)}
+                                </span>
+                                <span className="text-lg text-muted-foreground mb-1">/10</span>
                             </div>
-                        </CardContent>
-                    </Card>
-                </motion.div>
+                            <Progress value={overallScore * 10} className="h-1.5 mt-4 mb-4" />
+                        </div>
+                        <p className="text-sm text-muted-foreground leading-relaxed">
+                            {getScoreDescription(overallScore)}
+                        </p>
+                    </CardContent>
+                </Card>
 
+                {/* Bar chart */}
                 <ScoreBarChart data={evaluations} />
             </div>
 
+            {/* Category scores */}
             <Card>
-                <CardContent className="p-6">
-                    <h3 className="text-lg font-semibold mb-4">Category Scores</h3>
+                <CardHeader className="pb-2 pt-5 px-6">
+                    <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-widest">
+                        Category Breakdown
+                    </CardTitle>
+                </CardHeader>
+                <CardContent className="px-6 pb-6">
                     <div className="space-y-4">
                         {evaluations.map(({ criteria, score }) => (
-                            <div key={criteria} className="space-y-2">
-                                <div className="flex justify-between text-sm font-medium">
-                                    <span>{criteria}</span>
-                                    <Badge className={cn(getScoreColor(score))}>
-                                        {score.toFixed(1)}
-                                    </Badge>
+                            <div key={criteria} className="space-y-1.5">
+                                <div className="flex justify-between items-center text-sm">
+                                    <span className="font-medium">{criteria}</span>
+                                    <Badge className={cn(getScoreColor(score))}>{score.toFixed(1)}</Badge>
                                 </div>
                                 <Progress value={score * 10} className="h-1.5" />
                             </div>

@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -7,13 +6,11 @@ import { CopyButton } from "../export/copy-button";
 import { cn, getScoreColor } from "../utils";
 import { getEvaluations } from "@/lib/utils/evaluation-utils";
 import { UniversalPitchData } from "@/lib/types/pitch";
-import { 
-  TrendingUp, 
-  AlertCircle, 
-  CheckCircle2, 
+import {
+  AlertCircle,
+  CheckCircle2,
   Target,
   Star,
-  ArrowRight
 } from "lucide-react";
 import React, { FC } from "react";
 
@@ -78,24 +75,22 @@ export const StructuredDetailedAnalysis: FC<StructuredDetailedAnalysisProps> = (
 
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-6">Detailed Analysis</h2>
-      <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
+      <h2 className="text-xl font-bold mb-4">Detailed Analysis</h2>
+      <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
         {evaluations.map((evaluation) => (
-          <motion.div
-            key={evaluation.criteria}
-            whileHover={{ y: -5 }}
-            transition={{ duration: 0.2 }}
-          >
-            <Card className="h-full relative">
-              <CardHeader className="pb-4">
-                <div className="flex justify-between items-start pr-10">
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <Star className="h-5 w-5 text-primary" />
+          <Card key={evaluation.criteria} className="h-full">
+              <CardHeader className="pb-3">
+                <div className="flex justify-between items-start">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Star className="h-4 w-4 text-foreground" />
                     {evaluation.criteria}
                   </CardTitle>
-                  <Badge className={cn(getScoreColor(evaluation.score))}>
-                    {evaluation.score.toFixed(1)}
-                  </Badge>
+                  <div className="flex items-center gap-2">
+                    <Badge className={cn(getScoreColor(evaluation.score))}>
+                      {evaluation.score.toFixed(1)}
+                    </Badge>
+                    <CopyButton text={getCopyText(evaluation)} />
+                  </div>
                 </div>
               </CardHeader>
               
@@ -175,7 +170,7 @@ export const StructuredDetailedAnalysis: FC<StructuredDetailedAnalysisProps> = (
                             </Badge>
                           </div>
                           <div className="flex items-start gap-1 mt-1">
-                            <ArrowRight className="h-3 w-3 mt-0.5 flex-shrink-0" />
+                            <span className="shrink-0">→</span>
                             <span className="opacity-80 leading-tight">{improvement.actionable}</span>
                           </div>
                         </div>
@@ -189,14 +184,14 @@ export const StructuredDetailedAnalysis: FC<StructuredDetailedAnalysisProps> = (
                   <>
                     <Separator />
                     <div className="space-y-2">
-                      <h4 className="font-medium text-sm flex items-center gap-2">
-                        <Target className="h-4 w-4 text-purple-500" />
-                        Key Recommendations
+                      <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1.5">
+                        <Target className="h-3.5 w-3.5" />
+                        Recommendations
                       </h4>
-                      <ul className="space-y-1">
+                      <ul className="space-y-1.5">
                         {evaluation.recommendations.map((rec, idx) => (
                           <li key={idx} className="text-xs text-muted-foreground flex gap-2 leading-relaxed">
-                            <span className="text-purple-500 flex-shrink-0 mt-0.5">•</span>
+                            <span className="shrink-0 mt-0.5">·</span>
                             <span>{rec}</span>
                           </li>
                         ))}
@@ -204,13 +199,8 @@ export const StructuredDetailedAnalysis: FC<StructuredDetailedAnalysisProps> = (
                     </div>
                   </>
                 )}
-
-                <div className="absolute top-2 right-4">
-                  <CopyButton text={getCopyText(evaluation)} />
-                </div>
               </CardContent>
             </Card>
-          </motion.div>
         ))}
       </div>
     </div>

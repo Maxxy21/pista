@@ -33,28 +33,28 @@ const StatCard = memo<StatCardProps>(
 
         return (
             <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
+                transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
             >
                 <Card className={cn("overflow-hidden", className)}>
-                    <CardContent className="p-4 sm:p-6">
-                        <div className="flex justify-between items-start">
-                            <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium text-muted-foreground mb-1">
-                                    {title}
-                                </p>
-                                <h3 className="text-xl sm:text-2xl font-bold truncate">
-                                    {valueNode ?? value}
-                                </h3>
-                                {description && (
-                                    <div className={cn("text-xs mt-1", trendColor)}>
-                                        {description}
-                                    </div>
-                                )}
+                    <CardContent className="p-5 sm:p-6">
+                        <div className="flex items-start justify-between gap-3">
+                            <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                                <Icon className="h-4 w-4 text-foreground" />
                             </div>
-                            <div className="bg-primary/10 p-2 rounded-full ml-2 flex-shrink-0">
-                                <Icon className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+                            {description && (
+                                <div className={cn("text-xs font-medium mt-0.5 shrink-0", trendColor)}>
+                                    {description}
+                                </div>
+                            )}
+                        </div>
+                        <div className="mt-4">
+                            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">
+                                {title}
+                            </p>
+                            <div className="text-2xl font-bold truncate">
+                                {valueNode ?? value}
                             </div>
                         </div>
                     </CardContent>

@@ -1,42 +1,55 @@
-import React from 'react';
-import {motion} from "framer-motion";
+'use client';
+
+import { motion } from "framer-motion";
 import Link from "next/link";
-import {Button} from "@/components/ui/button";
-import {ArrowRight} from "lucide-react";
 
 const CTA = () => {
     return (
-        <section className="py-20 lg:py-32 relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-b from-background to-primary/5 -z-10"/>
-            <div className="absolute -bottom-64 right-0 w-96 h-96 bg-primary/10 rounded-full filter blur-3xl -z-10"/>
-
-            <motion.div
-                initial={{opacity: 0, y: 20}}
-                whileInView={{opacity: 1, y: 0}}
-                viewport={{once: true}}
-                className="container px-4 sm:px-6 lg:px-8"
-            >
-                <div className="mx-auto max-w-4xl">
-                    <div className="rounded-2xl bg-gradient-to-b from-background to-muted/20 p-2 shadow-lg border border-primary/10">
-                        <div className="rounded-xl bg-background p-8 sm:p-10 lg:p-12 text-center backdrop-blur-sm">
-                            <h2 className="text-3xl font-bold mb-4">
-                                Ready to Perfect Your Pitch?
-                            </h2>
-                            <p className="mb-8 text-xl text-muted-foreground max-w-2xl mx-auto">
-                                Join startups who have improved their pitch decks with our
-                                GenAI-powered platform. Get started today.
+        <section
+            className="py-24 lg:py-32"
+            style={{ borderTop: "1px solid var(--landing-border)" }}
+        >
+            <div className="mx-auto max-w-6xl px-6 lg:px-8">
+                <motion.div
+                    initial={{ opacity: 0, y: 24 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-80px" }}
+                    transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                    className="mx-auto max-w-2xl"
+                >
+                    {/* Gradient shell card */}
+                    <div className="gradient-shell">
+                        <div className="gradient-shell-inner p-12 sm:p-16 text-center">
+                            <p
+                                className="text-xs uppercase tracking-widest mb-5 font-medium"
+                                style={{ color: "var(--landing-text-muted)" }}
+                            >
+                                Get started free
                             </p>
-                            <motion.div whileHover={{scale: 1.05}} whileTap={{scale: 0.95}}>
-                                <Link href="/sign-up">
-                                    <Button size="lg" className="font-medium bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 gap-2">
-                                        Get Started Now <ArrowRight className="h-4 w-4"/>
-                                    </Button>
-                                </Link>
-                            </motion.div>
+                            <h2
+                                className="font-playfair text-4xl sm:text-5xl tracking-tight leading-[1.1] mb-5"
+                                style={{ color: "var(--landing-cream)" }}
+                            >
+                                Ready to perfect
+                                <br />your pitch?
+                            </h2>
+                            <p
+                                className="text-base mb-10 max-w-sm mx-auto leading-relaxed"
+                                style={{ color: "var(--landing-text-muted)" }}
+                            >
+                                Stop guessing what investors want to hear. Get structured, honest feedback from AI trained on what actually matters.
+                            </p>
+                            <Link
+                                href="/sign-up"
+                                className="inline-block px-10 py-4 text-sm font-medium rounded-full transition-opacity duration-150 hover:opacity-85"
+                                style={{ background: "var(--landing-cream)", color: "#0e0d0c" }}
+                            >
+                                Evaluate my pitch
+                            </Link>
                         </div>
                     </div>
-                </div>
-            </motion.div>
+                </motion.div>
+            </div>
         </section>
     );
 };

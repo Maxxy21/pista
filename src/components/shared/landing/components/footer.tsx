@@ -1,39 +1,48 @@
-import React from 'react';
-import {motion} from "framer-motion";
 import Link from "next/link";
-import LogoIcon from "@/components/ui/logo-icon";
 
 const Footer = () => {
     return (
-        <motion.footer
-            initial={{opacity: 0}}
-            animate={{opacity: 1}}
-            transition={{delay: 0.5}}
-            className="border-t border-gradient-to-r from-primary/20 to-primary/5 py-12 bg-background"
+        <footer
+            className="py-10"
+            style={{ borderTop: "1px solid var(--landing-border)" }}
         >
-            <div className="container px-4 sm:px-6 lg:px-8">
-                <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-                    <motion.div
-                        whileHover={{scale: 1.05}}
-                        className="flex items-center gap-2"
-                    >
-                        <LogoIcon/>
-                        <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70">
+            <div className="mx-auto max-w-6xl px-6 lg:px-8">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    {/* Logo */}
+                    <Link href="/" className="flex items-center gap-2.5 group">
+                        <div
+                            className="h-5 w-6 rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0 opacity-80"
+                            style={{ background: "var(--landing-cream)" }}
+                        />
+                        <span
+                            className="text-base font-semibold tracking-tight"
+                            style={{ color: "var(--landing-cream)", opacity: 0.8 }}
+                        >
                             Pista
                         </span>
-                    </motion.div>
-                    <div className="flex flex-col md:flex-row items-center gap-4">
-                        <p className="text-sm text-muted-foreground">
-                            © {new Date().getFullYear()} Pista. All rights reserved.
-                        </p>
-                        <span className="hidden md:inline text-muted-foreground">•</span>
-                        <p className="text-sm text-muted-foreground">
-                            Made by <Link href="https://maxwellaboagye.xyz" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">Maxwell Aboagye</Link>
-                        </p>
+                    </Link>
+
+                    <div className="flex items-center gap-5 text-sm" style={{ color: "var(--landing-text-muted)" }}>
+                        <span>© {new Date().getFullYear()} Pista</span>
+                        <span style={{ opacity: 0.3 }}>·</span>
+                        <span>
+                            Built by{" "}
+                            <Link
+                                href="https://maxwell.is-a.dev"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="transition-colors duration-150 hover:underline underline-offset-4"
+                                style={{ color: "var(--landing-cream)", opacity: 0.75 }}
+                                onMouseEnter={e => (e.currentTarget.style.opacity = "1")}
+                                onMouseLeave={e => (e.currentTarget.style.opacity = "0.75")}
+                            >
+                                Maxwell Aboagye
+                            </Link>
+                        </span>
                     </div>
                 </div>
             </div>
-        </motion.footer>
+        </footer>
     );
 };
 

@@ -6,12 +6,9 @@ import Image from "next/image";
 
 import { useOrganization, useAuth, useUser } from "@clerk/nextjs";
 import { useQuery } from "convex/react";
-import { motion } from "framer-motion";
 import qs from "query-string";
 import { toast } from "sonner";
 import { useDebounceValue } from "usehooks-ts";
-import { useTheme } from "next-themes";
-
 import { ArrowLeft, Star, FileText, Folder, PlusCircle, Share2, Download, Search } from "lucide-react";
 import {
     Sidebar,
@@ -26,7 +23,6 @@ import {
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import LogoIcon from "@/components/ui/logo-icon";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 
@@ -57,8 +53,6 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
     const { user } = useUser();
     
     // UI state
-    const { resolvedTheme } = useTheme();
-    const isDark = resolvedTheme === "dark";
     const [search, setSearch] = React.useState("");
     const [debouncedSearch] = useDebounceValue(search, 500);
     const { state } = useSidebar();
@@ -243,13 +237,10 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
             <SidebarHeader className="py-4">
                 {state === "collapsed" ? (
                     <div className="flex flex-col items-center space-y-3">
-                        <motion.div
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.95 }}
-                            className="flex items-center justify-center bg-primary/10 p-2 rounded-lg"
-                        >
-                            <LogoIcon className="h-6 w-6 text-primary" />
-                        </motion.div>
+                        <div
+                            className="h-5 w-6 rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0"
+                            style={{ background: "#F2EAD3" }}
+                        />
                         <SidebarMenuButton
                             onClick={handleBack}
                             className="rounded-lg transition-all duration-200 hover:shadow-sm"
@@ -260,15 +251,12 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
                     </div>
                 ) : (
                     <div className="px-4 space-y-3">
-                        <div className="flex items-center gap-3">
-                            <motion.div
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                                className="bg-gradient-to-br from-primary/20 to-primary/10 p-2.5 rounded-xl shadow-sm"
-                            >
-                                <LogoIcon className="h-6 w-6 text-primary" />
-                            </motion.div>
-                            <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70">
+                        <div className="flex items-center gap-2.5">
+                            <div
+                                className="h-5 w-6 rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0"
+                                style={{ background: "#F2EAD3" }}
+                            />
+                            <h1 className="text-lg font-semibold tracking-tight" style={{ color: "#F2EAD3" }}>
                                 Pista
                             </h1>
                         </div>
@@ -290,20 +278,15 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
                         )}
                         {isAuthLoaded && (
                             <div className="space-y-4">
-                                <motion.div
-                                    whileHover={{ x: 2 }}
-                                    whileTap={{ scale: 0.98 }}
+                                <Button
+                                    onClick={handleBack}
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-10 -ml-2 px-4 text-muted-foreground flex items-center gap-3 hover:text-foreground hover:bg-muted/50 rounded-xl transition-all duration-200 group w-full justify-start"
                                 >
-                                    <Button
-                                        onClick={handleBack}
-                                        variant="ghost"
-                                        size="sm"
-                                        className="h-10 -ml-2 px-4 text-muted-foreground flex items-center gap-3 hover:text-foreground hover:bg-muted/50 rounded-xl transition-all duration-200 group w-full justify-start"
-                                    >
-                                        <ArrowLeft className="h-4 w-4 group-hover:-translate-x-0.5 transition-transform" />
-                                        <span className="font-medium">Back to Dashboard</span>
-                                    </Button>
-                                </motion.div>
+                                    <ArrowLeft className="h-4 w-4 group-hover:-translate-x-0.5 transition-transform" />
+                                    <span className="font-medium">Back to Dashboard</span>
+                                </Button>
                                 <SearchForm
                                     value={search}
                                     onChange={handleSearchChange}
@@ -371,24 +354,16 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
                                         ))}
                                     </div>
                                 ) : (
-                                    <motion.div 
-                                        initial={{ opacity: 0 }}
-                                        animate={{ opacity: 1 }}
-                                        className="text-center py-8 px-4"
-                                    >
+                                    <div className="text-center py-8 px-4">
                                         <div className="text-muted-foreground/40 mb-2">
                                             <FileText className="h-8 w-8 mx-auto" />
                                         </div>
                                         <div className="text-sm text-muted-foreground">
                                             {debouncedSearch ? `No pitches found for "${debouncedSearch}"` : "No other pitches found"}
                                         </div>
-                                    </motion.div>
+                                    </div>
                                 )}
-                                <motion.div
-                                    whileHover={{ scale: 1.02 }}
-                                    whileTap={{ scale: 0.98 }}
-                                    className="mt-6"
-                                >
+                                <div className="mt-6">
                                     <Button
                                         variant="outline"
                                         size="sm"
@@ -398,7 +373,7 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
                                         <Folder className="h-3.5 w-3.5" />
                                         View all pitches
                                     </Button>
-                                </motion.div>
+                                </div>
                             </div>
                         </div>
                     ) : (
@@ -475,11 +450,10 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
                         </>
                     )}
                     <SidebarMenuItem>
-                        <SidebarMenuButton 
-                            className="bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary/80 text-primary-foreground font-medium shadow-sm transition-all duration-200"
-                            onClick={() => {
-                                router.push('/dashboard?create=pitch');
-                            }}
+                        <SidebarMenuButton
+                            className="font-medium transition-opacity duration-150 hover:opacity-85"
+                            style={{ background: "#F2EAD3", color: "#0e0d0c" }}
+                            onClick={() => router.push('/dashboard?view=new')}
                             tooltip={state === "collapsed" ? "New Pitch" : undefined}
                         >
                             <PlusCircle />
@@ -488,7 +462,7 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
                     </SidebarMenuItem>
                     {organization && (
                         <SidebarMenuItem>
-                            <InviteButton isDark={isDark} />
+                            <InviteButton isDark={true} />
                         </SidebarMenuItem>
                     )}
                 </SidebarMenu>

@@ -1,93 +1,183 @@
 'use client';
 
-import {motion} from "framer-motion";
-import {ArrowRight} from "lucide-react";
+import { motion } from "framer-motion";
 import Link from "next/link";
-import {Button} from "@/components/ui/button";
-import {animations} from "./constants";
-import { MacbookScroll } from "@/components/ui/macbook-scroll";
+import Image from "next/image";
+import { animations, stats } from "./constants";
 
 const Hero = () => {
     return (
-        <section className="relative py-24 lg:py-32 overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-b from-background to-primary/5 -z-10"/>
-            <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary/10 rounded-full filter blur-3xl -z-10"/>
-            <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-primary/10 rounded-full filter blur-3xl -z-10"/>
+        <section className="relative pt-32 pb-0 overflow-hidden">
+            {/* Ambient warm glow */}
+            <div
+                className="pointer-events-none absolute inset-0 -z-10"
+                aria-hidden
+            >
+                <div
+                    className="absolute left-1/2 top-0 -translate-x-1/2 w-[800px] h-[500px] rounded-full opacity-20"
+                    style={{
+                        background: "radial-gradient(ellipse at center, #F2EAD3 0%, transparent 70%)",
+                        filter: "blur(80px)",
+                    }}
+                />
+            </div>
 
-            <div className="container px-4 sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-6xl px-6 lg:px-8">
                 <motion.div
                     initial="hidden"
                     animate="visible"
                     variants={animations.staggerChildren}
                     className="mx-auto max-w-3xl text-center"
                 >
-                    <motion.div
-                        variants={animations.fadeIn}
-                        className="inline-block px-4 py-1.5 mb-6 rounded-full bg-primary/10 text-primary text-sm font-medium"
-                    >
-                        Transform your startup pitch with GenAI
+                    {/* Badge */}
+                    <motion.div variants={animations.fadeIn} className="mb-8">
+                        <span
+                            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-medium tracking-wide"
+                            style={{
+                                border: "1px solid var(--landing-border)",
+                                color: "var(--landing-cream-muted)",
+                                background: "var(--landing-cream-faint)",
+                            }}
+                        >
+                            <span
+                                className="w-1.5 h-1.5 rounded-full animate-pulse"
+                                style={{ background: "#4ade80" }}
+                            />
+                            AI-powered pitch evaluation
+                        </span>
                     </motion.div>
+
+                    {/* Headline — Playfair Display */}
                     <motion.h1
                         variants={animations.fadeIn}
-                        className="mb-6 text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-tight"
+                        className="font-playfair text-6xl sm:text-7xl lg:text-[80px] leading-[1.05] tracking-[-0.03em] mb-6"
+                        style={{ color: "var(--landing-cream)" }}
                     >
-                        Perfect Your{" "}
-                        <span className="relative">
-                            <span className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-                                Startup Pitch
-                            </span>
-                            <svg className="absolute -bottom-2 left-0 w-full" viewBox="0 0 358 12" fill="none"
-                                 xmlns="http://www.w3.org/2000/svg">
-                                <path d="M3 9C118.957 4.47226 236.914 1.23827 355 9"
-                                      stroke="url(#paint0_linear)" strokeWidth="6" strokeLinecap="round"/>
-                                <defs>
-                                    <linearGradient id="paint0_linear" x1="179" y1="3" x2="179" y2="9"
-                                                    gradientUnits="userSpaceOnUse">
-                                        <stop stopColor="var(--primary)" stopOpacity="0.3"/>
-                                        <stop offset="1" stopColor="var(--primary)" stopOpacity="0"/>
-                                    </linearGradient>
-                                </defs>
-                            </svg>
+                        Pitch smarter.
+                        <br />
+                        <span style={{ color: "var(--landing-text-muted)" }}>
+                            Close faster.
                         </span>
                     </motion.h1>
+
+                    {/* Subheading */}
                     <motion.p
                         variants={animations.fadeIn}
-                        className="mb-8 text-xl text-muted-foreground"
+                        className="text-lg leading-relaxed max-w-xl mx-auto mb-10"
+                        style={{ color: "var(--landing-text-muted)" }}
                     >
-                        Get instant, expert-level feedback on your pitch deck from our AI system.
-                        Identify strengths, fix weaknesses, and secure funding with confidence.
+                        Submit your startup pitch and get structured AI analysis: scoring,
+                        risk assessment, investor questions, and actionable improvements in under 60 seconds.
                     </motion.p>
+
+                    {/* CTAs */}
                     <motion.div
                         variants={animations.fadeIn}
-                        className="flex flex-wrap justify-center gap-4"
+                        className="flex flex-wrap justify-center gap-3 mb-16"
                     >
-                        <motion.div whileHover={{scale: 1.05}} whileTap={{scale: 0.95}}>
-                            <Link href="/sign-up">
-                                <Button size="lg"
-                                        className="font-medium bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 gap-2">
-                                    Get Started <ArrowRight className="h-4 w-4"/>
-                                </Button>
-                            </Link>
-                        </motion.div>
+                        <Link
+                            href="/sign-up"
+                            className="px-8 py-3.5 text-sm font-medium rounded-full transition-opacity duration-150 hover:opacity-85"
+                            style={{ background: "var(--landing-cream)", color: "#0e0d0c" }}
+                        >
+                            Evaluate my pitch
+                        </Link>
+                        <a
+                            href="#how-it-works"
+                            className="px-8 py-3.5 text-sm font-medium rounded-full transition-colors duration-150"
+                            style={{
+                                border: "1px solid var(--landing-border)",
+                                color: "var(--landing-text-muted)",
+                            }}
+                            onMouseEnter={e => {
+                                e.currentTarget.style.borderColor = "var(--landing-border-hover)";
+                                e.currentTarget.style.color = "var(--landing-text)";
+                            }}
+                            onMouseLeave={e => {
+                                e.currentTarget.style.borderColor = "var(--landing-border)";
+                                e.currentTarget.style.color = "var(--landing-text-muted)";
+                            }}
+                        >
+                            See how it works
+                        </a>
+                    </motion.div>
+
+                    {/* Stats row */}
+                    <motion.div
+                        variants={animations.fadeIn}
+                        className="flex flex-wrap justify-center gap-10 mb-20"
+                    >
+                        {stats.map((stat) => (
+                            <div key={stat.label} className="flex flex-col items-center gap-1">
+                                <span
+                                    className="text-2xl font-bold tabular-nums font-playfair"
+                                    style={{ color: "var(--landing-cream)" }}
+                                >
+                                    {stat.value}
+                                </span>
+                                <span className="text-xs uppercase tracking-widest" style={{ color: "var(--landing-text-muted)" }}>
+                                    {stat.label}
+                                </span>
+                            </div>
+                        ))}
                     </motion.div>
                 </motion.div>
 
-                {/* Dashboard Preview */}
-                <div className="mt-16">
-                    <MacbookScroll 
-                        src="/img.png" 
-                        title={
-                            <span>
-                                See your pitch evaluations <br /> 
-                                in our professional dashboard
-                            </span>
-                        }
-                        showGradient={false}
-                    />
-                </div>
+                {/* Browser chrome mockup */}
+                <motion.div
+                    initial={{ opacity: 0, y: 48 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                    className="mx-auto max-w-5xl"
+                >
+                    {/* Gradient shell wrapper */}
+                    <div className="gradient-shell">
+                        <div className="gradient-shell-inner overflow-hidden">
+                            {/* Browser bar */}
+                            <div
+                                className="flex items-center gap-3 px-4 py-3 border-b"
+                                style={{ borderColor: "var(--landing-border)", background: "rgba(255,255,255,0.03)" }}
+                            >
+                                <div className="flex items-center gap-1.5">
+                                    <span className="w-3 h-3 rounded-full" style={{ background: "rgba(255,255,255,0.15)" }} />
+                                    <span className="w-3 h-3 rounded-full" style={{ background: "rgba(255,255,255,0.15)" }} />
+                                    <span className="w-3 h-3 rounded-full" style={{ background: "rgba(255,255,255,0.15)" }} />
+                                </div>
+                                <div className="flex-1 max-w-xs mx-auto">
+                                    <div
+                                        className="flex items-center gap-2 px-3 py-1 rounded-md text-xs"
+                                        style={{
+                                            background: "rgba(255,255,255,0.05)",
+                                            border: "1px solid var(--landing-border)",
+                                            color: "var(--landing-text-muted)",
+                                        }}
+                                    >
+                                        <span className="w-1.5 h-1.5 rounded-full" style={{ background: "#4ade80", opacity: 0.7 }} />
+                                        pista.vercel.app/dashboard
+                                    </div>
+                                </div>
+                            </div>
+                            {/* Screenshot */}
+                            <div className="relative w-full">
+                                <Image
+                                    src="/img.png"
+                                    alt="Pista dashboard showing pitch evaluations with scores and analytics"
+                                    width={1280}
+                                    height={800}
+                                    className="w-full h-auto block"
+                                    priority
+                                />
+                                <div
+                                    className="absolute bottom-0 left-0 right-0 h-40"
+                                    style={{ background: "linear-gradient(to top, var(--landing-bg), transparent)" }}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </motion.div>
             </div>
         </section>
     );
-}
+};
 
-export default Hero
+export default Hero;

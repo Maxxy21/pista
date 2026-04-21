@@ -85,7 +85,7 @@ export const PitchFilters: React.FC<PitchFiltersProps> = ({
     const handleSortChange = (v: string) => setSortBy(v as 'newest' | 'score' | 'updated');
 
     return (
-        <div className="border-b bg-gradient-to-r from-muted/5 via-muted/10 to-muted/5 px-3 md:px-6 py-2.5 md:py-3.5">
+        <div className="border-b bg-background px-3 md:px-6 py-2.5 md:py-3.5">
             <div className="flex items-center justify-between gap-2 md:gap-4">
                 <div className="flex items-center gap-2 sm:gap-3 md:gap-4 min-w-0">
                     <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>

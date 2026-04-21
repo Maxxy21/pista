@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getOpenAI, OpenAIConfigError } from "@/lib/utils";
+import { logger } from "@/lib/logger";
 import { PROMPT_VERSION, POLICY_VERSION, MODEL_NAME } from "@/lib/constants/eval";
 import { withAuth, AuthenticatedRequest } from "@/lib/auth/api-auth";
 import { withRateLimit, apiRateLimiter } from "@/lib/rate-limit/rate-limiter";
@@ -96,7 +97,7 @@ export const POST = withRateLimit(apiRateLimiter)(withAuth(async (req: Authentic
 
         return NextResponse.json(result);
     } catch (error) {
-        console.error("Answer evaluation error:", error);
+        logger.error("evaluate-answers", "Answer evaluation failed:", error);
         
         if (error instanceof OpenAIConfigError) {
             return NextResponse.json({

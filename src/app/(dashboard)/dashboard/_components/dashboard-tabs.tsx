@@ -29,8 +29,7 @@ export const DashboardTabs: React.FC<DashboardTabsProps> = ({
                         <TabsTrigger
                             key={tab.value}
                             value={tab.value}
-                            className="data-[state=active]:bg-background data-[state=active]:shadow-none data-[state=active]:border-b-2 
-                            data-[state=active]:border-primary data-[state=active]:rounded-none h-12"
+                            className="text-sm font-medium data-[state=active]:bg-background data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-foreground data-[state=active]:rounded-none h-12 text-muted-foreground data-[state=active]:text-foreground"
                         >
                             {tab.label}
                         </TabsTrigger>

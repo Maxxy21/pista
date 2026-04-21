@@ -1,4 +1,5 @@
-import {NextRequest} from "next/server";
+import { NextRequest } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 
 interface RateLimitStore {
   [key: string]: {
@@ -31,30 +32,15 @@ class RateLimiter {
     });
   }
 
-  private getClientIdentifier(req: NextRequest): string {
-    // Try to get IP from various headers for proxy setups
-    const forwarded = req.headers.get('x-forwarded-for');
-    const realIp = req.headers.get('x-real-ip');
-    const cfConnectingIp = req.headers.get('cf-connecting-ip');
-    
-    // Extract first IP if comma-separated
-      return forwarded?.split(',')[0]?.trim() ||
-        realIp ||
-        cfConnectingIp ||
-        '127.0.0.1';
-  }
-
-  isRateLimited(req: NextRequest): { limited: boolean; remaining?: number; resetTime?: number } {
-    const key = this.getClientIdentifier(req);
+  isRateLimited(key: string): { limited: boolean; remaining?: number; resetTime?: number } {
     const now = Date.now();
-    
-    // Initialize or reset if window expired
+
     if (!this.store[key] || this.store[key].resetTime <= now) {
       this.store[key] = {
         count: 1,
         resetTime: now + this.windowMs
       };
-      
+
       return {
         limited: false,
         remaining: this.maxRequests - 1,
@@ -64,7 +50,6 @@ class RateLimiter {
 
     this.store[key].count++;
 
-    // Check if limit exceeded
     if (this.store[key].count > this.maxRequests) {
       return {
         limited: true,
@@ -79,22 +64,30 @@ class RateLimiter {
       resetTime: this.store[key].resetTime
     };
   }
+
+  get limit() {
+    return this.maxRequests;
+  }
 }
 
 // Create singleton instances for different endpoints
 export const apiRateLimiter = new RateLimiter(
-  parseInt(process.env.RATE_LIMIT_MAX || '50'), 
+  parseInt(process.env.RATE_LIMIT_MAX || '50'),
   parseInt(process.env.RATE_LIMIT_WINDOW || '60000')
 );
 
-export const transcriptionRateLimiter = new RateLimiter(10, 60000); // 10 requests per minute
-export const evaluationRateLimiter = new RateLimiter(20, 60000); // 20 requests per minute
+export const transcriptionRateLimiter = new RateLimiter(10, 60000);
+export const evaluationRateLimiter = new RateLimiter(20, 60000);
 
 export function withRateLimit(limiter: RateLimiter) {
   return function(handler: (req: NextRequest, context?: any) => Promise<Response>) {
     return async (req: NextRequest, context?: any): Promise<Response> => {
-      const result = limiter.isRateLimited(req);
-      
+      // Key by authenticated userId — not IP, which is client-spoofable
+      const { userId } = await auth();
+      const key = userId ?? "anonymous";
+
+      const result = limiter.isRateLimited(key);
+
       if (result.limited) {
         return new Response(JSON.stringify({
           error: "Rate limit exceeded",
@@ -104,7 +97,7 @@ export function withRateLimit(limiter: RateLimiter) {
           status: 429,
           headers: {
             'Content-Type': 'application/json',
-            'X-RateLimit-Limit': limiter['maxRequests'].toString(),
+            'X-RateLimit-Limit': limiter.limit.toString(),
             'X-RateLimit-Remaining': '0',
             'X-RateLimit-Reset': Math.ceil(result.resetTime! / 1000).toString(),
             'Retry-After': Math.ceil((result.resetTime! - Date.now()) / 1000).toString()
@@ -112,7 +105,6 @@ export function withRateLimit(limiter: RateLimiter) {
         });
       }
 
-      // Add rate limit headers to successful responses
       const response = await handler(req, context);
 
       const newResponse = new Response(response.body, {
@@ -121,7 +113,7 @@ export function withRateLimit(limiter: RateLimiter) {
         headers: response.headers
       });
 
-      newResponse.headers.set('X-RateLimit-Limit', limiter['maxRequests'].toString());
+      newResponse.headers.set('X-RateLimit-Limit', limiter.limit.toString());
       newResponse.headers.set('X-RateLimit-Remaining', result.remaining!.toString());
       newResponse.headers.set('X-RateLimit-Reset', Math.ceil(result.resetTime! / 1000).toString());
 

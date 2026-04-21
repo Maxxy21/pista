@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getOpenAI, OpenAIConfigError } from "@/lib/utils";
+import { logger } from "@/lib/logger";
 import { withAuth, AuthenticatedRequest } from "@/lib/auth/api-auth";
 import { withRateLimit, apiRateLimiter } from "@/lib/rate-limit/rate-limiter";
 import { z } from "zod";
@@ -71,7 +72,7 @@ export const POST = withRateLimit(apiRateLimiter)(withAuth(async (req: Authentic
 
     return NextResponse.json({ questions });
   } catch (error) {
-    console.error("Question generation error:", error);
+    logger.error("generate-questions", "Question generation failed:", error);
     
     if (error instanceof OpenAIConfigError) {
       return NextResponse.json({

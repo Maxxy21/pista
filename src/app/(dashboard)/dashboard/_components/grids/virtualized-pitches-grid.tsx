@@ -99,6 +99,7 @@ export const VirtualizedPitchesGrid: React.FC<VirtualizedPitchesGridProps> = ({
                     return (
                         <div
                             key={virtualRow.key}
+                            data-index={virtualRow.index}
                             className={cn("absolute top-0 left-0 w-full grid gap-6 py-3", colsClass)}
                             style={{
                                 height: `${virtualRow.size}px`,

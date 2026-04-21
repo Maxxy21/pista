@@ -1,4 +1,31 @@
 import { StructuredEvaluation } from '@/lib/types/evaluation'
+import { logger } from '@/lib/logger'
+
+interface ParsedAspectScore {
+  score?: number;
+  rationale?: string;
+}
+
+interface ParsedStrength {
+  point?: string;
+  impact?: string;
+}
+
+interface ParsedImprovement {
+  area?: string;
+  priority?: string;
+  actionable?: string;
+}
+
+interface ParsedEvaluationResponse {
+  score?: number;
+  aspectScores?: ParsedAspectScore[];
+  strengths?: Array<string | ParsedStrength>;
+  improvements?: Array<string | ParsedImprovement>;
+  summary?: string;
+  analysis?: string;
+  recommendations?: string[];
+}
 
 export function parseStructuredEvaluationResponse(
   response: string,
@@ -6,16 +33,16 @@ export function parseStructuredEvaluationResponse(
   aspects: string[]
 ): StructuredEvaluation {
   try {
-    const parsed = JSON.parse(response)
+    const parsed: ParsedEvaluationResponse = JSON.parse(response)
     const numericAspectScores = Array.isArray(parsed.aspectScores)
       ? parsed.aspectScores
-          .map((s: any) => Number(s?.score))
-          .filter((n: any) => Number.isFinite(n))
+          .map((s) => Number(s?.score))
+          .filter((n) => Number.isFinite(n))
       : []
     const baseScore = Number(parsed.score)
     const clamped = (n: number) => Math.min(Math.max(n, 1), 10)
     const aspectAvg = numericAspectScores.length
-      ? numericAspectScores.reduce((a: number, b: number) => a + b, 0) / numericAspectScores.length
+      ? numericAspectScores.reduce((a, b) => a + b, 0) / numericAspectScores.length
       : NaN
     const criterionScore = Number.isFinite(aspectAvg)
       ? clamped(aspectAvg)
@@ -25,14 +52,14 @@ export function parseStructuredEvaluationResponse(
       criteria: criteriaName,
       score: criterionScore,
       breakdown: {
-        strengths: (parsed.strengths || []).map((s: any) => ({
+        strengths: (parsed.strengths || []).map((s) => ({
           point: typeof s === 'string' ? s : s.point || '',
-          impact: s.impact || 'Medium'
+          impact: (typeof s === 'string' ? 'Medium' : s.impact || 'Medium') as 'High' | 'Medium' | 'Low'
         })),
-        improvements: (parsed.improvements || []).map((i: any) => ({
+        improvements: (parsed.improvements || []).map((i) => ({
           area: typeof i === 'string' ? i : i.area || '',
-          priority: i.priority || 'Important',
-          actionable: i.actionable || i.area || ''
+          priority: (typeof i === 'string' ? 'Important' : i.priority || 'Important') as 'Critical' | 'Important' | 'Nice to Have',
+          actionable: typeof i === 'string' ? i : i.actionable || i.area || ''
         })),
         aspectScores: aspects.map((aspect, index) => ({
           aspect,
@@ -44,6 +71,7 @@ export function parseStructuredEvaluationResponse(
       recommendations: parsed.recommendations || []
     }
   } catch (error) {
+    logger.error("parse", `JSON evaluation parse failed for "${criteriaName}", falling back to text parsing:`, error);
     return parseTextEvaluationResponse(response, criteriaName, aspects)
   }
 }
@@ -94,4 +122,3 @@ export function parseTextEvaluationResponse(
     recommendations: []
   }
 }
-

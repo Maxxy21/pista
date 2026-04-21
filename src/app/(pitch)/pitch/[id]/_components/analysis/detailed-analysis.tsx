@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CopyButton } from "../export/copy-button";
@@ -68,10 +67,23 @@ const ImprovementsList: FC<{ improvements: string[] }> = ({ improvements }) => (
     </div>
 );
 
-const getCopyText = (evaluation: any) => {
+interface EvaluationLike {
+    criteria: string;
+    score: number;
+    summary?: string;
+    comment?: string;
+    strengths?: string[];
+    improvements?: string[];
+    breakdown?: {
+        strengths?: Array<{ point: string }>;
+        improvements?: Array<{ area: string }>;
+    };
+}
+
+const getCopyText = (evaluation: EvaluationLike) => {
     const comment = evaluation.summary || evaluation.comment || ''
-    const strengths = evaluation.breakdown?.strengths?.map((s: any) => s.point) || evaluation.strengths || []
-    const improvements = evaluation.breakdown?.improvements?.map((i: any) => i.area) || evaluation.improvements || []
+    const strengths = evaluation.breakdown?.strengths?.map((s) => s.point) || evaluation.strengths || []
+    const improvements = evaluation.breakdown?.improvements?.map((i) => i.area) || evaluation.improvements || []
     
     return [
         evaluation.criteria,
@@ -96,18 +108,16 @@ export const DetailedAnalysis: FC<DetailedAnalysisProps> = ({ data }) => {
             <h2 className="text-2xl font-bold mb-6">Detailed Analysis</h2>
             <div className="grid gap-6 md:grid-cols-2">
                 {evaluations.map((evaluation) => (
-                <motion.div
-                    key={evaluation.criteria}
-                    whileHover={{ y: -5 }}
-                    transition={{ duration: 0.2 }}
-                >
-                    <Card className="h-full relative">
+                    <Card key={evaluation.criteria} className="h-full">
                         <CardHeader className="pb-2">
-                            <div className="flex justify-between items-center pr-10">
+                            <div className="flex justify-between items-center gap-2">
                                 <CardTitle className="text-lg">{evaluation.criteria}</CardTitle>
-                                <Badge className={cn(getScoreColor(evaluation.score))}>
-                                    {evaluation.score.toFixed(1)}
-                                </Badge>
+                                <div className="flex items-center gap-2 shrink-0">
+                                    <Badge className={cn(getScoreColor(evaluation.score))}>
+                                        {evaluation.score.toFixed(1)}
+                                    </Badge>
+                                    <CopyButton text={getCopyText(evaluation)} />
+                                </div>
                             </div>
                         </CardHeader>
                         <CardContent className="space-y-4">
@@ -116,12 +126,8 @@ export const DetailedAnalysis: FC<DetailedAnalysisProps> = ({ data }) => {
                                 <StrengthsList strengths={evaluation.breakdown?.strengths?.map(s => s.point) || (evaluation as any).strengths || []} />
                                 <ImprovementsList improvements={evaluation.breakdown?.improvements?.map(i => i.area) || (evaluation as any).improvements || []} />
                             </div>
-                            <div className="absolute top-2 right-4">
-                                <CopyButton text={getCopyText(evaluation)} />
-                            </div>
                         </CardContent>
                     </Card>
-                </motion.div>
                 ))}
             </div>
         </div>

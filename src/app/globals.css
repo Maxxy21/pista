@@ -2,11 +2,62 @@
 @tailwind components;
 @tailwind utilities;
 
-
 html,
 body,
 :root {
     height: 100%;
+}
+
+/* Landing page design tokens */
+:root {
+    --landing-bg: #0e0d0c;
+    --landing-surface: #171512;
+    --landing-cream: #F2EAD3;
+    --landing-cream-muted: rgba(242, 234, 211, 0.6);
+    --landing-cream-faint: rgba(242, 234, 211, 0.08);
+    --landing-border: rgba(242, 234, 211, 0.12);
+    --landing-border-hover: rgba(242, 234, 211, 0.25);
+    --landing-text: #F2EAD3;
+    --landing-text-muted: rgba(242, 234, 211, 0.55);
+}
+
+/* Gradient border shell utility */
+@layer utilities {
+    .gradient-shell {
+        padding: 1px;
+        border-radius: 24px;
+        background: linear-gradient(
+            to right bottom,
+            rgba(242, 234, 211, 0.28),
+            rgba(242, 234, 211, 0.06),
+            rgba(0, 0, 0, 0)
+        );
+    }
+
+    .gradient-shell-inner {
+        border-radius: 23px;
+        background: #171512;
+        box-shadow:
+            rgba(255, 255, 255, 0.02) 0px 0px 40px 0px inset,
+            rgba(0, 0, 0, 0.12) 0px 100px 80px 0px;
+    }
+
+    .gradient-shell-sm {
+        padding: 1px;
+        border-radius: 16px;
+        background: linear-gradient(
+            to right bottom,
+            rgba(242, 234, 211, 0.22),
+            rgba(242, 234, 211, 0.04),
+            rgba(0, 0, 0, 0)
+        );
+    }
+
+    .gradient-shell-sm-inner {
+        border-radius: 15px;
+        background: #171512;
+        box-shadow: rgba(255, 255, 255, 0.02) 0px 0px 40px 0px inset;
+    }
 }
 
 @layer base {

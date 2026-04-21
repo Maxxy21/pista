@@ -8,7 +8,6 @@ import { NavUserNavbar } from "./nav-user-navbar"
 import { useWorkspace } from "@/hooks/use-workspace"
 import { WorkspaceBadge } from "./workspace-badge"
  
-import { useTheme } from "next-themes"
 import { Progress } from "@/components/ui/progress"
 import { Clock } from "lucide-react"
 import { SearchForm } from "@/components/shared/forms/search-form"
@@ -25,8 +24,6 @@ interface NavbarProps {
 }
 
 export function Navbar({ title = "Dashboard", rateLimit, searchValue, setSearchValue }: NavbarProps) {
-  const { resolvedTheme } = useTheme()
-  const isDark = resolvedTheme === "dark"
   const workspace = useWorkspace()
   
 
@@ -40,7 +37,7 @@ export function Navbar({ title = "Dashboard", rateLimit, searchValue, setSearchV
         <div className="flex items-center gap-2 min-w-0">
           <SidebarTrigger className="-ml-1" />
           <Separator orientation="vertical" className="h-5 hidden sm:block" />
-          <h1 className="hidden sm:block text-lg md:text-xl font-bold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent truncate">
+          <h1 className="hidden sm:block text-lg font-semibold truncate">
             {title}
           </h1>
         </div>
@@ -89,7 +86,7 @@ export function Navbar({ title = "Dashboard", rateLimit, searchValue, setSearchV
           )}
 
           {/* User Profile */}
-          <NavUserNavbar isDark={isDark} />
+          <NavUserNavbar />
         </div>
       </div>
     </header>

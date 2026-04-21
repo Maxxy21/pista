@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
-import { motion } from "framer-motion";
+import { Bar, BarChart, XAxis, YAxis } from "recharts";
 
 import {
   Card,
@@ -33,10 +32,10 @@ interface ScoreBarChartProps {
 }
 
 const getScoreColor = (score: number): string => {
-  if (score >= 8) return "hsl(142, 76%, 36%)"; // Green
-  if (score >= 6) return "hsl(217, 91%, 60%)"; // Blue  
-  if (score >= 4) return "hsl(43, 89%, 38%)"; // Amber
-  return "hsl(0, 84%, 60%)"; // Red
+  if (score >= 8) return "#4ade80";
+  if (score >= 6) return "#F2EAD3";
+  if (score >= 4) return "#f59e0b";
+  return "#f87171";
 };
 
 export const ScoreBarChart = ({ data }: ScoreBarChartProps) => {
@@ -84,11 +83,7 @@ export const ScoreBarChart = ({ data }: ScoreBarChartProps) => {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-    >
+    <div>
       <Card>
         <CardHeader className="items-center pb-4">
           <CardTitle>Score Distribution</CardTitle>
@@ -101,24 +96,23 @@ export const ScoreBarChart = ({ data }: ScoreBarChartProps) => {
             config={chartConfig}
             className="h-[300px] sm:h-[350px] w-full"
           >
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart 
+              <BarChart
                 data={chartData}
                 margin={{ top: 20, right: 10, left: 10, bottom: 80 }}
               >
-                <ChartTooltip 
-                  cursor={false} 
-                  content={<ChartTooltipContent 
+                <ChartTooltip
+                  cursor={false}
+                  content={<ChartTooltipContent
                     labelFormatter={(value) => {
                       const item = chartData.find(d => d.category === value);
                       return item?.fullCategory || value;
                     }}
-                  />} 
+                  />}
                 />
-                <XAxis 
-                  dataKey="category" 
-                  tick={{ 
-                    fontSize: 10, 
+                <XAxis
+                  dataKey="category"
+                  tick={{
+                    fontSize: 10,
                     fill: 'hsl(var(--foreground))',
                     textAnchor: 'end',
                     dominantBaseline: 'ideographic'
@@ -130,47 +124,46 @@ export const ScoreBarChart = ({ data }: ScoreBarChartProps) => {
                   tickLine={{ stroke: 'hsl(var(--border))' }}
                   axisLine={{ stroke: 'hsl(var(--border))' }}
                 />
-                <YAxis 
+                <YAxis
                   domain={[0, 10]}
-                  tick={{ 
-                    fontSize: 10, 
+                  tick={{
+                    fontSize: 10,
                     fill: 'hsl(var(--foreground))'
                   }}
                   className="text-foreground"
                   tickLine={{ stroke: 'hsl(var(--border))' }}
                   axisLine={{ stroke: 'hsl(var(--border))' }}
                 />
-                <Bar 
-                  dataKey="score" 
+                <Bar
+                  dataKey="score"
                   radius={[4, 4, 0, 0]}
                   animationDuration={1000}
                   animationEasing="ease-out"
                 />
               </BarChart>
-            </ResponsiveContainer>
           </ChartContainer>
           
           {/* Score Legend */}
           <div className="flex flex-wrap justify-center gap-2 sm:gap-4 mt-4 text-xs">
             <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded-sm bg-green-600"></div>
+              <div className="w-3 h-3 rounded-sm" style={{ background: "#4ade80" }}></div>
               <span className="text-muted-foreground">Excellent (8-10)</span>
             </div>
             <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded-sm bg-blue-600"></div>
+              <div className="w-3 h-3 rounded-sm" style={{ background: "#F2EAD3" }}></div>
               <span className="text-muted-foreground">Good (6-7.9)</span>
             </div>
             <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded-sm bg-amber-600"></div>
+              <div className="w-3 h-3 rounded-sm" style={{ background: "#f59e0b" }}></div>
               <span className="text-muted-foreground">Fair (4-5.9)</span>
             </div>
             <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded-sm bg-red-600"></div>
+              <div className="w-3 h-3 rounded-sm" style={{ background: "#f87171" }}></div>
               <span className="text-muted-foreground">Poor (0-3.9)</span>
             </div>
           </div>
         </CardContent>
       </Card>
-    </motion.div>
+    </div>
   );
 };

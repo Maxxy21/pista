@@ -1,41 +1,41 @@
-import { ArrowRight, CheckCircle2, Sparkles, Target, Zap, MessageSquareText, Award } from "lucide-react";
+import { Sparkles, Zap, Target, MessageSquareText, BarChart3, Shield } from "lucide-react";
 
 export const features = [
     {
         title: "AI-Powered Analysis",
         description:
-            "AI evaluates your pitch content and structure, providing feedback on key areas like clarity, flow, and business fundamentals.",
+            "GPT-4 evaluates your pitch across problem-solution fit, business model, team strength, and presentation quality.",
         icon: Sparkles,
     },
     {
-        title: "Fast Feedback",
+        title: "Instant Feedback",
         description:
-            "Get feedback within minutes of submitting your pitch. No waiting for human reviewers or scheduling calls.",
+            "No waiting for human reviewers. Get structured, investor-grade feedback in under a minute.",
         icon: Zap,
     },
     {
-        title: "Business-Focused Review",
+        title: "Dimensional Scoring",
         description:
-            "Receive feedback on essential pitch elements including problem definition, solution clarity, market opportunity, and business model.",
-        icon: Award,
-    },
-    {
-        title: "Detailed Scoring",
-        description:
-            "Get scores across different pitch dimensions with specific feedback on what works well and what could be improved.",
+            "Scores across 4 weighted dimensions with sub-aspect breakdowns, so you know exactly where to improve.",
         icon: Target,
     },
     {
-        title: "Investor Questions",
+        title: "Investor Q&A Prep",
         description:
-            "Get potential investor questions based on your pitch content to help you prepare for real pitch meetings.",
+            "Generate the tough questions investors will ask based on gaps in your pitch, then practice your answers.",
         icon: MessageSquareText,
     },
     {
-        title: "Text Input",
+        title: "Visual Analytics",
         description:
-            "Submit your pitch by typing directly or uploading a text file. Simple and straightforward process.",
-        icon: CheckCircle2,
+            "Radar charts and score breakdowns make it easy to track improvements across multiple pitch iterations.",
+        icon: BarChart3,
+    },
+    {
+        title: "Risk Assessment",
+        description:
+            "Get a clear-eyed view of investment viability, key risks, and mitigation strategies for your startup.",
+        icon: Shield,
     },
 ];
 
@@ -43,30 +43,37 @@ export const steps = [
     {
         title: "Submit Your Pitch",
         description:
-            "Type your pitch directly or upload a text file. The system processes text-based pitch content.",
+            "Paste your pitch text, upload a file, or record audio. Pista handles all three.",
     },
     {
-        title: "AI Analysis",
+        title: "AI Evaluates",
         description:
-            "AI analyzes your pitch content for structure, clarity, and key business elements like problem-solution fit and market opportunity.",
+            "Our model scores your pitch against a rubric used by real investors, in under 60 seconds.",
     },
     {
-        title: "Review Feedback",
+        title: "Review & Iterate",
         description:
-            "Get scores and specific feedback on different aspects of your pitch, plus potential investor questions to consider.",
+            "Get detailed scores, specific feedback, and investor questions. Refine and resubmit.",
     },
+];
+
+export const stats = [
+    { value: "4", label: "Evaluation dimensions" },
+    { value: "<60s", label: "Time to feedback" },
+    { value: "GPT-4", label: "Powered by" },
+    { value: "3+", label: "Input formats" },
 ];
 
 export const animations = {
     fadeIn: {
-        hidden: { opacity: 0, y: 20 },
-        visible: { opacity: 1, y: 0 }
+        hidden: { opacity: 0, y: 16 },
+        visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } },
     },
     staggerChildren: {
         visible: {
             transition: {
-                staggerChildren: 0.2
-            }
-        }
-    }
-}; 
+                staggerChildren: 0.1,
+            },
+        },
+    },
+};

@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react"
+import { useState, useCallback, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { useOrganization } from "@clerk/nextjs"
 import { useWorkspace } from "@/hooks/use-workspace"
@@ -17,15 +17,40 @@ export interface QAItem {
   answer: string
 }
 
+interface SubmitSnapshot {
+  kind: "submit"
+  title: string
+  type: PitchType
+  textContent: string
+  file: File | null
+  qa: QAItem[]
+  enableQA: boolean
+  stage: FormStage
+  preparedText: string
+  readTextFile: (f: File) => Promise<string>
+  onQuestionsGenerated: (questions: string[]) => void
+  onStageChange: (stage: FormStage) => void
+  onPreparedTextChange: (text: string) => void
+}
+
+interface SkipSnapshot {
+  kind: "skip"
+  title: string
+  type: PitchType
+  preparedText: string
+  textContent: string
+}
+
 export function usePitchSubmission() {
   const router = useRouter()
   const { organization } = useOrganization()
   const workspace = useWorkspace()
   const { mutate: createPitch, pending } = useApiMutation(api.pitches.create)
   const evalProg = useEvaluationProgress()
-  
+
   const [processing, setProcessing] = useState(false)
   const [progress, setProgress] = useState(0)
+  const lastCall = useRef<SubmitSnapshot | SkipSnapshot | null>(null)
 
   const transcribeAudio = useCallback(async (audioFile: File) => {
     evalProg.setStep('uploading', 'Uploading audio...')
@@ -95,6 +120,7 @@ export function usePitchSubmission() {
     onPreparedTextChange: (text: string) => void
   ) => {
     if (processing) return
+    lastCall.current = { kind: "submit", title, type, textContent, file, qa, enableQA, stage, preparedText, readTextFile, onQuestionsGenerated, onStageChange, onPreparedTextChange }
     setProcessing(true)
     
     try {
@@ -155,6 +181,7 @@ export function usePitchSubmission() {
     textContent: string
   ) => {
     if (processing) return
+    lastCall.current = { kind: "skip", title, type, preparedText, textContent }
     setProcessing(true)
     
     try {
@@ -186,11 +213,28 @@ export function usePitchSubmission() {
     }
   }, [processing, workspace.mode, organization?.id, createPitch, router, evalProg, evaluateText])
 
+  const submitPitchRef = useRef(submitPitch)
+  submitPitchRef.current = submitPitch
+  const skipQARef = useRef(skipQAAndSubmit)
+  skipQARef.current = skipQAAndSubmit
+
+  const retry = useCallback(() => {
+    const snap = lastCall.current
+    if (!snap) return
+    evalProg.reset()
+    if (snap.kind === "submit") {
+      void submitPitchRef.current(snap.title, snap.type, snap.textContent, snap.file, snap.qa, snap.enableQA, snap.stage, snap.preparedText, snap.readTextFile, snap.onQuestionsGenerated, snap.onStageChange, snap.onPreparedTextChange)
+    } else {
+      void skipQARef.current(snap.title, snap.type, snap.preparedText, snap.textContent)
+    }
+  }, [evalProg])
+
   return {
     processing,
     pending,
     progress,
     submitPitch,
     skipQAAndSubmit,
+    retry,
   }
 }

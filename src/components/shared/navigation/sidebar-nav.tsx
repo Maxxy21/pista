@@ -38,7 +38,10 @@ export function SidebarNav({ currentView, collapsed, onNavigate }: SidebarNavPro
               <span className="font-medium">{item.title}</span>
             </SidebarMenuButton>
             {item.badge && (
-              <SidebarMenuBadge className="bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xs font-medium">
+              <SidebarMenuBadge
+                className="text-xs font-medium"
+                style={{ background: "#F2EAD3", color: "#0e0d0c" }}
+              >
                 {item.badge}
               </SidebarMenuBadge>
             )}

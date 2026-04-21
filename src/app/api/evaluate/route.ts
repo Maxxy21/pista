@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getOpenAI, OpenAIConfigError } from "@/lib/utils";
+import { logger } from "@/lib/logger";
 import { withAuth, AuthenticatedRequest } from "@/lib/auth/api-auth";
 import { withRateLimit, evaluationRateLimiter } from "@/lib/rate-limit/rate-limiter";
 import { z } from "zod";
@@ -23,7 +24,6 @@ import {
   SCORING_SYSTEM_PROMPT,
 } from "@/lib/constants/eval";
 
-// export const runtime = "edge";
 export const maxDuration = 60;
 const MAX_CONTENT_CHARS = CONTENT_LIMITS.evaluateChars;
 
@@ -350,7 +350,7 @@ export const POST = withRateLimit(evaluationRateLimiter)(withAuth(async (req: Au
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error("Evaluation error:", error);
+    logger.error("evaluate", "Evaluation failed:", error);
     
     if (error instanceof OpenAIConfigError) {
       return NextResponse.json({

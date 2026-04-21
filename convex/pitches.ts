@@ -1,4 +1,4 @@
-import { mutation, query } from "./_generated/server";
+import { mutation, query, MutationCtx, QueryCtx } from "./_generated/server";
 import { ConvexError, v } from "convex/values";
 import { Doc } from "@/convex/_generated/dataModel";
 import { getAllOrThrow } from "convex-helpers/server/relationships";
@@ -13,9 +13,8 @@ interface PitchStats {
 }
 
 const RECENT_PITCH_COUNT = 5;
-const PREFETCH_COUNT = 10;
 
-const validateUser = async (ctx: { auth: any }) => {
+const validateUser = async (ctx: QueryCtx | MutationCtx) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
         throw new ConvexError({
@@ -285,8 +284,26 @@ export const getFilteredPitches = query({
     handler: async (ctx, args) => {
         const identity = await validateUser(ctx);
 
-        let pitches: Doc<"pitches">[] = [];
-        if (args.orgId) {
+        if (args.ownerUserId && args.ownerUserId !== identity.subject) {
+            throw new ConvexError("Unauthorized: cannot query another user's pitches");
+        }
+
+        // Use the search index when a search term is provided
+        if (args.search) {
+            const orgId = args.orgId ?? "";
+            pitches = await ctx.db
+                .query("pitches")
+                .withSearchIndex("search_title", (q) =>
+                    q.search("title", args.search!).eq("orgId", orgId)
+                )
+                .collect();
+
+            // If searching in personal workspace, filter to this user's pitches only
+            if (!args.orgId) {
+                const userId = args.ownerUserId ?? identity.subject;
+                pitches = pitches.filter((p) => p.userId === userId);
+            }
+        } else if (args.orgId) {
             pitches = await ctx.db
                 .query("pitches")
                 .withIndex("by_org", (q) => q.eq("orgId", args.orgId!))
@@ -309,15 +326,6 @@ export const getFilteredPitches = query({
                 .collect();
         }
 
-        if (args.search) {
-            const searchTerm = args.search.trim().toLowerCase();
-            pitches = pitches.filter(
-                (pitch) =>
-                    pitch.title.toLowerCase().includes(searchTerm) ||
-                    pitch.text.toLowerCase().includes(searchTerm)
-            );
-        }
-
         if (args.scoreRange) {
             pitches = pitches.filter(
                 (pitch) =>
@@ -334,7 +342,7 @@ export const getFilteredPitches = query({
             );
         }
 
-        let favorites: Doc<"userFavorites">[] = [] as any;
+        let favorites: Doc<"userFavorites">[] = [];
         if (args.orgId) {
             favorites = await ctx.db
                 .query("userFavorites")
@@ -370,6 +378,10 @@ export const getPitchStats = query({
     },
     handler: async (ctx, args): Promise<PitchStats> => {
         const identity = await validateUser(ctx);
+
+        if (args.ownerUserId && args.ownerUserId !== identity.subject) {
+            throw new ConvexError("Unauthorized: cannot query another user's pitches");
+        }
 
         let pitches: Doc<"pitches">[] = [];
         if (args.orgId) {
@@ -428,39 +440,6 @@ export const getPitchStats = query({
     },
 });
 
-// Add a prefetch mutation to warm up the cache
-export const prefetch = mutation({
-    args: {
-        orgId: v.string(),
-    },
-    handler: async (ctx, args) => {
-        const identity = await validateUser(ctx);
-
-        await ctx.db
-            .query("pitches")
-            .withIndex("by_org", (q) => q.eq("orgId", args.orgId))
-            .order("desc")
-            .take(PREFETCH_COUNT);
-
-        const favorites = await ctx.db
-            .query("userFavorites")
-            .withIndex("by_user_org_pitch", (q) =>
-                q.eq("userId", identity.subject).eq("orgId", args.orgId)
-            )
-            .collect();
-
-        const favoritedIds = favorites.map((f) => f.pitchId);
-
-        if (favoritedIds.length > 0) {
-            await Promise.all(
-                favoritedIds.slice(0, PREFETCH_COUNT).map((id) => ctx.db.get(id))
-            );
-        }
-
-    return { success: true };
-    },
-});
-
 // Export user's pitches and evaluations as CSV (thesis analysis)
 export const exportCSV = query({
     args: {},
@@ -491,7 +470,7 @@ export const exportCSV = query({
             let promptVersion = '';
             let policyVersion = '';
 
-            const ev: any = p.evaluation as any;
+            const ev = p.evaluation as Record<string, unknown> & { overallScore?: number; metadata?: Record<string, string> };
             if (ev && typeof ev === 'object') {
                 overallScore = String(ev.overallScore ?? '');
                 if (ev.metadata) {

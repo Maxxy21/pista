@@ -42,7 +42,10 @@ export function QuestionsSection({ qa, updateQAAnswer }: QuestionsSectionProps) 
             />
             <div className="text-xs text-muted-foreground text-right">
               {q.answer.length > 0 ? (
-                <span className="text-green-600 font-medium">✓ Answered</span>
+                <span className="inline-flex items-center gap-1 font-medium" style={{ color: "#4ade80" }}>
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>
+                  Answered
+                </span>
               ) : (
                 <span>Answer to improve evaluation</span>
               )}

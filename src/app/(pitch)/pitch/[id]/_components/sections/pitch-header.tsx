@@ -1,6 +1,5 @@
 import React from "react";
 import Link from "next/link";
-import { useTheme } from "next-themes";
 import { toast } from "sonner";
 import { ChevronLeft } from "lucide-react";
 
@@ -18,10 +17,6 @@ interface PitchHeaderProps {
 }
 
 export const PitchHeader: React.FC<PitchHeaderProps> = React.memo(({ data }) => {
-    // Theme state
-    const { resolvedTheme } = useTheme();
-    const isDark = resolvedTheme === "dark";
-    
     // Inline editing state
     const [isEditing, setIsEditing] = React.useState(false);
     const [title, setTitle] = React.useState(data.title);
@@ -106,7 +101,7 @@ export const PitchHeader: React.FC<PitchHeaderProps> = React.memo(({ data }) => 
                     </p>
                 </div>
                 <div className="flex items-center gap-2 ml-4">
-                    <NavUserNavbar isDark={isDark} />
+                    <NavUserNavbar />
                 </div>
             </div>
         </header>

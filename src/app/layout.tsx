@@ -1,6 +1,19 @@
 import type {Metadata} from "next";
-import {Noto_Sans_Georgian} from "next/font/google";
+import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
+
+const inter = Inter({
+    subsets: ["latin"],
+    variable: "--font-inter",
+    display: "swap",
+});
+
+const playfair = Playfair_Display({
+    subsets: ["latin"],
+    weight: ["400", "700"],
+    variable: "--font-playfair",
+    display: "swap",
+});
 import { Analytics } from "@vercel/analytics/react"
 // import { SpeedInsights } from "@vercel/speed-insights/next"
 
@@ -13,7 +26,6 @@ import {ModalProvider} from "@/providers/modal-provider";
 import { EvaluationProgressOverlay } from "@/components/shared/progress/evaluation-progress";
 
 
-const defaultFont = Noto_Sans_Georgian({subsets: ["latin"]});
 
 const ORIGIN_URL =
     process.env.NODE === "production"
@@ -36,13 +48,14 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en">
-        <body className={defaultFont.className}>
+        <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
+        <body className={inter.className}>
         <Suspense fallback={<Loading/>}>
             <ThemeProvider
                 attribute="class"
-                defaultTheme="system"
-                enableSystem
+                defaultTheme="dark"
+                forcedTheme="dark"
+                enableSystem={false}
                 disableTransitionOnChange
             >
                 <ConvexClientProvider>

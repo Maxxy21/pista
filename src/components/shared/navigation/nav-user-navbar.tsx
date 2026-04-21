@@ -3,7 +3,6 @@
 import { LogOut, User, Download } from 'lucide-react'
 import { toast } from "sonner";
 import {useClerk, useUser} from "@clerk/nextjs"
-import {useTheme} from "next-themes"
 import React, { useEffect, useState } from "react";
 
 
@@ -27,24 +26,22 @@ import { cn } from "@/lib/utils";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useWorkspace } from "@/hooks/use-workspace";
-import { ThemeMenu } from "./theme-menu";
 import { exportPitchesCsv } from "@/lib/utils/csv-export";
+import { UniversalPitchData } from "@/lib/types/pitch";
 
 interface NavUserNavbarProps {
-    isDark?: boolean
     className?: string
 }
 
-export function NavUserNavbar({isDark, className}: NavUserNavbarProps) {
+export function NavUserNavbar({className}: NavUserNavbarProps) {
     const {user} = useUser()
     const {signOut, openUserProfile} = useClerk()
-    const {setTheme, theme} = useTheme()
     const workspace = useWorkspace()
     const [exportRequested, setExportRequested] = useState(false)
     const pitches = useQuery(
       api.pitches.getFilteredPitches,
       workspace.mode === 'org' && workspace.orgId ? { orgId: workspace.orgId } : (workspace.userId ? { ownerUserId: workspace.userId } : "skip")
-    ) as any[] | "skip" | undefined
+    ) as UniversalPitchData[] | undefined
 
     const handleSignOut = async () => {
         try {
@@ -59,7 +56,7 @@ export function NavUserNavbar({isDark, className}: NavUserNavbarProps) {
         if (!Array.isArray(pitches)) return
 
         const toastId = toast.loading("Preparing CSV…")
-        const { data, error } = exportPitchesCsv(pitches as any[])
+        const { data, error } = exportPitchesCsv(pitches)
         if (error) {
           toast.error("Export failed", { id: toastId })
         } else {
@@ -116,7 +113,7 @@ export function NavUserNavbar({isDark, className}: NavUserNavbarProps) {
                 <DropdownMenuSeparator/>
 
                 <DropdownMenuItem
-                    onClick={() => openUserProfile({appearance: getClerkAppearance(isDark)})}
+                    onClick={() => openUserProfile({appearance: getClerkAppearance()})}
                     className="gap-2"
                 >
                     <User className="mr-2 h-4 w-4 text-muted-foreground"/>
@@ -130,10 +127,6 @@ export function NavUserNavbar({isDark, className}: NavUserNavbarProps) {
                     <Download className="mr-2 h-4 w-4 text-muted-foreground"/>
                     Export CSV
                 </DropdownMenuItem>
-                <DropdownMenuSeparator/>
-                <DropdownMenuGroup>
-                  <ThemeMenu theme={theme} setTheme={setTheme} />
-                </DropdownMenuGroup>
                 <DropdownMenuSeparator/>
                 <DropdownMenuItem onClick={handleSignOut} className="gap-2 text-red-500 focus:text-red-500">
                     <LogOut className="mr-2 h-4 w-4"/>

@@ -1,30 +1,87 @@
-
-import LogoIcon from "@/components/ui/logo-icon"
-import { SignInForm } from "./_components/sign-in-form"
-
+import Link from "next/link";
+import { SignInForm } from "./_components/sign-in-form";
 
 const SignInPage = () => {
     return (
-        <div className="container relative flex min-h-screen flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0">
-            <div className="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex">
-                <div className="absolute inset-0 bg-primary/50" />
-                <div className="relative z-20 flex items-center gap-2 text-lg font-medium">
-                    <LogoIcon />
-                    <span>Pista</span>
+        <div
+            className="flex min-h-screen"
+            style={{ background: "#0e0d0c" }}
+        >
+            {/* Left panel */}
+            <div className="relative hidden lg:flex lg:w-1/2 flex-col justify-between p-12 overflow-hidden">
+                {/* Ambient glow */}
+                <div
+                    className="pointer-events-none absolute inset-0 -z-10"
+                    aria-hidden
+                >
+                    <div
+                        className="absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full opacity-15"
+                        style={{
+                            background: "radial-gradient(ellipse at center, #F2EAD3 0%, transparent 70%)",
+                            filter: "blur(80px)",
+                        }}
+                    />
                 </div>
-                <div className="relative z-20 mt-auto">
-                    <blockquote className="space-y-2">
-                        <p className="text-lg">
-                            &quot;Pista: A GenAI-powered system for automated startup pitch evaluation.&quot;
-                        </p>
-                        <footer className="text-sm">Welcome back</footer>
-                    </blockquote>
+
+                {/* Logo */}
+                <Link href="/" className="flex items-center gap-2.5 group w-fit">
+                    <div
+                        className="h-5 w-6 rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0"
+                        style={{ background: "#F2EAD3" }}
+                    />
+                    <span
+                        className="text-lg font-semibold tracking-tight"
+                        style={{ color: "#F2EAD3" }}
+                    >
+                        Pista
+                    </span>
+                </Link>
+
+                {/* Bottom quote */}
+                <div>
+                    <div
+                        className="gradient-shell inline-block mb-8"
+                    >
+                        <div
+                            className="gradient-shell-inner px-4 py-2 text-xs font-medium tracking-widest uppercase"
+                            style={{ color: "rgba(242,234,211,0.5)" }}
+                        >
+                            AI pitch evaluation
+                        </div>
+                    </div>
+                    <h2
+                        className="font-playfair text-5xl leading-[1.1] tracking-tight mb-6"
+                        style={{ color: "#F2EAD3" }}
+                    >
+                        Welcome back.
+                        <br />
+                        <span style={{ color: "rgba(242,234,211,0.45)" }}>
+                            Your pitches are waiting.
+                        </span>
+                    </h2>
+                    <p className="text-sm leading-relaxed max-w-xs" style={{ color: "rgba(242,234,211,0.45)" }}>
+                        Sign in to review your evaluations, track improvements, and keep refining your pitch.
+                    </p>
                 </div>
             </div>
-            <SignInForm/>
+
+            {/* Right panel — Clerk form */}
+            <div
+                className="flex flex-1 flex-col items-center justify-center p-8"
+                style={{ borderLeft: "1px solid rgba(242,234,211,0.08)" }}
+            >
+                {/* Mobile logo */}
+                <Link href="/" className="flex items-center gap-2 mb-10 lg:hidden">
+                    <div
+                        className="h-5 w-6 rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm"
+                        style={{ background: "#F2EAD3" }}
+                    />
+                    <span className="text-lg font-semibold" style={{ color: "#F2EAD3" }}>Pista</span>
+                </Link>
+                <SignInForm />
+            </div>
         </div>
-    )
-}
+    );
+};
 
-
-export default SignInPage
+export default SignInPage;

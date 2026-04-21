@@ -3,9 +3,7 @@
 import * as React from "react";
 import { PlusCircle } from "lucide-react";
 import { useOrganization } from "@clerk/nextjs";
-import { useTheme } from "next-themes";
 import { useRouter, useSearchParams } from "next/navigation";
-import { motion } from "framer-motion";
 
 import {
     Sidebar,
@@ -30,8 +28,6 @@ import { SidebarNav } from "./sidebar-nav";
 
 export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
     const { organization, isLoaded } = useOrganization();
-    const { resolvedTheme } = useTheme();
-    const isDark = resolvedTheme === "dark";
     const router = useRouter();
     const searchParams = useSearchParams();
     const { state } = useSidebar();
@@ -61,29 +57,22 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
             <SidebarHeader className="py-4">
                 {state === "collapsed" ? (
                     <div className="flex flex-col items-center space-y-3">
-                        <motion.div
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.95 }}
-                            className="flex items-center justify-center bg-primary/10 p-2 rounded-lg"
-                        >
-                            <LogoIcon className="h-6 w-6 text-primary" />
-                        </motion.div>
+                        <div
+                            className="h-5 w-6 rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0"
+                            style={{ background: "#F2EAD3" }}
+                        />
                     </div>
                 ) : (
-                    <div className="px-4 space-y-3">
-                        <div className="flex items-center gap-3">
-                            <motion.div
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                                className="bg-gradient-to-br from-primary/20 to-primary/10 p-2.5 rounded-xl shadow-sm"
-                            >
-                                <LogoIcon className="h-6 w-6 text-primary" />
-                            </motion.div>
-                            <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70">
+                    <div className="px-4">
+                        <div className="flex items-center gap-2.5">
+                            <div
+                                className="h-5 w-6 rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0"
+                                style={{ background: "#F2EAD3" }}
+                            />
+                            <h1 className="text-lg font-semibold tracking-tight" style={{ color: "#F2EAD3" }}>
                                 Pista
                             </h1>
                         </div>
-                        {/* Title and optional org indicator only; switcher moved to footer */}
                     </div>
                 )}
             </SidebarHeader>
@@ -105,9 +94,10 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
                 {/* Action Buttons */}
                 <SidebarMenu className="space-y-1">
                     <SidebarMenuItem>
-                        <SidebarMenuButton 
+                        <SidebarMenuButton
                             asChild
-                            className="bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary/80 text-primary-foreground font-medium shadow-sm transition-all duration-200"
+                            className="font-medium transition-opacity duration-150 hover:opacity-85"
+                            style={{ background: "#F2EAD3", color: "#0e0d0c" }}
                             tooltip={state === "collapsed" ? "New Pitch" : undefined}
                         >
                             <Link href="/dashboard?view=new">
@@ -117,7 +107,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                     <SidebarMenuItem>
-                        <InviteButton isDark={isDark} />
+                        <InviteButton isDark={true} />
                     </SidebarMenuItem>
                     <SidebarMenuItem>
                         {/* Organization switcher positioned at bottom of sidebar */}

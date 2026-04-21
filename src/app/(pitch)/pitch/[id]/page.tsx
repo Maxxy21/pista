@@ -110,10 +110,9 @@ const PitchDetails = () => {
                         <Suspense fallback={<TranscriptSkeleton/>}>
                             <TranscriptSection data={data}/>
                         </Suspense>
-                        {/* Q&A section commented out for testing with external pitches */}
-                        {<Suspense fallback={<QuestionsSkeleton/>}>
+                        <Suspense fallback={<QuestionsSkeleton/>}>
                             <QuestionsSection data={data}/>
-                        </Suspense>}
+                        </Suspense>
                     </div>
                     <Suspense fallback={<ScoreOverviewSkeleton/>}>
                         <ScoreOverview data={data}/>

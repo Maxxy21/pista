@@ -45,7 +45,6 @@ export default function FileUploadExample() {
 
   const handleFileUpload = (newFiles: File[]) => {
     setFiles(newFiles);
-    console.log(newFiles);
   };
 
   const accept = useMemo(

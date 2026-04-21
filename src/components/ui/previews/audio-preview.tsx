@@ -82,14 +82,14 @@ export function AudioPreview({ file, onRemove }: AudioPreviewProps) {
           <Slider value={[currentTime]} max={Math.max(1, duration)} step={0.1} onValueChange={handleSeek} />
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Button variant="ghost" size="icon" onClick={togglePlay}>
+              <Button variant="ghost" size="icon" onClick={togglePlay} aria-label={isPlaying ? "Pause" : "Play"}>
                 {isPlaying ? (
                   <PauseCircle className="h-6 w-6" />
                 ) : (
                   <PlayCircle className="h-6 w-6" />
                 )}
               </Button>
-              <Button variant="ghost" size="icon" onClick={handleReset}>
+              <Button variant="ghost" size="icon" onClick={handleReset} aria-label="Restart">
                 <RotateCcw className="h-4 w-4" />
               </Button>
             </div>

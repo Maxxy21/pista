@@ -1,5 +1,6 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
+import { logger } from "@/lib/logger";
 
 export interface AuthenticatedRequest extends NextRequest {
   userId: string;
@@ -35,7 +36,7 @@ export async function validateApiAuth(req: NextRequest): Promise<AuthResult> {
       orgId: orgId || undefined
     };
   } catch (error) {
-    console.error("Authentication validation failed:", error);
+    logger.error("auth", "Authentication validation failed:", error);
     return {
       success: false,
       error: "Authentication validation failed"
@@ -91,17 +92,3 @@ export async function requireAuth(req: NextRequest) {
   };
 }
 
-/**
- * Checks if user has access to organization resources
- * @param userId - The user ID
- * @param orgId - The organization ID to check access for
- * @param requiredOrgId - The organization ID required for access
- * @returns boolean indicating access permission
- */
-export function hasOrgAccess(userId: string, orgId: string | undefined, requiredOrgId: string): boolean {
-  // If no org context, allow personal access
-  if (!requiredOrgId) return true;
-  
-  // Must have matching org ID
-  return orgId === requiredOrgId;
-}

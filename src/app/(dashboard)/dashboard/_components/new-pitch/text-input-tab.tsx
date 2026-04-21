@@ -20,7 +20,7 @@ export function TextInputTab({
   return (
     <div className="space-y-2">
       <Label htmlFor="pitch-text">Pitch Content</Label>
-      <div className="h-[480px] border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-background rounded-lg relative overflow-hidden">
+      <div className="h-[300px] sm:h-[420px] border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-background rounded-lg relative overflow-hidden">
         <div className="absolute inset-0 [mask-image:radial-gradient(ellipse_at_center,white,transparent)]">
           <GridPattern />
         </div>
@@ -42,7 +42,7 @@ export function TextInputTab({
             onFocus={() => setTextFocused(true)}
             onBlur={() => setTextFocused(false)}
             placeholder={textFocused || text ? "Describe your startup idea, business model, target market, and competitive advantages..." : ""}
-            className={`flex-1 min-h-[400px] resize-none border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 ${text || textFocused ? 'mt-0 text-left' : 'mt-auto text-center'} ${textFocused || text ? 'placeholder:text-left' : 'placeholder:text-center'} relative z-10 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full`}
+            className={`flex-1 min-h-[220px] sm:min-h-[360px] resize-none border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 ${text || textFocused ? 'mt-0 text-left' : 'mt-auto text-center'} ${textFocused || text ? 'placeholder:text-left' : 'placeholder:text-center'} relative z-10 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full`}
             style={{
               scrollbarWidth: 'thin',
               scrollbarColor: 'hsl(var(--border)) transparent'

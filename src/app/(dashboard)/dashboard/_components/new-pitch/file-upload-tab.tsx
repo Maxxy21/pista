@@ -31,7 +31,7 @@ export function FileUploadTab({
   return (
     <div className="space-y-2">
       <Label>{label}</Label>
-      <div className="h-[480px] border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-background rounded-lg overflow-hidden">
+      <div className="h-[220px] sm:h-[300px] border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-background rounded-lg overflow-hidden">
         <div className="h-full [&>div]:h-full [&>div>div]:h-full [&>div>div]:!p-4 [&>div>div]:flex [&>div>div]:items-center [&>div>div]:justify-center">
           <PrettyFileUpload 
             accept={accept} 

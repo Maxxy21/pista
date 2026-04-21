@@ -11,7 +11,6 @@ import HowItWorks from "./components/how-it-works";
 import CTA from "./components/cta";
 import Footer from "./components/footer";
 
-
 export default function LandingPage() {
     const { user, isLoaded } = useUser();
     const router = useRouter();
@@ -26,9 +25,12 @@ export default function LandingPage() {
     if (user) return null;
 
     return (
-        <div className="flex min-h-screen flex-col">
+        <div
+            className="flex min-h-screen flex-col"
+            style={{ background: "var(--landing-bg)", color: "var(--landing-text)" }}
+        >
             <Header />
-            <div className="h-16"/>
+            <div className="h-16" />
             <main className="flex-1">
                 <Hero />
                 <Features />
