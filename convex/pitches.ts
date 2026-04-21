@@ -289,6 +289,7 @@ export const getFilteredPitches = query({
         }
 
         // Use the search index when a search term is provided
+        let pitches: Doc<"pitches">[] = [];
         if (args.search) {
             const orgId = args.orgId ?? "";
             pitches = await ctx.db
