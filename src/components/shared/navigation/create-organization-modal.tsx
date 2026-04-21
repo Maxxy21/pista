@@ -8,14 +8,13 @@ import { getClerkAppearance } from "@/lib/utils/clerk-appearance";
 interface CreateOrganizationModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  isDark?: boolean;
 }
 
-export function CreateOrganizationModal({ open, onOpenChange, isDark }: CreateOrganizationModalProps) {
+export function CreateOrganizationModal({ open, onOpenChange }: CreateOrganizationModalProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="p-0 bg-transparent border-none max-w-[430px]">
-        <CreateOrganization appearance={getClerkAppearance(isDark)} routing="hash" />
+        <CreateOrganization appearance={getClerkAppearance()} routing="hash" />
       </DialogContent>
     </Dialog>
   );

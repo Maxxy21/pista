@@ -26,7 +26,6 @@ import {
     useSidebar,
 } from "@/components/ui/sidebar";
 
-import { useTheme } from "next-themes";
 import { dark } from "@clerk/themes";
 import { cn } from "@/lib/utils";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -36,11 +35,10 @@ import { PersonalWorkspaceAvatar } from "./personal-workspace-avatar";
 import { PersonalWorkspaceLabel } from "./personal-workspace-label";
 
 interface TeamSwitcherProps {
-    isDark?: boolean;
     className?: string;
 }
 
-export function TeamSwitcher({ isDark, className }: TeamSwitcherProps) {
+export function TeamSwitcher({ className }: TeamSwitcherProps) {
     const { isMobile, state } = useSidebar();
     const { organization } = useOrganization();
     const { user } = useUser();
@@ -52,8 +50,6 @@ export function TeamSwitcher({ isDark, className }: TeamSwitcherProps) {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
-    const { resolvedTheme } = useTheme();
-    const isDarkTheme = isDark ?? resolvedTheme === "dark";
     const [pending, setPending] = React.useState<string | "personal" | null>(null);
     const [createOpen, setCreateOpen] = React.useState(false);
 
@@ -196,7 +192,7 @@ export function TeamSwitcher({ isDark, className }: TeamSwitcherProps) {
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
-                <CreateOrganizationModal open={createOpen} onOpenChange={setCreateOpen} isDark={isDarkTheme} />
+                <CreateOrganizationModal open={createOpen} onOpenChange={setCreateOpen} />
             </SidebarMenuItem>
         </SidebarMenu>
     );

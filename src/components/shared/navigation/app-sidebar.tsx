@@ -107,7 +107,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                     <SidebarMenuItem>
-                        <InviteButton isDark={true} />
+                        <InviteButton />
                     </SidebarMenuItem>
                     <SidebarMenuItem>
                         {/* Organization switcher positioned at bottom of sidebar */}

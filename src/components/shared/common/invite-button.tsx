@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react";
-import {UserPlus, Building2} from "lucide-react";
+import { UserPlus } from "lucide-react";
 import { OrganizationProfile } from "@clerk/nextjs";
 import { getClerkAppearance } from "@/lib/utils/clerk-appearance";
 import {
@@ -12,15 +12,10 @@ import {
 } from "@/components/ui/dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { SidebarMenuButton, useSidebar } from "@/components/ui/sidebar";
-import {dark} from "@clerk/themes";
 import { CreateOrganizationModal } from "@/components/shared/navigation/create-organization-modal";
 import { useWorkspace } from "@/hooks/use-workspace";
 
-interface InviteButtonProps {
-    isDark?: boolean;
-}
-
-export const InviteButton = ({ isDark }: InviteButtonProps) => {
+export const InviteButton = () => {
     const { state } = useSidebar();
     const workspace = useWorkspace();
     const [createOpen, setCreateOpen] = React.useState(false);
@@ -38,12 +33,12 @@ export const InviteButton = ({ isDark }: InviteButtonProps) => {
                     <VisuallyHidden>
                         <DialogTitle>Organization</DialogTitle>
                     </VisuallyHidden>
-                    <OrganizationProfile appearance={getClerkAppearance(isDark)} routing="hash" />
+                    <OrganizationProfile appearance={getClerkAppearance()} routing="hash" />
                 </DialogContent>
             </Dialog>
         );
     }
-    
+
     return (
         <>
             <SidebarMenuButton
@@ -53,7 +48,7 @@ export const InviteButton = ({ isDark }: InviteButtonProps) => {
                 <UserPlus />
                 <span>Create Organization</span>
             </SidebarMenuButton>
-            <CreateOrganizationModal open={createOpen} onOpenChange={setCreateOpen} isDark={isDark} />
+            <CreateOrganizationModal open={createOpen} onOpenChange={setCreateOpen} />
         </>
     );
 };

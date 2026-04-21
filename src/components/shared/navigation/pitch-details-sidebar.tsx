@@ -462,7 +462,7 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
                     </SidebarMenuItem>
                     {organization && (
                         <SidebarMenuItem>
-                            <InviteButton isDark={true} />
+                            <InviteButton />
                         </SidebarMenuItem>
                     )}
                 </SidebarMenu>
