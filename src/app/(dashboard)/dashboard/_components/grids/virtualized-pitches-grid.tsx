@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useRef } from 'react';
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { OrganizationResource } from "@clerk/types";
+type OrgResource = { id: string; name: string | null } | null | undefined;
 import { PitchCard } from "../cards/pitch-card";
 import { SkeletonCard } from "@/components/ui/skeleton-card";
 import { useVirtualizer } from '@tanstack/react-virtual';
@@ -18,7 +18,7 @@ interface VirtualizedPitchesGridProps {
     viewMode: "grid" | "list";
     searchQuery: string;
     currentView: string;
-    organization?: OrganizationResource | null;
+    organization?: OrgResource;
     isLoading?: boolean;
     scrollRef?: React.RefObject<HTMLDivElement>;
 }

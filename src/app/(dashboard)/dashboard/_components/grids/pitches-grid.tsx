@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { OrganizationResource } from "@clerk/types";
+type OrgResource = { id: string; name: string | null } | null | undefined;
 import { PitchCard } from "../cards/pitch-card";
 import { toPitchCardProps } from "./pitch-to-card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -31,7 +31,7 @@ interface PitchesGridProps {
     viewMode: "grid" | "list";
     searchQuery: string;
     currentView: string;
-    organization: OrganizationResource | null | undefined;
+    organization: OrgResource;
     isLoading?: boolean;
     useOuterScroll?: boolean;
 }
