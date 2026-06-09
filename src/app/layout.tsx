@@ -1,17 +1,22 @@
 import type {Metadata} from "next";
-import { Inter, Playfair_Display } from "next/font/google";
+import { Fraunces, Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({
+const hanken = Hanken_Grotesk({
     subsets: ["latin"],
-    variable: "--font-inter",
+    variable: "--font-hanken",
     display: "swap",
 });
 
-const playfair = Playfair_Display({
+const fraunces = Fraunces({
     subsets: ["latin"],
-    weight: ["400", "700"],
-    variable: "--font-playfair",
+    variable: "--font-fraunces",
+    display: "swap",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+    subsets: ["latin"],
+    variable: "--font-mono",
     display: "swap",
 });
 import { Analytics } from "@vercel/analytics/react"
@@ -48,8 +53,8 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
-        <body className={inter.className}>
+        <html lang="en" className={`${hanken.variable} ${fraunces.variable} ${jetbrainsMono.variable}`}>
+        <body className={hanken.className}>
         <Suspense fallback={<Loading/>}>
             <ThemeProvider
                 attribute="class"

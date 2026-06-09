@@ -24,8 +24,10 @@ const config = {
         },
         extend: {
             fontFamily: {
-                sans: ["var(--font-inter)", "sans-serif"],
-                playfair: ["var(--font-playfair)", "serif"],
+                sans: ["var(--font-hanken)", "system-ui", "sans-serif"],
+                display: ["var(--font-fraunces)", "Georgia", "serif"],
+                serif: ["var(--font-fraunces)", "Georgia", "serif"],
+                mono: ["var(--font-mono)", "ui-monospace", "monospace"],
             },
             colors: {
                 border: 'hsl(var(--border))',
