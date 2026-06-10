@@ -69,3 +69,6 @@ blob
 
 # brainstorm visual companion scratch
 .superpowers/
+
+# local-only, never commit
+CLAUDE.md
