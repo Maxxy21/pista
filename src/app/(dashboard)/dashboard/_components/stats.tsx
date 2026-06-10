@@ -3,68 +3,32 @@
 import { useQuery } from "convex/react";
 import { useAuth } from "@clerk/nextjs";
 import { api } from "@/convex/_generated/api";
-import { Card, CardContent } from "@/components/ui/card";
-import { LineChart, ChevronUp, CalendarDays, BarChart3 } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { useMemo, memo } from "react";
+import { useMemo } from "react";
 import { useWorkspace } from "@/hooks/use-workspace";
 import { motion } from "framer-motion";
-import { SkeletonCard } from "@/components/ui/skeleton-card";
-import { ScoreBadge } from "./cards/score-badge";
+import { ScoreRing } from "@/components/ui/score-ring";
 
-interface StatCardProps {
-    title: string;
-    value: string | number;
-    valueNode?: React.ReactNode;
-    description?: React.ReactNode;
-    icon: React.ElementType;
-    className?: string;
-    trend?: "up" | "down" | "neutral";
+function StatCell({
+    label,
+    children,
+    sub,
+}: {
+    label: string;
+    children: React.ReactNode;
+    sub?: React.ReactNode;
+}) {
+    return (
+        <div className="px-5 py-4">
+            <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-muted-foreground/70">
+                {label}
+            </p>
+            <div className="mt-2 font-mono text-2xl font-medium leading-none tracking-tight">
+                {children}
+            </div>
+            {sub && <p className="mt-1.5 text-[11px] text-muted-foreground">{sub}</p>}
+        </div>
+    );
 }
-
-const StatCard = memo<StatCardProps>(
-    ({ title, value, valueNode, description, icon: Icon, className, trend = "neutral" }) => {
-        const trendColor =
-            trend === "up"
-                ? "text-green-500"
-                : trend === "down"
-                ? "text-red-500"
-                : "text-gray-500";
-
-        return (
-            <motion.div
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            >
-                <Card className={cn("overflow-hidden", className)}>
-                    <CardContent className="p-5 sm:p-6">
-                        <div className="flex items-start justify-between gap-3">
-                            <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center shrink-0">
-                                <Icon className="h-4 w-4 text-foreground" />
-                            </div>
-                            {description && (
-                                <div className={cn("text-xs font-medium mt-0.5 shrink-0", trendColor)}>
-                                    {description}
-                                </div>
-                            )}
-                        </div>
-                        <div className="mt-4">
-                            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">
-                                {title}
-                            </p>
-                            <div className="text-2xl font-bold truncate">
-                                {valueNode ?? value}
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
-            </motion.div>
-        );
-    }
-);
-
-StatCard.displayName = "StatCard";
 
 export function DashboardStats() {
     const { userId, isLoaded, isSignedIn } = useAuth();
@@ -95,13 +59,6 @@ export function DashboardStats() {
             : "skip"
     );
 
-    // Memoized derived values
-    const pitchGrowth = useMemo(() => {
-        return stats?.recentPitches?.length
-            ? "+14%"
-            : "0%";
-    }, [stats?.recentPitches]);
-
     const bestPitchScore = stats?.bestPitch?.evaluation?.overallScore ?? 0;
 
     const averageScore = stats?.averageScore ?? 0;
@@ -109,9 +66,12 @@ export function DashboardStats() {
     // Loading state
     if (!shouldFetch || !stats) {
         return (
-            <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid grid-cols-2 divide-x divide-border rounded-2xl border border-border bg-card lg:grid-cols-4">
                 {Array.from({ length: 4 }).map((_, i) => (
-                    <SkeletonCard key={i} variant="stat" />
+                    <div key={i} className="px-5 py-4">
+                        <div className="h-3 w-20 rounded bg-muted" />
+                        <div className="mt-3 h-7 w-14 rounded bg-muted" />
+                    </div>
                 ))}
             </div>
         );
@@ -121,37 +81,30 @@ export function DashboardStats() {
     const mergedStats = { ...defaultStats, ...stats };
 
     return (
-        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-            <StatCard
-                title="Total Pitches"
-                value={mergedStats.totalPitches}
-                description={pitchGrowth}
-                trend="up"
-                icon={BarChart3}
-            />
-            <StatCard
-                title="Average Score"
-                value={averageScore.toFixed(1)}
-                valueNode={<ScoreBadge score={averageScore} />}
-                description={`${mergedStats.totalPitches} pitches analyzed`}
-                icon={LineChart}
-                trend="neutral"
-            />
-            <StatCard
-                title="Best Pitch"
-                value={mergedStats.bestPitch?.title ?? "None"}
-                description={<ScoreBadge score={bestPitchScore} />}
-                icon={ChevronUp}
-                trend="up"
-            />
-            <StatCard
-                title="Recent Pitches"
-                value={mergedStats.recentPitches.length}
-                description="Last 7 days"
-                icon={CalendarDays}
-                trend="neutral"
-            />
-        </div>
+        <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            className="grid grid-cols-2 divide-x divide-border overflow-hidden rounded-2xl border border-border bg-card lg:grid-cols-4"
+        >
+            <StatCell label="Total pitches" sub={`${mergedStats.totalPitches} analyzed`}>
+                {mergedStats.totalPitches}
+            </StatCell>
+            <StatCell label="Average score">
+                <ScoreRing score={averageScore} size="md" />
+            </StatCell>
+            <StatCell
+                label="Best pitch"
+                sub={mergedStats.bestPitch ? `${bestPitchScore.toFixed(1)} / 10` : undefined}
+            >
+                <span className="block truncate font-display text-lg">
+                    {mergedStats.bestPitch?.title ?? "None"}
+                </span>
+            </StatCell>
+            <StatCell label="Recent" sub="last 7 days">
+                {mergedStats.recentPitches.length}
+            </StatCell>
+        </motion.div>
     );
 }
 
