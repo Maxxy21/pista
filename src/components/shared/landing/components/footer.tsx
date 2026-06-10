@@ -1,4 +1,5 @@
 import Link from "next/link";
+import LogoIcon from "@/components/ui/logo-icon";
 
 const Footer = () => {
     return (
@@ -9,14 +10,11 @@ const Footer = () => {
             <div className="mx-auto max-w-6xl px-6 lg:px-8">
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                     {/* Logo */}
-                    <Link href="/" className="flex items-center gap-2.5 group">
-                        <div
-                            className="h-5 w-6 rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0 opacity-80"
-                            style={{ background: "var(--landing-cream)" }}
-                        />
+                    <Link href="/" className="flex items-center gap-2.5 group opacity-80 transition-opacity duration-150 hover:opacity-100">
+                        <span style={{ color: "var(--landing-cream)" }}><LogoIcon size="sm" /></span>
                         <span
                             className="text-base font-semibold tracking-tight"
-                            style={{ color: "var(--landing-cream)", opacity: 0.8 }}
+                            style={{ color: "var(--landing-cream)" }}
                         >
                             Pista
                         </span>
