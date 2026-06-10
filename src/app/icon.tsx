@@ -4,6 +4,8 @@ export const size = {
     width: 32,
     height: 32,
 }
+export const contentType = 'image/png'
+
 export default function Icon() {
     return new ImageResponse(
         (
@@ -14,21 +16,16 @@ export default function Icon() {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    background: 'transparent'
+                    background: '#0E0D0C',
+                    borderRadius: 7,
                 }}
             >
-                <div
-                    style={{
-                        height: '20px',
-                        width: '24px',
-                        background: 'linear-gradient(to bottom, #3B82F6, #2563EB)',
-                        borderTopLeftRadius: '8px',
-                        borderTopRightRadius: '2px',
-                        borderBottomRightRadius: '8px',
-                        borderBottomLeftRadius: '2px',
-                        flexShrink: 0,
-                    }}
-                />
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                    <rect x="3" y="3.4" width="18" height="2.6" rx="1.3" fill="#F2EAD3" />
+                    <rect x="5.5" y="12.5" width="3" height="8" rx="1.5" fill="#F2EAD3" fillOpacity="0.55" />
+                    <rect x="10.5" y="7" width="3" height="13.5" rx="1.5" fill="#F2EAD3" fillOpacity="0.85" />
+                    <rect x="15.5" y="10" width="3" height="10.5" rx="1.5" fill="#C9A227" />
+                </svg>
             </div>
         ),
         { ...size }
