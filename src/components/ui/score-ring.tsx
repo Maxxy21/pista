@@ -4,12 +4,12 @@ import { getScoreTier, type ScoreTier } from "@/lib/utils/score";
 
 interface ScoreRingProps {
   score: number;
-  size?: "sm" | "md" | "lg";
+  size?: "sm" | "md" | "lg" | "xl";
   className?: string;
 }
 
-const PX = { sm: 34, md: 44, lg: 56 } as const;
-const FONT = { sm: 12, md: 15, lg: 19 } as const;
+const PX = { sm: 34, md: 44, lg: 56, xl: 96 } as const;
+const FONT = { sm: 12, md: 15, lg: 19, xl: 34 } as const;
 
 const TIER_BORDER: Record<ScoreTier, string> = {
   high: "border-[hsl(var(--score-high))]",

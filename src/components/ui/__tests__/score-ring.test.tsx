@@ -12,4 +12,8 @@ describe("ScoreRing", () => {
     const { container } = render(<ScoreRing score={3} />);
     expect(container.innerHTML).toContain("border-[hsl(var(--score-low))]");
   });
+  it("renders at xl size", () => {
+    const { getByText } = render(<ScoreRing score={8} size="xl" />);
+    expect(getByText("8.0")).toBeTruthy();
+  });
 });
