@@ -6,28 +6,27 @@ interface LogoIconProps {
     size?: "sm" | "md" | "lg";
 }
 
-const LogoIcon = ({ className, size = "md" }: LogoIconProps) => {
-    // Define sizes based on the size prop
-    const sizes = {
-        sm: "h-4 w-5",
-        md: "h-5 w-6",
-        lg: "h-6 w-7",
-    };
+const px = { sm: 18, md: 22, lg: 28 } as const;
 
+const LogoIcon = ({ className, size = "md" }: LogoIconProps) => {
+    const s = px[size];
     return (
-        <div
-            className={cn(
-                "font-normal flex space-x-2 items-center py-1 relative z-20",
-                className
-            )}
+        <svg
+            width={s}
+            height={s}
+            viewBox="0 0 24 24"
+            fill="none"
+            role="img"
+            aria-label="Pista"
+            className={cn("text-foreground flex-shrink-0", className)}
         >
-            <div
-                className={cn(
-                    "bg-gradient-to-br from-primary to-primary/80 rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0 shadow-sm transition-transform duration-300",
-                    sizes[size]
-                )}
-            />
-        </div>
+            {/* pi top bar */}
+            <rect x="3" y="3.4" width="18" height="2.6" rx="1.3" fill="currentColor" />
+            {/* three rising score bars; rightmost is gold */}
+            <rect x="5.5" y="12.5" width="3" height="8" rx="1.5" fill="currentColor" fillOpacity="0.55" />
+            <rect x="10.5" y="7" width="3" height="13.5" rx="1.5" fill="currentColor" fillOpacity="0.85" />
+            <rect x="15.5" y="10" width="3" height="10.5" rx="1.5" style={{ fill: "hsl(var(--gold))" }} />
+        </svg>
     );
 };
 

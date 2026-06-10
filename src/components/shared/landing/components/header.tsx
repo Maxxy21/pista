@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import LogoIcon from "@/components/ui/logo-icon";
 
 const Header = () => {
     const [scrolled, setScrolled] = useState(false);
@@ -26,10 +27,7 @@ const Header = () => {
             <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6 lg:px-8">
                 {/* Logo */}
                 <Link href="/" className="flex items-center gap-2.5 group">
-                    <div
-                        className="h-5 w-6 rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0 transition-opacity duration-200 group-hover:opacity-80"
-                        style={{ background: "var(--landing-cream)" }}
-                    />
+                    <span style={{ color: "var(--landing-cream)" }}><LogoIcon size="md" /></span>
                     <span
                         className="text-lg font-semibold tracking-tight"
                         style={{ color: "var(--landing-cream)" }}
