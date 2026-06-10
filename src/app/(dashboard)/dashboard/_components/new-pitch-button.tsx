@@ -9,7 +9,7 @@ interface NewPitchButtonProps {
     orgId?: string;
     disabled?: boolean;
     className?: string;
-    variant?: "default" | "gradient" | "outline";
+    variant?: "default" | "gradient" | "outline" | "gold";
     size?: "default" | "sm" | "lg" | "icon";
     showIcon?: boolean;
     mobileIconOnly?: boolean;
@@ -23,6 +23,7 @@ const BUTTON_STYLES: Record<
     gradient:
         "bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70",
     outline: "border-primary/50 text-primary hover:bg-primary/10",
+    gold: "",
 };
 
 export function NewPitchButton({
@@ -47,7 +48,7 @@ export function NewPitchButton({
             type="button"
             onClick={onClick}
                 disabled={disabled}
-                variant={variant === "outline" ? "outline" : "default"}
+                variant={variant === "outline" ? "outline" : variant === "gold" ? "gold" : "default"}
                 size={size}
                 className={cn(
                     mobileIconOnly ? "w-9 h-9 p-0 sm:w-auto sm:h-9 sm:gap-2 sm:px-4" : "gap-2", 
