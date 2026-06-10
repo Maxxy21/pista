@@ -8,3 +8,11 @@ export function getScoreTone(score?: number | null): ScoreTone {
   return "red";
 }
 
+export type ScoreTier = "high" | "mid" | "low";
+
+export function getScoreTier(score: number): ScoreTier {
+  if (score >= 7.5) return "high";
+  if (score >= 5) return "mid";
+  return "low";
+}
+
