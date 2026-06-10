@@ -11,7 +11,6 @@
 /__tests__
 TESTING.md
 /src/test
-vitest.config.ts
 
 # next.js
 /.next/
