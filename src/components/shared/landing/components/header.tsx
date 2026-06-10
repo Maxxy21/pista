@@ -26,7 +26,7 @@ const Header = () => {
         >
             <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6 lg:px-8">
                 {/* Logo */}
-                <Link href="/" className="flex items-center gap-2.5 group">
+                <Link href="/" className="flex items-center gap-2.5 group transition-opacity duration-200 group-hover:opacity-80 hover:opacity-80">
                     <span style={{ color: "var(--landing-cream)" }}><LogoIcon size="md" /></span>
                     <span
                         className="text-lg font-semibold tracking-tight"

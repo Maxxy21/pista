@@ -8,6 +8,12 @@ interface LogoIconProps {
 
 const px = { sm: 18, md: 22, lg: 28 } as const;
 
+/**
+ * Pista logo mark: a π top bar over three rising "score" bars.
+ * The three left bars use `currentColor` (override via `color`/`text-*`),
+ * but the rightmost bar is intentionally always `--gold` and does not
+ * follow color overrides.
+ */
 const LogoIcon = ({ className, size = "md" }: LogoIconProps) => {
     const s = px[size];
     return (
