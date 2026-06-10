@@ -3,8 +3,7 @@
 import React, { Suspense, lazy, useEffect, useMemo, useRef } from "react";
 import { useOrganization, useUser } from "@clerk/nextjs";
 import { Loading } from "@/components/shared/auth/loading";
-import { DashboardTabs } from "./dashboard-tabs";
-import { PitchFilters } from "./pitch-filters";
+import { DashboardToolbar } from "./dashboard-toolbar";
 import { NewPitchPanel } from "./new-pitch-panel";
 import { useDashboardState } from "../_hooks/use-dashboard-state";
 import { usePrefetchPitches } from "@/hooks/use-prefetch-pitches";
@@ -26,11 +25,10 @@ export function DashboardContent() {
   const searchParams = useSearchParams();
 
   const {
-    searchValue, setSearchValue,
     viewMode, setViewMode,
     scoreFilter, setScoreFilter,
     sortBy, setSortBy,
-    handleSearch, handleTabChange,
+    handleTabChange,
     getScoreRange,
   } = useDashboardState(searchParams);
 
@@ -50,7 +48,16 @@ export function DashboardContent() {
 
   return (
     <div className="min-h-0 flex-1 bg-background flex flex-col overflow-hidden">
-      <DashboardTabs currentView={viewParam} handleTabChange={handleTabChange} />
+      <DashboardToolbar
+        currentView={viewParam}
+        handleTabChange={handleTabChange}
+        viewMode={viewMode}
+        setViewMode={setViewMode}
+        scoreFilter={scoreFilter}
+        setScoreFilter={setScoreFilter}
+        sortBy={sortBy}
+        setSortBy={setSortBy}
+      />
       <div className="flex-1 overflow-hidden">
         <ScrollArea className="h-full" viewportRef={viewportRef}>
           <div className="p-4 md:p-6 pb-0">
@@ -60,19 +67,6 @@ export function DashboardContent() {
               </Suspense>
             </ErrorBoundary>
           </div>
-
-          <PitchFilters
-            searchValue={searchValue}
-            setSearchValue={setSearchValue}
-            viewMode={viewMode}
-            setViewMode={setViewMode}
-            scoreFilter={scoreFilter}
-            setScoreFilter={setScoreFilter}
-            sortBy={sortBy}
-            setSortBy={setSortBy}
-            handleSearch={handleSearch}
-            resultsCount={Array.isArray(data) ? data.length : undefined}
-          />
 
           <div className="p-4 md:p-6 pt-0">
             {viewParam === "new" ? (
