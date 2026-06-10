@@ -37,7 +37,7 @@ export function Navbar({ title = "Dashboard", rateLimit, searchValue, setSearchV
         <div className="flex items-center gap-2 min-w-0">
           <SidebarTrigger className="-ml-1" />
           <Separator orientation="vertical" className="h-5 hidden sm:block" />
-          <h1 className="hidden sm:block text-lg font-semibold truncate">
+          <h1 className="hidden truncate font-display text-lg font-semibold sm:block">
             {title}
           </h1>
         </div>
