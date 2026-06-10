@@ -22,6 +22,7 @@ export interface PitchCardProps {
     orgId: string;
     isFavorite: boolean;
     score?: number;
+    inputType?: "TEXT" | "AUDIO";
     onClick: () => void;
 }
 

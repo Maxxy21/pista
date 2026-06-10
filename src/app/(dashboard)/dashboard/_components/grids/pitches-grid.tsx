@@ -16,6 +16,7 @@ export interface Pitch {
     _id: Id<"pitches">;
     title: string;
     text: string;
+    type: string;
     userId: string;
     authorName: string;
     _creationTime: number;
