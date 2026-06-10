@@ -1,12 +1,11 @@
 import React, { useCallback, useMemo } from "react";
 import { motion } from "framer-motion";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { formatDistanceToNow } from "date-fns";
-import { ChevronRight } from "lucide-react";
 import { useApiMutation } from "@/hooks/use-api-mutation";
 import { api } from "@/convex/_generated/api";
 import { useAuth } from "@clerk/nextjs";
-import { ScoreBadge } from "./score-badge";
+import { ScoreRing } from "@/components/ui/score-ring";
 import { FavoriteToggleButton } from "./favorite-toggle";
 import { CardActions } from "./card-actions";
 import { toast } from "sonner";
@@ -36,6 +35,7 @@ export function PitchCard({
     orgId,
     isFavorite,
     score,
+    inputType,
     onClick,
 }: PitchCardProps) {
     const { userId } = useAuth();
@@ -89,31 +89,37 @@ export function PitchCard({
         >
             <Card
                 onClick={onClick}
-                className="flex flex-col h-full cursor-pointer transition-all duration-200 hover:border-foreground/20 hover:shadow-sm overflow-hidden relative group"
+                className="group relative flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl border-border bg-card p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-[hsl(var(--foreground)/0.28)]"
                 tabIndex={0}
                 aria-label={`Pitch: ${title}`}
             >
-                <CardContent className="flex-1 p-5 pb-3">
-                    {/* Title row with actions */}
-                    <div className="flex items-start justify-between gap-2 mb-3">
-                        <h3 className="text-sm font-semibold leading-snug line-clamp-2 flex-1">{title}</h3>
-                        <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <FavoriteToggleButton isFavorite={isFavorite} disabled={isPending} onToggle={toggleFavorite} />
-                            <CardActions id={id} title={title} />
-                        </div>
-                    </div>
-                    <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">{text}</p>
-                </CardContent>
+                <div className="absolute right-4 top-4 flex items-center gap-1">
+                    <FavoriteToggleButton isFavorite={isFavorite} disabled={isPending} onToggle={toggleFavorite} />
+                    <span className="opacity-0 transition-opacity group-hover:opacity-100">
+                        <CardActions id={id} title={title} />
+                    </span>
+                </div>
 
-                <CardFooter className="flex-none px-5 py-3 border-t border-border/60 flex justify-between items-center">
-                    <span className="text-xs text-muted-foreground">
+                <div className="flex-1">
+                    {inputType && (
+                        <div className="mb-2 font-mono text-[10px] uppercase tracking-[0.12em] text-muted-foreground/70">
+                            {inputType}
+                        </div>
+                    )}
+                    <h3 className="mb-2 line-clamp-2 pr-14 font-display text-lg font-semibold leading-tight">
+                        {title}
+                    </h3>
+                    <p className="line-clamp-3 text-[13px] leading-relaxed text-muted-foreground">
+                        {text}
+                    </p>
+                </div>
+
+                <div className="mt-4 flex items-center justify-between border-t border-border pt-3">
+                    <span className="font-mono text-[10.5px] uppercase tracking-wide text-muted-foreground/70">
                         {authorLabel} · {createdAtLabel}
                     </span>
-                    <div className="flex items-center gap-2">
-                        {score !== undefined && <ScoreBadge score={score} />}
-                        <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/50" />
-                    </div>
-                </CardFooter>
+                    {score !== undefined && <ScoreRing score={score} size="sm" />}
+                </div>
             </Card>
         </motion.div>
     );
