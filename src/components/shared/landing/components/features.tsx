@@ -19,7 +19,7 @@ const Features = () => {
                         What you get
                     </p>
                     <h2
-                        className="font-playfair text-4xl sm:text-5xl tracking-tight leading-[1.1] mb-4"
+                        className="font-display text-4xl sm:text-5xl tracking-tight leading-[1.1] mb-4"
                         style={{ color: "var(--landing-cream)" }}
                     >
                         Everything you need

@@ -50,7 +50,7 @@ const SignInPage = () => {
                         </div>
                     </div>
                     <h2
-                        className="font-playfair text-5xl leading-[1.1] tracking-tight mb-6"
+                        className="font-display text-5xl leading-[1.1] tracking-tight mb-6"
                         style={{ color: "#F2EAD3" }}
                     >
                         Welcome back.

@@ -50,7 +50,7 @@ const Hero = () => {
                     {/* Headline — Playfair Display */}
                     <motion.h1
                         variants={animations.fadeIn}
-                        className="font-playfair text-6xl sm:text-7xl lg:text-[80px] leading-[1.05] tracking-[-0.03em] mb-6"
+                        className="font-display text-6xl sm:text-7xl lg:text-[80px] leading-[1.05] tracking-[-0.03em] mb-6"
                         style={{ color: "var(--landing-cream)" }}
                     >
                         Pitch smarter.
@@ -110,7 +110,7 @@ const Hero = () => {
                         {stats.map((stat) => (
                             <div key={stat.label} className="flex flex-col items-center gap-1">
                                 <span
-                                    className="text-2xl font-bold tabular-nums font-playfair"
+                                    className="text-2xl font-bold tabular-nums font-display"
                                     style={{ color: "var(--landing-cream)" }}
                                 >
                                     {stat.value}
