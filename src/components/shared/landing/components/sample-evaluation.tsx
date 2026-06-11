@@ -10,7 +10,7 @@ import { animations } from "./constants";
 import { sampleEvaluation } from "./sample-data";
 
 const SampleEvaluation = () => {
-  const detailed = sampleEvaluation.categories.slice(0, 2);
+  const detailed = sampleEvaluation.categories;
 
   return (
     <section
