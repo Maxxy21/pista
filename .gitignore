@@ -72,3 +72,4 @@ blob
 
 # local-only, never commit
 CLAUDE.md
+tempimages/
