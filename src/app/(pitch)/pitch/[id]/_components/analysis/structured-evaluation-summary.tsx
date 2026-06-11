@@ -97,7 +97,7 @@ Execution Capability: ${feedback.foundersAssessment.executionCapability}
         <CardHeader className="flex flex-row items-center justify-between pb-3">
           <div className="flex items-center gap-2">
             <CheckCircle className="h-4 w-4 text-foreground" />
-            <CardTitle className="text-base">Overall Assessment</CardTitle>
+            <CardTitle className="font-display text-base">Overall Assessment</CardTitle>
           </div>
           <div className="flex items-center gap-2">
             {metadata && (
@@ -124,7 +124,7 @@ Execution Capability: ${feedback.foundersAssessment.executionCapability}
                   <ul className="space-y-1.5">
                     {feedback.overallAssessment.keyHighlights.map((highlight, idx) => (
                       <li key={idx} className="text-sm text-muted-foreground flex gap-2">
-                        <span className="text-green-500 shrink-0">✓</span>
+                        <span className="text-[hsl(var(--score-high))] shrink-0">✓</span>
                         <span>{highlight}</span>
                       </li>
                     ))}
@@ -140,7 +140,7 @@ Execution Capability: ${feedback.foundersAssessment.executionCapability}
                   <ul className="space-y-1.5">
                     {feedback.overallAssessment.primaryConcerns.map((concern, idx) => (
                       <li key={idx} className="text-sm text-muted-foreground flex gap-2">
-                        <span className="text-amber-500 shrink-0">!</span>
+                        <span className="text-[hsl(var(--score-mid))] shrink-0">!</span>
                         <span>{concern}</span>
                       </li>
                     ))}
@@ -158,7 +158,7 @@ Execution Capability: ${feedback.foundersAssessment.executionCapability}
           <CardHeader className="pb-3">
             <div className="flex items-center gap-2">
               <TrendingUp className="h-4 w-4 text-foreground" />
-              <CardTitle className="text-base">Investment Thesis</CardTitle>
+              <CardTitle className="font-display text-base">Investment Thesis</CardTitle>
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -190,9 +190,9 @@ Execution Capability: ${feedback.foundersAssessment.executionCapability}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <AlertTriangle className="h-4 w-4 text-foreground" />
-                <CardTitle className="text-base">Risk Assessment</CardTitle>
+                <CardTitle className="font-display text-base">Risk Assessment</CardTitle>
               </div>
-              <Badge variant="outline" className="text-xs">
+              <Badge variant="outline" className="font-mono text-xs">
                 {feedback.riskAssessment.riskScore}/10
               </Badge>
             </div>
@@ -217,7 +217,7 @@ Execution Capability: ${feedback.foundersAssessment.executionCapability}
           <CardHeader className="pb-3">
             <div className="flex items-center gap-2">
               <Target className="h-4 w-4 text-foreground" />
-              <CardTitle className="text-base">Next Steps</CardTitle>
+              <CardTitle className="font-display text-base">Next Steps</CardTitle>
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -261,7 +261,7 @@ Execution Capability: ${feedback.foundersAssessment.executionCapability}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Users className="h-4 w-4 text-foreground" />
-                <CardTitle className="text-base">Team Assessment</CardTitle>
+                <CardTitle className="font-display text-base">Team Assessment</CardTitle>
               </div>
               <Badge className={getExecutionColor(feedback.foundersAssessment.executionCapability)}>
                 {feedback.foundersAssessment.executionCapability}
@@ -275,7 +275,7 @@ Execution Capability: ${feedback.foundersAssessment.executionCapability}
                 <ul className="space-y-1.5">
                   {feedback.foundersAssessment.teamStrengths.map((strength, idx) => (
                     <li key={idx} className="text-sm text-muted-foreground flex gap-2">
-                      <span className="text-green-500 shrink-0">✓</span>
+                      <span className="text-[hsl(var(--score-high))] shrink-0">✓</span>
                       <span>{strength}</span>
                     </li>
                   ))}
@@ -290,7 +290,7 @@ Execution Capability: ${feedback.foundersAssessment.executionCapability}
                   <ul className="space-y-1.5">
                     {feedback.foundersAssessment.experienceGaps.map((gap, idx) => (
                       <li key={idx} className="text-sm text-muted-foreground flex gap-2">
-                        <span className="text-amber-500 shrink-0">!</span>
+                        <span className="text-[hsl(var(--score-mid))] shrink-0">!</span>
                         <span>{gap}</span>
                       </li>
                     ))}
@@ -306,7 +306,7 @@ Execution Capability: ${feedback.foundersAssessment.executionCapability}
       {(feedback.competitivePosition.marketOpportunity || feedback.competitivePosition.strengths.length > 0 || feedback.competitivePosition.weaknesses.length > 0) && (
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-base">Competitive Position</CardTitle>
+            <CardTitle className="font-display text-base">Competitive Position</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {feedback.competitivePosition.marketOpportunity && (
@@ -325,7 +325,7 @@ Execution Capability: ${feedback.foundersAssessment.executionCapability}
                     <ul className="space-y-1.5">
                       {feedback.competitivePosition.strengths.map((s, idx) => (
                         <li key={idx} className="text-sm text-muted-foreground flex gap-2">
-                          <span className="text-green-500 shrink-0">✓</span>
+                          <span className="text-[hsl(var(--score-high))] shrink-0">✓</span>
                           <span>{s}</span>
                         </li>
                       ))}
@@ -338,7 +338,7 @@ Execution Capability: ${feedback.foundersAssessment.executionCapability}
                     <ul className="space-y-1.5">
                       {feedback.competitivePosition.weaknesses.map((w, idx) => (
                         <li key={idx} className="text-sm text-muted-foreground flex gap-2">
-                          <span className="text-red-400 shrink-0">×</span>
+                          <span className="text-[hsl(var(--score-low))] shrink-0">×</span>
                           <span>{w}</span>
                         </li>
                       ))}
