@@ -43,14 +43,16 @@ const SampleEvaluation = () => {
           whileInView="visible"
           viewport={{ once: true, margin: "-80px" }}
           variants={animations.staggerChildren}
-          className="grid gap-4 lg:grid-cols-2"
+          className="grid gap-4 lg:grid-cols-2 lg:items-start"
         >
           {/* Overall + radar */}
-          <motion.div variants={animations.fadeIn}>
-            <div className="gradient-shell h-full">
-              <div className="gradient-shell-inner h-full p-8 flex flex-col items-center gap-6">
+          <motion.div variants={animations.fadeIn} className="lg:sticky lg:top-24">
+            <div className="gradient-shell">
+              <div className="gradient-shell-inner p-8 flex flex-col items-center gap-6">
                 <ScoreRing score={sampleEvaluation.overallScore} size="xl" />
-                <ScoreRadarChart data={sampleEvaluation.categories} />
+                <div className="w-full max-w-xs">
+                  <ScoreRadarChart data={sampleEvaluation.categories} />
+                </div>
               </div>
             </div>
           </motion.div>
