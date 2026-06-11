@@ -2,8 +2,8 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import Image from "next/image";
 import { animations, stats } from "./constants";
+import { VerdictCard } from "./verdict-card";
 
 const Hero = () => {
     return (
@@ -16,7 +16,7 @@ const Hero = () => {
                 <div
                     className="absolute left-1/2 top-0 -translate-x-1/2 w-[800px] h-[500px] rounded-full opacity-20"
                     style={{
-                        background: "radial-gradient(ellipse at center, #F2EAD3 0%, transparent 70%)",
+                        background: "radial-gradient(ellipse at center, hsl(var(--foreground)) 0%, transparent 70%)",
                         filter: "blur(80px)",
                     }}
                 />
@@ -41,7 +41,7 @@ const Hero = () => {
                         >
                             <span
                                 className="w-1.5 h-1.5 rounded-full animate-pulse"
-                                style={{ background: "#4ade80" }}
+                                style={{ background: "hsl(var(--score-high))" }}
                             />
                             AI-powered pitch evaluation
                         </span>
@@ -110,7 +110,7 @@ const Hero = () => {
                         {stats.map((stat) => (
                             <div key={stat.label} className="flex flex-col items-center gap-1">
                                 <span
-                                    className="text-2xl font-bold tabular-nums font-display"
+                                    className="text-2xl font-bold tabular-nums font-mono"
                                     style={{ color: "var(--landing-cream)" }}
                                 >
                                     {stat.value}
@@ -123,57 +123,14 @@ const Hero = () => {
                     </motion.div>
                 </motion.div>
 
-                {/* Browser chrome mockup */}
+                {/* Live verdict card */}
                 <motion.div
                     initial={{ opacity: 0, y: 48 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                    className="mx-auto max-w-5xl"
+                    className="mx-auto max-w-md"
                 >
-                    {/* Gradient shell wrapper */}
-                    <div className="gradient-shell">
-                        <div className="gradient-shell-inner overflow-hidden">
-                            {/* Browser bar */}
-                            <div
-                                className="flex items-center gap-3 px-4 py-3 border-b"
-                                style={{ borderColor: "var(--landing-border)", background: "rgba(255,255,255,0.03)" }}
-                            >
-                                <div className="flex items-center gap-1.5">
-                                    <span className="w-3 h-3 rounded-full" style={{ background: "rgba(255,255,255,0.15)" }} />
-                                    <span className="w-3 h-3 rounded-full" style={{ background: "rgba(255,255,255,0.15)" }} />
-                                    <span className="w-3 h-3 rounded-full" style={{ background: "rgba(255,255,255,0.15)" }} />
-                                </div>
-                                <div className="flex-1 max-w-xs mx-auto">
-                                    <div
-                                        className="flex items-center gap-2 px-3 py-1 rounded-md text-xs"
-                                        style={{
-                                            background: "rgba(255,255,255,0.05)",
-                                            border: "1px solid var(--landing-border)",
-                                            color: "var(--landing-text-muted)",
-                                        }}
-                                    >
-                                        <span className="w-1.5 h-1.5 rounded-full" style={{ background: "#4ade80", opacity: 0.7 }} />
-                                        pista.vercel.app/dashboard
-                                    </div>
-                                </div>
-                            </div>
-                            {/* Screenshot */}
-                            <div className="relative w-full">
-                                <Image
-                                    src="/img.png"
-                                    alt="Pista dashboard showing pitch evaluations with scores and analytics"
-                                    width={1280}
-                                    height={800}
-                                    className="w-full h-auto block"
-                                    priority
-                                />
-                                <div
-                                    className="absolute bottom-0 left-0 right-0 h-40"
-                                    style={{ background: "linear-gradient(to top, var(--landing-bg), transparent)" }}
-                                />
-                            </div>
-                        </div>
-                    </div>
+                    <VerdictCard />
                 </motion.div>
             </div>
         </section>
