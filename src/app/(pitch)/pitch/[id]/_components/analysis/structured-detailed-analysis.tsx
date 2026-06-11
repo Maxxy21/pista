@@ -4,6 +4,7 @@ import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { CopyButton } from "../export/copy-button";
 import { cn, getScoreColor } from "../utils";
+import { getImpactColor, getPriorityColor } from "@/lib/utils/evaluation-colors";
 import { getEvaluations } from "@/lib/utils/evaluation-utils";
 import { UniversalPitchData } from "@/lib/types/pitch";
 import {
@@ -17,24 +18,6 @@ import React, { FC } from "react";
 interface StructuredDetailedAnalysisProps {
   data: UniversalPitchData;
 }
-
-const getImpactColor = (impact: string) => {
-  switch (impact) {
-    case "High": return "text-green-700 dark:text-green-300 bg-green-50 dark:bg-green-950/50 border-green-200 dark:border-green-800";
-    case "Medium": return "text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/50 border-amber-200 dark:border-amber-800";
-    case "Low": return "text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/50 border-blue-200 dark:border-blue-800";
-    default: return "text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-950/50 border-gray-200 dark:border-gray-800";
-  }
-};
-
-const getPriorityColor = (priority: string) => {
-  switch (priority) {
-    case "Critical": return "text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-950/50 border-red-200 dark:border-red-800";
-    case "Important": return "text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/50 border-amber-200 dark:border-amber-800";
-    case "Nice to Have": return "text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/50 border-blue-200 dark:border-blue-800";
-    default: return "text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-950/50 border-gray-200 dark:border-gray-800";
-  }
-};
 
 const getCopyText = (evaluation: any) => {
   const strengths = evaluation.breakdown.strengths.map((s: any) => 
@@ -75,13 +58,13 @@ export const StructuredDetailedAnalysis: FC<StructuredDetailedAnalysisProps> = (
 
   return (
     <div>
-      <h2 className="text-xl font-bold mb-4">Detailed Analysis</h2>
+      <h2 className="font-display text-2xl font-bold mb-4">Detailed Analysis</h2>
       <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
         {evaluations.map((evaluation) => (
           <Card key={evaluation.criteria} className="h-full">
               <CardHeader className="pb-3">
                 <div className="flex justify-between items-start">
-                  <CardTitle className="text-base flex items-center gap-2">
+                  <CardTitle className="font-display text-base flex items-center gap-2">
                     <Star className="h-4 w-4 text-foreground" />
                     {evaluation.criteria}
                   </CardTitle>
@@ -111,7 +94,7 @@ export const StructuredDetailedAnalysis: FC<StructuredDetailedAnalysisProps> = (
                         <div className="flex justify-between items-center text-xs">
                           <span className="font-medium">{aspect.aspect}</span>
                           <span className={cn(
-                            "px-2 py-0.5 rounded text-xs",
+                            "px-2 py-0.5 rounded font-mono text-xs",
                             getScoreColor(aspect.score)
                           )}>
                             {aspect.score.toFixed(1)}
@@ -132,7 +115,7 @@ export const StructuredDetailedAnalysis: FC<StructuredDetailedAnalysisProps> = (
                 <div className="grid gap-4 grid-cols-1">
                   <div className="space-y-3">
                     <h4 className="font-medium text-sm flex items-center gap-2">
-                      <CheckCircle2 className="h-4 w-4 text-green-500" />
+                      <CheckCircle2 className="h-4 w-4 text-[hsl(var(--score-high))]" />
                       Strengths
                     </h4>
                     <div className="space-y-2">
@@ -154,7 +137,7 @@ export const StructuredDetailedAnalysis: FC<StructuredDetailedAnalysisProps> = (
 
                   <div className="space-y-3">
                     <h4 className="font-medium text-sm flex items-center gap-2">
-                      <AlertCircle className="h-4 w-4 text-amber-500" />
+                      <AlertCircle className="h-4 w-4 text-[hsl(var(--score-mid))]" />
                       Improvements
                     </h4>
                     <div className="space-y-2">
