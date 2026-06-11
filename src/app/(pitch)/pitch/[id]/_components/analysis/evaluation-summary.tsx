@@ -58,7 +58,7 @@ export const EvaluationSummary: FC<EvaluationSummaryProps> = ({ data }) => {
                 aria-hidden="true"
             />
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle>Evaluation Summary</CardTitle>
+                <CardTitle className="font-display">Evaluation Summary</CardTitle>
                 <CopyButton text={overallFeedback} />
             </CardHeader>
             <CardContent>{formattedFeedback}</CardContent>

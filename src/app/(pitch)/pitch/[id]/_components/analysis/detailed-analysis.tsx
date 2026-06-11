@@ -45,7 +45,7 @@ const StrengthsList: FC<{ strengths: string[] }> = ({ strengths }) => (
         <ul className="space-y-1 text-sm">
             {strengths.map((strength, idx) => (
                 <li key={idx} className="flex gap-2 text-muted-foreground">
-                    <span className="text-green-500 flex-shrink-0">✓</span>
+                    <span className="text-[hsl(var(--score-high))] flex-shrink-0">✓</span>
                     <span>{strength}</span>
                 </li>
             ))}
@@ -59,7 +59,7 @@ const ImprovementsList: FC<{ improvements: string[] }> = ({ improvements }) => (
         <ul className="space-y-1 text-sm">
             {improvements.map((improvement, idx) => (
                 <li key={idx} className="flex gap-2 text-muted-foreground">
-                    <span className="text-amber-500 flex-shrink-0">→</span>
+                    <span className="text-[hsl(var(--score-mid))] flex-shrink-0">→</span>
                     <span>{improvement}</span>
                 </li>
             ))}
@@ -105,13 +105,13 @@ export const DetailedAnalysis: FC<DetailedAnalysisProps> = ({ data }) => {
     
     return (
         <div>
-            <h2 className="text-2xl font-bold mb-6">Detailed Analysis</h2>
+            <h2 className="font-display text-2xl font-bold mb-6">Detailed Analysis</h2>
             <div className="grid gap-6 md:grid-cols-2">
                 {evaluations.map((evaluation) => (
                     <Card key={evaluation.criteria} className="h-full">
                         <CardHeader className="pb-2">
                             <div className="flex justify-between items-center gap-2">
-                                <CardTitle className="text-lg">{evaluation.criteria}</CardTitle>
+                                <CardTitle className="font-display text-lg">{evaluation.criteria}</CardTitle>
                                 <div className="flex items-center gap-2 shrink-0">
                                     <Badge className={cn(getScoreColor(evaluation.score))}>
                                         {evaluation.score.toFixed(1)}
