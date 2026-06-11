@@ -5,13 +5,6 @@ import { PolarAngleAxis, PolarGrid, Radar, RadarChart } from "recharts";
 import { motion } from "framer-motion";
 
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
@@ -57,7 +50,7 @@ export const ScoreRadarChart = ({ data }: RadarChartProps) => {
   const chartConfig: ChartConfig = {
     score: {
       label: "Score",
-      color: "hsl(var(--chart-1))",
+      color: "hsl(var(--gold))",
     },
   };
 
@@ -67,47 +60,33 @@ export const ScoreRadarChart = ({ data }: RadarChartProps) => {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
-      <Card>
-        <CardHeader className="items-center pb-4">
-          <CardTitle>Score Distribution</CardTitle>
-          <CardDescription>
-            Showing performance across all evaluation categories
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="pb-6">
-          <ChartContainer
-            config={chartConfig}
-            className="mx-auto aspect-square max-h-[300px]"
-          >
-            <RadarChart data={chartData}>
-              <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-              <PolarAngleAxis 
-                dataKey="category" 
-                tick={{ 
-                  fontSize: 12, 
-                  fill: 'hsl(var(--foreground))',
-                  textAnchor: 'middle'
-                }}
-                className="text-foreground"
-              />
-              <PolarGrid 
-                stroke="hsl(var(--border))" 
-                strokeOpacity={0.3}
-              />
-              <Radar
-                dataKey="score"
-                fill="var(--color-score)"
-                fillOpacity={0.6}
-                stroke="var(--color-score)"
-                strokeWidth={2}
-                animationDuration={1000}
-                animationEasing="ease-out"
-                isAnimationActive
-              />
-            </RadarChart>
-          </ChartContainer>
-        </CardContent>
-      </Card>
+      <ChartContainer
+        config={chartConfig}
+        className="mx-auto aspect-square max-h-[220px]"
+      >
+        <RadarChart data={chartData}>
+          <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+          <PolarAngleAxis
+            dataKey="category"
+            tick={{
+              fontSize: 10,
+              fill: "hsl(var(--muted-foreground))",
+              textAnchor: "middle",
+            }}
+          />
+          <PolarGrid stroke="hsl(var(--border))" strokeOpacity={0.4} />
+          <Radar
+            dataKey="score"
+            fill="var(--color-score)"
+            fillOpacity={0.25}
+            stroke="var(--color-score)"
+            strokeWidth={2}
+            animationDuration={1000}
+            animationEasing="ease-out"
+            isAnimationActive
+          />
+        </RadarChart>
+      </ChartContainer>
     </motion.div>
   );
 };
