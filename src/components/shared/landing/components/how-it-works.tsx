@@ -53,7 +53,7 @@ const HowItWorks = () => {
                             {/* Gradient shell number circle */}
                             <div className="mb-6 relative z-10" style={{ padding: "1px", borderRadius: "9999px", background: "linear-gradient(to right bottom, rgba(242,234,211,0.3), rgba(242,234,211,0.05), rgba(0,0,0,0))" }}>
                                 <div
-                                    className="flex h-16 w-16 items-center justify-center rounded-full text-sm font-bold tracking-wide"
+                                    className="flex h-16 w-16 items-center justify-center rounded-full font-mono text-sm font-bold tracking-wide"
                                     style={{
                                         background: "var(--landing-surface)",
                                         color: "var(--landing-cream)",

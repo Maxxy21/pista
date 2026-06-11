@@ -28,15 +28,15 @@ body,
         border-radius: 24px;
         background: linear-gradient(
             to right bottom,
-            rgba(242, 234, 211, 0.28),
-            rgba(242, 234, 211, 0.06),
-            rgba(0, 0, 0, 0)
+            hsl(var(--foreground) / 0.28),
+            hsl(var(--foreground) / 0.06),
+            transparent
         );
     }
 
     .gradient-shell-inner {
         border-radius: 23px;
-        background: #171512;
+        background: hsl(var(--card));
         box-shadow:
             rgba(255, 255, 255, 0.02) 0px 0px 40px 0px inset,
             rgba(0, 0, 0, 0.12) 0px 100px 80px 0px;
@@ -47,15 +47,15 @@ body,
         border-radius: 16px;
         background: linear-gradient(
             to right bottom,
-            rgba(242, 234, 211, 0.22),
-            rgba(242, 234, 211, 0.04),
-            rgba(0, 0, 0, 0)
+            hsl(var(--foreground) / 0.22),
+            hsl(var(--foreground) / 0.04),
+            transparent
         );
     }
 
     .gradient-shell-sm-inner {
         border-radius: 15px;
-        background: #171512;
+        background: hsl(var(--card));
         box-shadow: rgba(255, 255, 255, 0.02) 0px 0px 40px 0px inset;
     }
 }

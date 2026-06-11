@@ -42,7 +42,7 @@ const CTA = () => {
                             <Link
                                 href="/sign-up"
                                 className="inline-block px-10 py-4 text-sm font-medium rounded-full transition-opacity duration-150 hover:opacity-85"
-                                style={{ background: "var(--landing-cream)", color: "#0e0d0c" }}
+                                style={{ background: "var(--landing-cream)", color: "hsl(var(--background))" }}
                             >
                                 Evaluate my pitch
                             </Link>
