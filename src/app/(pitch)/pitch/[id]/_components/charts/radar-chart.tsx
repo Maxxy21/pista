@@ -64,16 +64,9 @@ export const ScoreRadarChart = ({ data }: RadarChartProps) => {
         config={chartConfig}
         className="mx-auto aspect-square max-h-[220px]"
       >
-        <RadarChart data={chartData}>
+        <RadarChart data={chartData} outerRadius="80%">
           <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-          <PolarAngleAxis
-            dataKey="category"
-            tick={{
-              fontSize: 10,
-              fill: "hsl(var(--muted-foreground))",
-              textAnchor: "middle",
-            }}
-          />
+          <PolarAngleAxis dataKey="category" tick={false} />
           <PolarGrid stroke="hsl(var(--border))" strokeOpacity={0.4} />
           <Radar
             dataKey="score"
