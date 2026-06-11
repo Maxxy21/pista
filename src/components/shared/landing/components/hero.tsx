@@ -78,7 +78,7 @@ const Hero = () => {
                         <Link
                             href="/sign-up"
                             className="px-8 py-3.5 text-sm font-medium rounded-full transition-opacity duration-150 hover:opacity-85"
-                            style={{ background: "var(--landing-cream)", color: "#0e0d0c" }}
+                            style={{ background: "var(--landing-cream)", color: "hsl(var(--background))" }}
                         >
                             Evaluate my pitch
                         </Link>

@@ -51,7 +51,7 @@ const HowItWorks = () => {
                             className="flex flex-col items-center text-center"
                         >
                             {/* Gradient shell number circle */}
-                            <div className="mb-6 relative z-10" style={{ padding: "1px", borderRadius: "9999px", background: "linear-gradient(to right bottom, rgba(242,234,211,0.3), rgba(242,234,211,0.05), rgba(0,0,0,0))" }}>
+                            <div className="mb-6 relative z-10" style={{ padding: "1px", borderRadius: "9999px", background: "linear-gradient(to right bottom, hsl(var(--foreground) / 0.3), hsl(var(--foreground) / 0.05), transparent)" }}>
                                 <div
                                     className="flex h-16 w-16 items-center justify-center rounded-full font-mono text-sm font-bold tracking-wide"
                                     style={{

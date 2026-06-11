@@ -52,7 +52,7 @@ const Header = () => {
                         className="px-5 py-2 text-sm font-medium rounded-full transition-opacity duration-150 hover:opacity-85"
                         style={{
                             background: "var(--landing-cream)",
-                            color: "#0e0d0c",
+                            color: "hsl(var(--background))",
                         }}
                     >
                         Get started
