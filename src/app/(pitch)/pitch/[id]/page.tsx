@@ -51,13 +51,9 @@ const QuestionsSkeleton = () => (
 )
 
 const ScoreOverviewSkeleton = () => (
-    <div className="space-y-6">
-        <div className="h-7 w-36 bg-muted rounded animate-pulse"/>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {Array.from({length: 4}).map((_, i) => (
-                <SkeletonCard key={i} variant="stat" className="h-[120px]"/>
-            ))}
-        </div>
+    <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
+        <SkeletonCard className="h-[280px]" variant="simple"/>
+        <SkeletonCard className="h-[280px]" variant="simple"/>
     </div>
 )
 
@@ -106,14 +102,6 @@ const PitchDetails = () => {
 
             <ScrollArea className="h-[calc(100vh-4rem)]">
                 <div className="container mx-auto py-4 px-4 sm:py-6 sm:px-6 space-y-8 sm:space-y-10">
-                    <div className="space-y-6">
-                        <Suspense fallback={<TranscriptSkeleton/>}>
-                            <TranscriptSection data={data}/>
-                        </Suspense>
-                        <Suspense fallback={<QuestionsSkeleton/>}>
-                            <QuestionsSection data={data}/>
-                        </Suspense>
-                    </div>
                     <Suspense fallback={<ScoreOverviewSkeleton/>}>
                         <ScoreOverview data={data}/>
                     </Suspense>
@@ -137,6 +125,18 @@ const PitchDetails = () => {
                             </Suspense>
                         </>
                     )}
+
+                    <div className="space-y-6 border-t border-border pt-8">
+                        <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
+                            Reference
+                        </p>
+                        <Suspense fallback={<TranscriptSkeleton/>}>
+                            <TranscriptSection data={data}/>
+                        </Suspense>
+                        <Suspense fallback={<QuestionsSkeleton/>}>
+                            <QuestionsSection data={data}/>
+                        </Suspense>
+                    </div>
                 </div>
             </ScrollArea>
         </SidebarInset>

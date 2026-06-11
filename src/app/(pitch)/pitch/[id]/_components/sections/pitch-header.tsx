@@ -88,8 +88,8 @@ export const PitchHeader: React.FC<PitchHeaderProps> = React.memo(({ data }) => 
                             autoFocus
                         />
                     ) : (
-                        <h1 
-                            className="text-lg font-semibold truncate cursor-pointer hover:text-primary transition-colors" 
+                        <h1
+                            className="font-display text-lg font-semibold truncate cursor-pointer hover:text-primary transition-colors"
                             title={`${data.title} (click to edit)`}
                             onClick={handleTitleClick}
                         >
