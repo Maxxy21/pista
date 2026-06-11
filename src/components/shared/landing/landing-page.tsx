@@ -8,6 +8,7 @@ import Header from "./components/header";
 import Hero from "./components/hero";
 import Features from "./components/features";
 import HowItWorks from "./components/how-it-works";
+import SampleEvaluation from "./components/sample-evaluation";
 import CTA from "./components/cta";
 import Footer from "./components/footer";
 
@@ -35,6 +36,7 @@ export default function LandingPage() {
                 <Hero />
                 <Features />
                 <HowItWorks />
+                <SampleEvaluation />
                 <CTA />
             </main>
             <Footer />
