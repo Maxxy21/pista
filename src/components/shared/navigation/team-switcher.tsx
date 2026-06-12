@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import Image from "next/image";
 import { ChevronsUpDown, Plus, Check, Building2 } from "lucide-react";
 import { useOrganization, useOrganizationList, useUser } from "@clerk/nextjs";
 import { motion } from "framer-motion";
@@ -30,6 +29,7 @@ import { dark } from "@clerk/themes";
 import { cn } from "@/lib/utils";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { OrganizationList, OrgItem } from "./organization-list";
+import { OrgAvatar } from "./org-avatar";
 import { CreateOrganizationModal } from "./create-organization-modal";
 import { PersonalWorkspaceAvatar } from "./personal-workspace-avatar";
 import { PersonalWorkspaceLabel } from "./personal-workspace-label";
@@ -58,6 +58,7 @@ export function TeamSwitcher({ className }: TeamSwitcherProps) {
             id: membership.organization.id,
             name: membership.organization.name,
             imageUrl: membership.organization.imageUrl,
+            hasImage: membership.organization.hasImage,
             role: membership.role,
         })) ?? [];
 
@@ -102,15 +103,12 @@ export function TeamSwitcher({ className }: TeamSwitcherProps) {
                         >
                             {organization ? (
                                 <>
-                                    <div className="relative flex h-7 w-7 shrink-0 overflow-hidden rounded-md border border-border">
-                                        <Image
-                                            src={organization.imageUrl}
-                                            alt={organization.name}
-                                            width={28}
-                                            height={28}
-                                            className="aspect-square h-full w-full"
-                                        />
-                                    </div>
+                                    <OrgAvatar
+                                        name={organization.name}
+                                        imageUrl={organization.imageUrl}
+                                        hasImage={organization.hasImage}
+                                        size={28}
+                                    />
                                     <div className="grid flex-1 text-left text-sm">
                                         <span className="truncate font-medium">
                                             {organization.name}

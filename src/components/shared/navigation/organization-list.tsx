@@ -1,15 +1,16 @@
 "use client";
 
 import React from "react";
-import Image from "next/image";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { OrgAvatar } from "./org-avatar";
 
 export interface OrgItem {
   id: string;
   name: string;
   imageUrl: string;
+  hasImage: boolean;
   role: string;
 }
 
@@ -33,9 +34,7 @@ export function OrganizationList({ items, activeId, pending, onSelect }: Organiz
           role="menuitemradio"
           aria-checked={activeId === org.id}
         >
-          <div className="relative flex h-7 w-7 shrink-0 overflow-hidden rounded-md border border-border">
-            <Image src={org.imageUrl} alt={org.name} width={28} height={28} className="aspect-square h-full w-full" />
-          </div>
+          <OrgAvatar name={org.name} imageUrl={org.imageUrl} hasImage={org.hasImage} size={28} />
           <div className="flex-1 overflow-hidden">
             <p className="text-sm font-medium truncate">{org.name}</p>
             <p className="text-xs text-muted-foreground truncate capitalize">{org.role.toLowerCase()}</p>

@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
-import Image from "next/image";
 
 import { useOrganization, useAuth, useUser } from "@clerk/nextjs";
 import { useQuery } from "convex/react";
@@ -35,6 +34,7 @@ import { getOverallFeedback } from "@/lib/utils/evaluation-utils";
 import { exportPitchToPDF } from "@/lib/utils/pdf-export";
 
 import LogoIcon from "@/components/ui/logo-icon";
+import { OrgAvatar } from "./org-avatar";
 import { SearchForm } from "../forms/search-form";
 import { InviteButton } from "../common/invite-button";
 import { CurrentPitchBanner } from "./pitch-current-banner";
@@ -257,17 +257,12 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
                         </div>
                         {organization && (
                           <div className="flex items-center gap-2 text-sm text-muted-foreground/90 px-1">
-                            <div className="flex h-6 w-6 items-center justify-center rounded-md border border-border bg-muted overflow-hidden">
-                              {organization.imageUrl ? (
-                                <Image
-                                  src={organization.imageUrl}
-                                  alt={organization.name}
-                                  width={24}
-                                  height={24}
-                                  className="object-cover"
-                                />
-                              ) : null}
-                            </div>
+                            <OrgAvatar
+                              name={organization.name}
+                              imageUrl={organization.imageUrl}
+                              hasImage={organization.hasImage}
+                              size={24}
+                            />
                             <span className="truncate" title={organization.name}>{organization.name}</span>
                           </div>
                         )}
