@@ -20,7 +20,7 @@ export function TextInputTab({
   return (
     <div className="space-y-2">
       <Label htmlFor="pitch-text">Pitch Content</Label>
-      <div className="h-[300px] sm:h-[420px] border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-background rounded-lg relative overflow-hidden">
+      <div className="h-[300px] sm:h-[420px] border-2 border-dashed border-[hsl(var(--border))] hover:border-[hsl(var(--gold)/0.5)] focus-within:border-[hsl(var(--gold)/0.5)] bg-gradient-to-br from-[hsl(var(--gold)/0.04)] to-background rounded-lg relative overflow-hidden transition-colors">
         <div className="absolute inset-0 [mask-image:radial-gradient(ellipse_at_center,white,transparent)]">
           <GridPattern />
         </div>
@@ -28,8 +28,8 @@ export function TextInputTab({
           {!text && !textFocused && (
             <div className="flex items-center justify-center h-20 mb-4">
               <div className="text-center space-y-2">
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
-                  <FileTextIcon className="w-5 h-5 text-primary" />
+                <div className="w-10 h-10 rounded-full bg-[hsl(var(--gold)/0.12)] flex items-center justify-center mx-auto">
+                  <FileTextIcon className="w-5 h-5 text-[hsl(var(--gold))]" />
                 </div>
                 <p className="text-sm text-muted-foreground text-center">Type or paste your pitch content</p>
               </div>

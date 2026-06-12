@@ -31,7 +31,7 @@ export function FileUploadTab({
   return (
     <div className="space-y-2">
       <Label>{label}</Label>
-      <div className="h-[220px] sm:h-[300px] border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-background rounded-lg overflow-hidden">
+      <div className="h-[220px] sm:h-[300px] border-2 border-dashed border-[hsl(var(--border))] hover:border-[hsl(var(--gold)/0.5)] focus-within:border-[hsl(var(--gold)/0.5)] bg-gradient-to-br from-[hsl(var(--gold)/0.04)] to-background rounded-lg overflow-hidden transition-colors">
         <div className="h-full [&>div]:h-full [&>div>div]:h-full [&>div>div]:!p-4 [&>div>div]:flex [&>div>div]:items-center [&>div>div]:justify-center">
           <PrettyFileUpload 
             accept={accept} 
@@ -59,7 +59,7 @@ export function FileUploadTab({
           )}
           
           <div className="mt-3 flex justify-between items-center">
-            <div className="text-xs text-muted-foreground">
+            <div className="font-mono text-xs text-muted-foreground">
               {isAudio ? (
                 `${(file.size / (1024 * 1024)).toFixed(1)} MB • ${file.name}`
               ) : (
