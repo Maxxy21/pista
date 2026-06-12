@@ -18,8 +18,8 @@ export function QuestionsSection({ qa, updateQAAnswer }: QuestionsSectionProps) 
   return (
     <div className="space-y-4 p-4 border rounded-lg bg-gradient-to-br from-primary/5 to-background">
       <div className="space-y-1">
-        <h3 className="font-medium flex items-center gap-2">
-          <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
+        <h3 className="font-display font-medium flex items-center gap-2">
+          <div className="w-2 h-2 bg-[hsl(var(--gold))] rounded-full animate-pulse" />
           Follow-up Questions
         </h3>
         <p className="text-sm text-muted-foreground">
@@ -42,7 +42,7 @@ export function QuestionsSection({ qa, updateQAAnswer }: QuestionsSectionProps) 
             />
             <div className="text-xs text-muted-foreground text-right">
               {q.answer.length > 0 ? (
-                <span className="inline-flex items-center gap-1 font-medium" style={{ color: "#4ade80" }}>
+                <span className="inline-flex items-center gap-1 font-medium text-[hsl(var(--score-high))]">
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>
                   Answered
                 </span>
