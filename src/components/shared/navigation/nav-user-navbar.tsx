@@ -128,7 +128,7 @@ export function NavUserNavbar({className}: NavUserNavbarProps) {
                     Export CSV
                 </DropdownMenuItem>
                 <DropdownMenuSeparator/>
-                <DropdownMenuItem onClick={handleSignOut} className="gap-2 text-red-500 focus:text-red-500">
+                <DropdownMenuItem onClick={handleSignOut} className="gap-2 text-[hsl(var(--score-low))] focus:text-[hsl(var(--score-low))]">
                     <LogOut className="mr-2 h-4 w-4"/>
                     Sign out
                 </DropdownMenuItem>
