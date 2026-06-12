@@ -1,91 +1,122 @@
 import React from "react"
 import { Progress } from "@/components/ui/progress"
 import { Button } from "@/components/ui/button"
-import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { AlertTriangle, RefreshCw } from "lucide-react"
 import LogoIcon from "@/components/ui/logo-icon"
 import { useEvaluationProgress } from "@/hooks/use-evaluation-progress"
 
+type PitchType = "text" | "textFile" | "audio"
+
 interface ProcessingStatusProps {
-  processing: boolean
-  progress: number
+  type: PitchType
   onRetry?: () => void
 }
 
-const STEP_LABELS: Record<string, string> = {
-  uploading: "Uploading audio...",
-  transcribing: "Transcribing audio...",
-  analyzing: "Analysing your pitch...",
-  complete: "Done",
-  error: "Something went wrong",
-  idle: "",
+const STAGES_BY_TYPE: Record<PitchType, string[]> = {
+  audio: ["Upload", "Transcribe", "Analyze"],
+  textFile: ["Upload", "Analyze"],
+  text: ["Analyze"],
 }
 
-export function ProcessingStatus({ processing, onRetry }: ProcessingStatusProps) {
+const STEP_TO_STAGE: Record<string, string> = {
+  uploading: "Upload",
+  transcribing: "Transcribe",
+  analyzing: "Analyze",
+}
+
+export function ProcessingStatus({ type, onRetry }: ProcessingStatusProps) {
   const { step, message, progress } = useEvaluationProgress()
 
-  const isError = step === "error"
+  if (step === "idle" || step === "complete") return null
 
-  if (!processing && !isError) return null
-
-  const label = message || STEP_LABELS[step] || "Processing your pitch..."
-  const showProgress = step === "uploading" && progress !== undefined
-
-  if (isError) {
+  if (step === "error") {
     return (
       <div
-        className="space-y-3 p-4 rounded-lg border border-destructive/30 bg-destructive/5"
+        className="flex flex-col items-center gap-4 py-10 text-center"
         role="alert"
         aria-live="assertive"
       >
-        <div className="flex items-center gap-3">
-          <AlertTriangle className="w-5 h-5 text-destructive flex-shrink-0" />
-          <div className="flex-1 min-w-0">
-            <p className="font-semibold text-sm text-destructive">Evaluation failed</p>
-            <p className="text-xs text-muted-foreground truncate">{label}</p>
-          </div>
-          {onRetry && (
-            <Button
-              size="sm"
-              variant="outline"
-              className="flex-shrink-0 gap-1.5 border-destructive/40 text-destructive hover:bg-destructive/10"
-              onClick={onRetry}
-            >
-              <RefreshCw className="w-3.5 h-3.5" />
-              Retry
-            </Button>
-          )}
+        <AlertTriangle className="w-8 h-8 text-destructive" />
+        <div>
+          <p className="font-display text-lg text-destructive">Evaluation failed</p>
+          <p className="mt-1 text-sm text-muted-foreground">{message || "Something went wrong."}</p>
         </div>
+        {onRetry && (
+          <Button
+            variant="outline"
+            className="gap-1.5 border-destructive/40 text-destructive hover:bg-destructive/10"
+            onClick={onRetry}
+          >
+            <RefreshCw className="w-3.5 h-3.5" />
+            Retry
+          </Button>
+        )}
       </div>
     )
   }
 
+  const stages = STAGES_BY_TYPE[type]
+  const activeStage = STEP_TO_STAGE[step] ?? "Analyze"
+  const activeIndex = stages.indexOf(activeStage)
+  const isUploading = activeStage === "Upload" && progress !== undefined
+
   return (
     <div
-      className="space-y-4 p-6 rounded-lg border border-primary/20 bg-muted/30"
+      className="flex flex-col items-center gap-6 py-10 text-center"
       role="status"
       aria-live="polite"
-      aria-label={label}
     >
-      <div className="flex items-center gap-4">
-        <div className="relative flex-shrink-0">
-          <LogoIcon />
-          <div className="absolute -inset-1 bg-primary/20 rounded-full blur-sm animate-pulse" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className="font-semibold text-sm">Processing your pitch</p>
-          <p className="text-xs text-muted-foreground truncate">{label}</p>
-        </div>
-        <LoadingSpinner variant="minimal" size="md" />
+      <div className="relative">
+        <LogoIcon size="lg" />
+        <div className="absolute -inset-2 -z-10 rounded-full bg-[hsl(var(--gold)/0.2)] blur-md animate-pulse" />
       </div>
 
-      {showProgress && (
-        <div className="space-y-2">
-          <div className="flex justify-between text-xs">
-            <span className="text-muted-foreground">Upload progress</span>
-            <span className="font-semibold tabular-nums">{Math.round(progress!)}%</span>
-          </div>
-          <Progress value={progress} className="h-2" />
+      <h3 className="font-display text-xl max-w-xs text-foreground">
+        Reading your pitch like an investor would…
+      </h3>
+
+      <div className="flex w-56 flex-col gap-3 text-left">
+        {stages.map((stage, i) => {
+          const done = activeIndex >= 0 && i < activeIndex
+          const active = i === activeIndex
+          return (
+            <div
+              key={stage}
+              className={`flex items-center gap-3 text-sm ${
+                done || active ? "text-foreground" : "text-muted-foreground"
+              }`}
+            >
+              <span
+                className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-[10px] ${
+                  done
+                    ? "border-[hsl(var(--score-high))] text-[hsl(var(--score-high))]"
+                    : active
+                    ? "border-[hsl(var(--gold))] text-[hsl(var(--gold))]"
+                    : "border-border text-muted-foreground"
+                }`}
+              >
+                {done ? "✓" : active ? "•" : i + 1}
+              </span>
+              <span>{stage}</span>
+              {active && stage === "Upload" && progress !== undefined && (
+                <span className="ml-auto font-mono text-xs text-muted-foreground">
+                  {Math.round(progress)}%
+                </span>
+              )}
+            </div>
+          )
+        })}
+      </div>
+
+      {message && (
+        <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
+          {message}
+        </p>
+      )}
+
+      {isUploading && (
+        <div className="w-56">
+          <Progress value={progress} className="h-1.5" />
         </div>
       )}
     </div>
