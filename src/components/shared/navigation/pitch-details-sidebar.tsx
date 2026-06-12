@@ -34,6 +34,7 @@ import { type UniversalPitchData } from "@/lib/types/pitch";
 import { getOverallFeedback } from "@/lib/utils/evaluation-utils";
 import { exportPitchToPDF } from "@/lib/utils/pdf-export";
 
+import LogoIcon from "@/components/ui/logo-icon";
 import { SearchForm } from "../forms/search-form";
 import { InviteButton } from "../common/invite-button";
 import { CurrentPitchBanner } from "./pitch-current-banner";
@@ -209,11 +210,11 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
     const renderTypeBadge = React.useCallback((type: string) => {
         switch (type) {
             case "audio":
-                return <Badge variant="secondary" className="bg-emerald-500/15 text-emerald-700 border-emerald-500/25 hover:bg-emerald-500/20 font-medium">Audio</Badge>;
+                return <Badge variant="secondary" className="bg-muted text-muted-foreground border-border font-medium">Audio</Badge>;
             case "textFile":
-                return <Badge variant="secondary" className="bg-blue-500/15 text-blue-700 border-blue-500/25 hover:bg-blue-500/20 font-medium">File</Badge>;
+                return <Badge variant="secondary" className="bg-muted text-muted-foreground border-border font-medium">File</Badge>;
             default:
-                return <Badge variant="secondary" className="bg-purple-500/15 text-purple-700 border-purple-500/25 hover:bg-purple-500/20 font-medium">Text</Badge>;
+                return <Badge variant="secondary" className="bg-muted text-muted-foreground border-border font-medium">Text</Badge>;
         }
     }, []);
 
@@ -222,11 +223,11 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
         return (
             <Sidebar collapsible="icon" className="border-r" {...props}>
                 <SidebarHeader className="p-4 border-b">
-                    <div className="animate-pulse h-8 bg-gray-200 dark:bg-gray-700 rounded" />
+                    <div className="animate-pulse h-8 bg-muted rounded" />
                 </SidebarHeader>
                 <div className="p-4 space-y-4">
-                    <div className="animate-pulse h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/2" />
-                    <div className="animate-pulse h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4" />
+                    <div className="animate-pulse h-6 bg-muted rounded w-1/2" />
+                    <div className="animate-pulse h-4 bg-muted rounded w-3/4" />
                 </div>
             </Sidebar>
         );
@@ -237,10 +238,7 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
             <SidebarHeader className="py-4">
                 {state === "collapsed" ? (
                     <div className="flex flex-col items-center space-y-3">
-                        <div
-                            className="h-5 w-6 rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0"
-                            style={{ background: "#F2EAD3" }}
-                        />
+                        <LogoIcon size="md" />
                         <SidebarMenuButton
                             onClick={handleBack}
                             className="rounded-lg transition-all duration-200 hover:shadow-sm"
@@ -252,11 +250,8 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
                 ) : (
                     <div className="px-4 space-y-3">
                         <div className="flex items-center gap-2.5">
-                            <div
-                                className="h-5 w-6 rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0"
-                                style={{ background: "#F2EAD3" }}
-                            />
-                            <h1 className="text-lg font-semibold tracking-tight" style={{ color: "#F2EAD3" }}>
+                            <LogoIcon size="md" />
+                            <h1 className="font-display text-lg font-semibold tracking-tight text-foreground">
                                 Pista
                             </h1>
                         </div>
@@ -399,8 +394,8 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
                                     <SidebarMenuItem>
                                         <SidebarMenuButton 
                                             className={`rounded-lg transition-all duration-200 hover:shadow-sm ${
-                                                currentPitch.isFavorite 
-                                                    ? "bg-yellow-500/15 text-yellow-700 border-yellow-500/25 hover:bg-yellow-500/20" 
+                                                currentPitch.isFavorite
+                                                    ? "bg-[hsl(var(--gold)/0.15)] text-[hsl(var(--gold))] border-[hsl(var(--gold)/0.25)] hover:bg-[hsl(var(--gold)/0.2)]"
                                                     : ""
                                             }`}
                                             tooltip={currentPitch.isFavorite ? "Remove from favorites" : "Add to favorites"}
@@ -408,7 +403,7 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
                                             onClick={toggleFavorite}
                                             disabled={pendingFavorite || pendingUnfavorite}
                                         >
-                                            <Star className={`h-4 w-4 ${currentPitch.isFavorite ? "fill-yellow-400 text-yellow-400" : ""}`} />
+                                            <Star className={`h-4 w-4 ${currentPitch.isFavorite ? "fill-[hsl(var(--gold))] text-[hsl(var(--gold))]" : ""}`} />
                                         </SidebarMenuButton>
                                     </SidebarMenuItem>
                                 )}
@@ -452,7 +447,7 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
                     <SidebarMenuItem>
                         <SidebarMenuButton
                             className="font-medium transition-opacity duration-150 hover:opacity-85"
-                            style={{ background: "#F2EAD3", color: "#0e0d0c" }}
+                            style={{ background: "hsl(var(--gold))", color: "hsl(var(--gold-foreground))" }}
                             onClick={() => router.push('/dashboard?view=new')}
                             tooltip={state === "collapsed" ? "New Pitch" : undefined}
                         >
