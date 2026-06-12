@@ -1,4 +1,3 @@
-// src/components/shared/navigation/__tests__/pitch-list-item.test.tsx
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { PitchListItem } from "../pitch-list-item";

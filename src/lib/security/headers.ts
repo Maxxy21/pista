@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 
 export function createSecurityHeaders() {
-  // Content Security Policy
   const csp = [
     "default-src 'self'",
     "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://clerk.*.dev https://*.clerk.accounts.dev https://challenges.cloudflare.com",
@@ -19,28 +18,13 @@ export function createSecurityHeaders() {
   ].join('; ');
 
   return {
-    // Content Security Policy
     'Content-Security-Policy': csp,
-    
-    // Prevent MIME type sniffing
     'X-Content-Type-Options': 'nosniff',
-    
-    // Enable XSS protection
     'X-XSS-Protection': '1; mode=block',
-    
-    // Prevent clickjacking
     'X-Frame-Options': 'DENY',
-    
-    // Enforce HTTPS
     'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
-    
-    // Control referrer information
     'Referrer-Policy': 'strict-origin-when-cross-origin',
-    
-    // Prevent DNS prefetching
     'X-DNS-Prefetch-Control': 'off',
-    
-    // Permissions Policy
     'Permissions-Policy': [
       'camera=()',
       'microphone=(self)',

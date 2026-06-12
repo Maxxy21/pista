@@ -17,7 +17,6 @@ class RateLimiter {
     this.maxRequests = maxRequests;
     this.windowMs = windowMs;
 
-    // Clean up expired entries every 5 minutes
     setInterval(() => {
       this.cleanupExpired();
     }, 5 * 60 * 1000);
@@ -70,7 +69,6 @@ class RateLimiter {
   }
 }
 
-// Create singleton instances for different endpoints
 export const apiRateLimiter = new RateLimiter(
   parseInt(process.env.RATE_LIMIT_MAX || '50'),
   parseInt(process.env.RATE_LIMIT_WINDOW || '60000')

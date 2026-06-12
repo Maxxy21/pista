@@ -1,5 +1,3 @@
-// lib/types/evaluation.ts
-
 export interface StructuredFeedback {
   overallAssessment: {
     summary: string;
@@ -72,7 +70,6 @@ export interface StructuredEvaluationData {
   };
 }
 
-// Legacy types for backward compatibility
 export interface LegacyEvaluation {
   criteria: string;
   comment: string;
@@ -88,7 +85,6 @@ export interface LegacyEvaluationData {
   overallFeedback: string;
 }
 
-// Type guards
 export function isStructuredEvaluationData(data: any): data is StructuredEvaluationData {
   return data && 
          typeof data === 'object' && 

@@ -35,7 +35,6 @@ export const VirtualizedPitchesGrid: React.FC<VirtualizedPitchesGridProps> = ({
     const router = useRouter();
     const parentRef = useRef<HTMLDivElement>(null);
 
-    // Responsive column count
     const [windowWidth, setWindowWidth] = React.useState(
         typeof window !== "undefined" ? window.innerWidth : 1200
     );
@@ -76,7 +75,6 @@ export const VirtualizedPitchesGrid: React.FC<VirtualizedPitchesGridProps> = ({
         [router]
     );
 
-    // Empty states
     if (!isLoading && pitches.length === 0) {
         if (searchQuery) return <EmptySearch />;
         if (currentView === "favorites") return <EmptyFavorites />;

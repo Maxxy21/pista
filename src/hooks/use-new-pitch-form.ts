@@ -18,7 +18,6 @@ export function useNewPitchForm() {
   const [enableQA, setEnableQA] = useState(true)
   const [textFocused, setTextFocused] = useState(false)
 
-  // Persist Q&A preference
   useEffect(() => {
     try {
       const stored = typeof window !== 'undefined' ? localStorage.getItem('pista_enable_qa') : null
@@ -66,7 +65,6 @@ export function useNewPitchForm() {
   }
 
   return {
-    // State
     title,
     type,
     text,
@@ -75,13 +73,9 @@ export function useNewPitchForm() {
     qa,
     enableQA,
     textFocused,
-    
-    // Computed
     canSubmitBase,
     allAnswersProvided,
     canSubmit,
-    
-    // Actions
     setTitle,
     setType,
     setText,

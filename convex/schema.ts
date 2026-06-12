@@ -1,4 +1,3 @@
-// convex/schema.ts
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
@@ -18,7 +17,6 @@ const legacyEvaluation = v.object({
     aspects: v.array(v.string()),
 });
 
-// New structured evaluation
 const structuredBreakdown = v.object({
     strengths: v.array(v.object({
         point: v.string(),
@@ -90,13 +88,11 @@ const evaluationMetadata = v.object({
 
 // Union type to support both legacy and new structured evaluations
 const evaluationData = v.union(
-    // Legacy format
     v.object({
         evaluations: v.array(legacyEvaluation),
         overallScore: v.number(),
         overallFeedback: v.string(),
     }),
-    // New structured format
     v.object({
         evaluations: v.array(structuredEvaluation),
         overallScore: v.number(),
@@ -105,7 +101,6 @@ const evaluationData = v.union(
     })
 );
 
-// Table definitions
 const pitches = defineTable({
     title: v.string(),
     text: v.string(),

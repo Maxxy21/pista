@@ -68,7 +68,6 @@ export function TeamSwitcher({ className }: TeamSwitcherProps) {
                 setPending(orgId ?? "personal");
                 await setActive?.({ organization: orgId });
 
-                // Update workspace context in URL: remove or set ctx
                 const current = new URLSearchParams(Array.from(searchParams.entries()));
                 if (orgId) current.set("ctx", "org");
                 else current.delete("ctx");

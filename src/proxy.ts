@@ -11,7 +11,6 @@ export default clerkMiddleware(async (auth, req) => {
         return redirectToSignIn()
     }
 
-    // Add security headers to all responses
     const response = NextResponse.next()
     return addSecurityHeaders(response)
 })

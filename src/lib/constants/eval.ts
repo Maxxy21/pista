@@ -2,12 +2,10 @@ export const MODEL_VERSION = "gpt-4-structured-v1";
 export const PROMPT_VERSION = "criteria-v1.2"; // rubric anchors + evidence gating
 export const POLICY_VERSION = "scoring-policy-v2"; // aspect-averaging + normalized weighted average
 
-// Model and generation configuration
 export const MODEL_NAME = "gpt-4";
 export const SCORING_TEMPERATURE = 0.2; // low variance for scoring
 export const FEEDBACK_TEMPERATURE = 0.7; // more creative for feedback
 
-// Content limits used for prompt truncation
 export const CONTENT_LIMITS = {
   evaluateChars: 8000,
   answersChars: 6000,

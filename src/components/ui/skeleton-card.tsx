@@ -84,7 +84,6 @@ export function SkeletonCard({
     );
   }
   
-  // Simple variant (default)
   return (
     <div className={cn(
       "rounded-md bg-muted/70 relative overflow-hidden",

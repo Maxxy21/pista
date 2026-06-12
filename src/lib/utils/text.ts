@@ -1,6 +1,5 @@
 export function normalizeTranscriptText(input: string): string {
   if (!input) return "";
-  // Normalize newlines, collapse hard wraps inside paragraphs, preserve paragraph breaks
   const lf = input.replace(/\r\n?/g, "\n");
   const paragraphs = lf
     .split(/\n{2,}/)

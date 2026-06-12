@@ -20,7 +20,6 @@ export const POST = withRateLimit(transcriptionRateLimiter)(withAuth(async (req:
             return NextResponse.json({ error: 'No audio file provided' }, { status: 400 });
         }
 
-        // Comprehensive file validation
         const validationResult = validateFile(audioFile, FILE_VALIDATION_CONFIGS.AUDIO);
         if (!validationResult.valid) {
             return NextResponse.json({ 

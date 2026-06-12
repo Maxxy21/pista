@@ -47,7 +47,6 @@ export const POST = withRateLimit(apiRateLimiter)(withAuth(async (req: Authentic
     const responseContent = completion.choices?.[0]?.message?.content ?? "";
 
     let questions: string[] = [];
-    // Try JSON first
     try {
       const data = JSON.parse(responseContent);
       if (Array.isArray(data?.items)) {
@@ -56,7 +55,6 @@ export const POST = withRateLimit(apiRateLimiter)(withAuth(async (req: Authentic
           .filter(Boolean);
       }
     } catch {
-      // Fallback to numbered list
       const lines = responseContent
         .split("\n")
         .map((l) => l.trim())
@@ -67,7 +65,6 @@ export const POST = withRateLimit(apiRateLimiter)(withAuth(async (req: Authentic
         .filter(Boolean);
     }
 
-    // Normalize: 1–3 items max; trim extras
     questions = questions.slice(0, 3);
 
     return NextResponse.json({ questions });

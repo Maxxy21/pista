@@ -1,4 +1,3 @@
-// src/components/shared/landing/components/verdict-card.tsx
 'use client';
 
 import { motion } from "framer-motion";

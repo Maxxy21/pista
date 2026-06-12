@@ -8,7 +8,6 @@ export function useFileHandling(type: PitchType) {
   const [file, setFile] = useState<File | null>(null)
   const [preview, setPreview] = useState<{ url?: string; text?: string } | null>(null)
 
-  // Clear file when switching between incompatible tab types
   useEffect(() => {
     if (file) {
       const isCurrentFileCompatible = 
@@ -22,7 +21,6 @@ export function useFileHandling(type: PitchType) {
     }
   }, [type, file])
 
-  // Build preview for audio/text files
   useEffect(() => {
     let revokedUrl: string | undefined
     const run = async () => {
@@ -59,7 +57,6 @@ export function useFileHandling(type: PitchType) {
         return
       }
     } else if (type === "textFile") {
-      // Prefer text/plain, fallback to .txt extension check
       const isTxt = f.type === "text/plain" || f.name.toLowerCase().endsWith(".txt")
       if (!isTxt) {
         toast.error("Please upload a plain text .txt file")

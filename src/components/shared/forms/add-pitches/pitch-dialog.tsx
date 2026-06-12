@@ -57,7 +57,6 @@ export function PitchDialog({
     setIsOpen(false);
   };
 
-  // Reset form and navigation when dialog closes
   const { resetForm } = form;
   const { resetNavigation } = stepNav;
   useEffect(() => {

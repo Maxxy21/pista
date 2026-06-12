@@ -124,14 +124,11 @@ export function usePitchSubmission() {
     setProcessing(true)
     
     try {
-      // Initialize global progress overlay
       evalProg.start()
-      
-      // Process content
+
       const normalized = await processContent(type, textContent, file, readTextFile)
       onPreparedTextChange(normalized)
 
-      // Handle Q&A generation if needed
       if (stage === 'compose' && enableQA) {
         evalProg.setStep('analyzing', 'Generating follow-up questions...')
         const questions = await generateQuestionsForText(normalized)
@@ -144,11 +141,9 @@ export function usePitchSubmission() {
         }
       }
 
-      // Evaluate pitch
       evalProg.setStep('analyzing', 'Analyzing content...')
       const evaluation = await evaluateText(normalized, enableQA ? qa : [])
 
-      // Create pitch
       evalProg.setStep('analyzing', 'Saving pitch...')
       const id = await createPitch({
         orgId: workspace.mode === "org" ? organization?.id : undefined,

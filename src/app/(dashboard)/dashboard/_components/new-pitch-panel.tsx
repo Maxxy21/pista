@@ -23,12 +23,10 @@ export function NewPitchPanel() {
   const { organization } = useOrganization()
   const workspace = useWorkspace()
   
-  // Custom hooks for state and logic
   const form = useNewPitchForm()
   const fileHandling = useFileHandling(form.type)
   const submission = usePitchSubmission()
-  
-  // Enhanced validation that includes file validation
+
   const canSubmitWithFile = form.canSubmitBase || (form.type !== "text" && fileHandling.hasValidFile())
 
   const handleSubmit = () => {
@@ -72,7 +70,6 @@ export function NewPitchPanel() {
         </div>
         
         <CardContent className="p-4 md:p-6 space-y-5">
-          {/* Q&A Toggle */}
           <div className="flex items-center justify-between">
             <div className="space-y-1">
               <Label htmlFor="improve-qa">Improve evaluation with follow-up questions</Label>
@@ -88,7 +85,6 @@ export function NewPitchPanel() {
             </div>
           </div>
 
-          {/* Title Input */}
           <div className="space-y-2">
             <Label htmlFor="title">Title</Label>
             <Input 
@@ -99,7 +95,6 @@ export function NewPitchPanel() {
             />
           </div>
 
-          {/* Tab Interface */}
           <Tabs value={form.type} onValueChange={(v) => form.setType(v as PitchType)}>
             <TabsList className="grid w-full grid-cols-3 h-11">
               <TabsTrigger value="text" className="flex items-center gap-2 text-xs sm:text-sm">
@@ -146,20 +141,17 @@ export function NewPitchPanel() {
             </TabsContent>
           </Tabs>
 
-          {/* Processing Status */}
           <ProcessingStatus
             processing={submission.processing}
             progress={submission.progress}
             onRetry={submission.retry}
           />
 
-          {/* Q&A Section */}
-          <QuestionsSection 
+          <QuestionsSection
             qa={form.qa} 
             updateQAAnswer={form.updateQAAnswer}
           />
 
-          {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-3 sm:justify-end">
             <Button 
               onClick={handleSubmit} 

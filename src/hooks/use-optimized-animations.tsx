@@ -5,7 +5,6 @@ export function useOptimizedAnimations() {
   const prefersReducedMotion = useReducedMotion();
   
   const animations = useMemo(() => {
-    // Base animations
     const baseAnimations = {
       fadeIn: {
         hidden: { opacity: 0 },
@@ -29,14 +28,11 @@ export function useOptimizedAnimations() {
       }
     };
     
-    // If user prefers reduced motion, simplify animations
     if (prefersReducedMotion) {
       return {
         ...baseAnimations,
-        // Override with simpler animations
         slideUp: baseAnimations.fadeIn,
         scale: baseAnimations.fadeIn,
-        // Reduce stagger time
         staggerChildren: {
           hidden: {},
           visible: {
@@ -51,7 +47,6 @@ export function useOptimizedAnimations() {
     return baseAnimations;
   }, [prefersReducedMotion]);
   
-  // Animation durations
   const durations = useMemo(() => ({
     fast: prefersReducedMotion ? 0.1 : 0.2,
     medium: prefersReducedMotion ? 0.2 : 0.5,

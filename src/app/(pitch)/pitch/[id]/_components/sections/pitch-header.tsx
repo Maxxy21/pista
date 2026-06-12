@@ -17,20 +17,16 @@ interface PitchHeaderProps {
 }
 
 export const PitchHeader: React.FC<PitchHeaderProps> = React.memo(({ data }) => {
-    // Inline editing state
     const [isEditing, setIsEditing] = React.useState(false);
     const [title, setTitle] = React.useState(data.title);
-    
-    // API mutation
+
     const { mutate: updatePitch, pending: updating } = useApiMutation(api.pitches.update);
 
-    // Event handlers for inline editing
     const handleTitleClick = React.useCallback(() => {
         setIsEditing(true);
     }, []);
 
     const handleTitleSubmit = React.useCallback(async () => {
-        // Don't submit if no changes or empty title
         if (title.trim() === data.title || !title.trim()) {
             setTitle(data.title);
             setIsEditing(false);
@@ -61,7 +57,6 @@ export const PitchHeader: React.FC<PitchHeaderProps> = React.memo(({ data }) => 
         handleTitleSubmit();
     }, [handleTitleSubmit]);
 
-    // Sync title state with prop changes
     React.useEffect(() => {
         setTitle(data.title);
     }, [data.title]);

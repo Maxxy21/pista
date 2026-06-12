@@ -11,7 +11,6 @@ export interface FileValidationOptions {
   maxFiles?: number;
 }
 
-// Common file type configurations
 export const FILE_VALIDATION_CONFIGS: Record<string, FileValidationOptions> = {
   AUDIO: {
     maxSize: 25 * 1024 * 1024, // 25MB
@@ -37,7 +36,6 @@ export const FILE_VALIDATION_CONFIGS: Record<string, FileValidationOptions> = {
 
 
 export function validateFile(file: File, options: FileValidationOptions): FileValidationResult {
-  // Check file size
   if (file.size > options.maxSize) {
     const maxSizeMB = Math.round(options.maxSize / (1024 * 1024));
     return {
@@ -47,7 +45,6 @@ export function validateFile(file: File, options: FileValidationOptions): FileVa
     };
   }
 
-  // Check file type
   if (!options.allowedTypes.includes(file.type)) {
     return {
       valid: false,
@@ -56,7 +53,6 @@ export function validateFile(file: File, options: FileValidationOptions): FileVa
     };
   }
 
-  // Check file extension if specified
   if (options.allowedExtensions) {
     const fileExtension = getFileExtension(file.name);
     if (!options.allowedExtensions.includes(fileExtension)) {
@@ -68,7 +64,6 @@ export function validateFile(file: File, options: FileValidationOptions): FileVa
     }
   }
 
-  // Additional security checks
   const securityCheck = performSecurityChecks(file);
   if (!securityCheck.valid) {
     return securityCheck;
@@ -80,7 +75,6 @@ export function validateFile(file: File, options: FileValidationOptions): FileVa
 
 
 function performSecurityChecks(file: File): FileValidationResult {
-  // Check for suspicious file names
   const suspiciousPatterns = [
     /\.(exe|bat|cmd|com|pif|scr|vbs|jar|sh)$/i,
     /\.\w+\.(exe|bat|cmd|com|pif|scr|vbs|jar|sh)$/i, // Double extensions
@@ -97,7 +91,6 @@ function performSecurityChecks(file: File): FileValidationResult {
     }
   }
 
-  // Check for empty files (0 bytes)
   if (file.size === 0) {
     return {
       valid: false,
@@ -109,9 +102,6 @@ function performSecurityChecks(file: File): FileValidationResult {
   return { valid: true };
 }
 
-/**
- * Gets the file extension from a filename
- */
 function getFileExtension(filename: string): string {
   const lastDotIndex = filename.lastIndexOf('.');
   return lastDotIndex === -1 ? '' : filename.slice(lastDotIndex).toLowerCase();

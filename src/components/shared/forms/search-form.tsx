@@ -55,10 +55,8 @@ export function SearchForm({
             e.preventDefault();
             e.stopPropagation();
         }
-        // Clear search through parent component
         onChange("");
-        
-        // Focus the input after clearing
+
         setTimeout(() => {
             inputRef.current?.focus();
         }, 0);
@@ -70,7 +68,6 @@ export function SearchForm({
         }
     }, [autoFocus]);
 
-    // Standalone search input (for dashboard header)
     if (variant === "standalone") {
         return (
             <form

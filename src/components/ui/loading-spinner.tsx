@@ -93,7 +93,6 @@ export function LoadingSpinner({
     );
   }
 
-  // Default spinner
   return (
     <div className={cn("flex flex-col items-center space-y-3", className)}>
       <div className={cn(

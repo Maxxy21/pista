@@ -18,7 +18,6 @@ export function getOverallFeedback(evaluation: UniversalEvaluationData): Structu
   if (isStructuredEvaluationData(evaluation)) {
     return evaluation.overallFeedback
   }
-  // legacy returns plain string summary
   return (evaluation as LegacyEvaluationData).overallFeedback
 }
 

@@ -1,4 +1,3 @@
-// src/components/shared/landing/components/sample-evaluation.tsx
 'use client';
 
 import { motion } from "framer-motion";
@@ -45,7 +44,6 @@ const SampleEvaluation = () => {
           variants={animations.staggerChildren}
           className="grid gap-4 lg:grid-cols-2 lg:items-start"
         >
-          {/* Overall + radar */}
           <motion.div variants={animations.fadeIn} className="lg:sticky lg:top-24">
             <div className="gradient-shell">
               <div className="gradient-shell-inner p-8 flex flex-col items-center gap-6">
@@ -57,7 +55,6 @@ const SampleEvaluation = () => {
             </div>
           </motion.div>
 
-          {/* Detailed criteria cards */}
           <div className="grid gap-4">
             {detailed.map((c) => (
               <motion.div key={c.criteria} variants={animations.fadeIn}>

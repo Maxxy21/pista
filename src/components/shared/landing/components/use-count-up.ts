@@ -1,4 +1,3 @@
-// src/components/shared/landing/components/use-count-up.ts
 import { animate } from "framer-motion";
 import { useEffect, useState } from "react";
 

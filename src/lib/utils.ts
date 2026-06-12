@@ -38,13 +38,11 @@ export function getOpenAI(): OpenAI {
 export const streamUpload = async (url: string, file: File, onProgress: (progress: number) => void) => {
   const contentLength = file.size;
 
-  // Create a ReadableStream from the file
   const stream = file.stream();
   const reader = stream.getReader();
 
   let uploaded = 0;
 
-  // Create a new ReadableStream that will track progress
   const progressStream = new ReadableStream({
     async start(controller) {
       while (true) {
@@ -63,14 +61,11 @@ export const streamUpload = async (url: string, file: File, onProgress: (progres
     },
   });
 
-  // Create a Response from the stream
   const newResponse = new Response(progressStream);
 
-  // Create a FormData with the streaming Response
   const formData = new FormData();
   formData.append('audio', await newResponse.blob(), file.name);
 
-  // Make the fetch request
   return fetch(url, {
     method: 'POST',
     body: formData

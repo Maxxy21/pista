@@ -19,7 +19,6 @@ export function useIntersectionObserver<T extends Element>({
   useEffect(() => {
     const node = ref.current;
     
-    // If the element doesn't exist or we've already triggered once and seen it, return
     if (!node || (triggerOnce && isIntersecting)) return;
     
     const observer = new IntersectionObserver(

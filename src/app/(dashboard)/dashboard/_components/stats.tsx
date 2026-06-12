@@ -34,7 +34,6 @@ export function DashboardStats() {
     const { userId, isLoaded, isSignedIn } = useAuth();
     const workspace = useWorkspace();
 
-    // Default stats for fallback/merging
     const defaultStats = useMemo(
         () => ({
             totalPitches: 0,
@@ -48,7 +47,6 @@ export function DashboardStats() {
         []
     );
 
-    // Only fetch stats if user is loaded and signed in
     const shouldFetch = isLoaded && isSignedIn && !!userId;
     const stats = useQuery(
         api.pitches.getPitchStats,
@@ -63,7 +61,6 @@ export function DashboardStats() {
 
     const averageScore = stats?.averageScore ?? 0;
 
-    // Loading state
     if (!shouldFetch || !stats) {
         return (
             <div className="grid grid-cols-2 divide-x divide-border rounded-2xl border border-border bg-card lg:grid-cols-4">
@@ -77,7 +74,6 @@ export function DashboardStats() {
         );
     }
 
-    // Merge stats with defaults to avoid undefineds
     const mergedStats = { ...defaultStats, ...stats };
 
     return (

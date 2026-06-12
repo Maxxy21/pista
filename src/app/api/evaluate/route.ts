@@ -293,7 +293,6 @@ Respond with this JSON structure:
   }
 }
 
-// Input validation schema
 const evaluateSchema = z.object({
   text: z.string().min(1, "Text is required").max(50000, "Text too long"),
   questions: z.array(z.object({

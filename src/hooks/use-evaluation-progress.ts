@@ -23,7 +23,6 @@ export const useEvaluationProgress = create<EvaluationProgressState>((set) => ({
   start: () => set({ visible: true, step: 'uploading', progress: 0, message: 'Uploading...' }),
   setStep: (step, message) => set({ step, message, progress: step === 'uploading' ? 0 : undefined }),
   setProgress: (value) => set({ progress: Math.max(0, Math.min(100, Math.round(value))) }),
-  // Hide overlay immediately on completion
   done: () => set({ visible: false, step: 'complete', message: 'Complete! View your results.', progress: 100 }),
   fail: (message) => set({ step: 'error', message: message || 'Something went wrong.' }),
   reset: () => set({ visible: false, step: 'idle', message: undefined, progress: undefined }),

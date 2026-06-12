@@ -65,7 +65,6 @@ export function withAuth(
       );
     }
 
-    // Attach user info to request
     const authenticatedReq = req as AuthenticatedRequest;
     authenticatedReq.userId = authResult.userId!;
     authenticatedReq.orgId = authResult.orgId;

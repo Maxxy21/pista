@@ -10,7 +10,6 @@ interface DetailedAnalysisProps {
     data: UniversalPitchData;
 }
 
-// Extracted for readability and reusability
 const formatComment = (text: string): ReactNode => {
     if (/\d+\.\s/.test(text)) {
         const parts = text.split(/(\d+\.\s)/);

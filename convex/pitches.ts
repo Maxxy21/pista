@@ -123,7 +123,6 @@ export const getPitch = query({
             throw new ConvexError("Unauthorized");
         }
 
-        // Check if pitch is favorited
         const favorite = await ctx.db
             .query("userFavorites")
             .filter((q) => q.and(
@@ -318,7 +317,6 @@ export const getFilteredPitches = query({
                 )
                 .collect();
         } else {
-            // Default to current user's personal pitches
             pitches = await ctx.db
                 .query("pitches")
                 .withIndex("by_user_org", (q) =>
@@ -371,7 +369,6 @@ export const getFilteredPitches = query({
     },
 });
 
-// Get pitch statistics
 export const getPitchStats = query({
     args: {
         orgId: v.optional(v.string()),
@@ -441,7 +438,6 @@ export const getPitchStats = query({
     },
 });
 
-// Export user's pitches and evaluations as CSV (thesis analysis)
 export const exportCSV = query({
     args: {},
     handler: async (ctx) => {

@@ -89,7 +89,6 @@ export const PitchesGrid: React.FC<PitchesGridProps> = ({
         [viewMode]
     );
 
-    // Loading state
     if (isLoading || data === undefined) {
         const content = (
             <div className={gridClass}>
@@ -101,7 +100,6 @@ export const PitchesGrid: React.FC<PitchesGridProps> = ({
         return useOuterScroll ? content : <ScrollArea className="h-full w-full">{content}</ScrollArea>;
     }
 
-    // Empty states
     if (data.length === 0) {
         if (searchQuery) return <EmptySearch />;
         if (currentView === "favorites") return <EmptyFavorites />;
@@ -109,7 +107,6 @@ export const PitchesGrid: React.FC<PitchesGridProps> = ({
         return null;
     }
 
-    // Main grid/list
     const grid = (
         <AnimatePresence>
             <motion.div
