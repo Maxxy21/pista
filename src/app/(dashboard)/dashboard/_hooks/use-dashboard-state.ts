@@ -9,13 +9,11 @@ export const useDashboardState = (searchParams: ReadonlyURLSearchParams) => {
     const [scoreFilter, setScoreFilterState] = useState<string>("all");
     const [sortBy, setSortByState] = useState<"newest" | "score" | "updated">("newest");
 
-    // Get search query from URL
     const searchQuery = searchParams.get("search") || "";
     const modeQuery = (searchParams.get("mode") || "grid") as "grid" | "list";
     const scoreQuery = (searchParams.get("score") || "all") as string;
     const sortQuery = (searchParams.get("sort") || "newest") as "newest" | "score" | "updated";
 
-    // Update search value when URL changes
     useEffect(() => {
         if (searchQuery) setSearchValue(searchQuery);
         setViewModeState(modeQuery);
@@ -23,7 +21,6 @@ export const useDashboardState = (searchParams: ReadonlyURLSearchParams) => {
         setSortByState(sortQuery);
     }, [searchQuery, modeQuery, scoreQuery, sortQuery]);
 
-    // Handle search form submission
     const handleSearch = (e: FormEvent) => {
         e.preventDefault();
         const url = qs.stringifyUrl({
@@ -37,7 +34,6 @@ export const useDashboardState = (searchParams: ReadonlyURLSearchParams) => {
         router.push(url);
     };
 
-    // Handle tab changes
     const handleTabChange = (value: string) => {
         const url = qs.stringifyUrl({
             url: "/dashboard",
@@ -50,7 +46,6 @@ export const useDashboardState = (searchParams: ReadonlyURLSearchParams) => {
         router.push(url);
     };
 
-    // Persist score filter to URL
     const setScoreFilter = (value: string) => {
         setScoreFilterState(value);
         const url = qs.stringifyUrl({
@@ -63,7 +58,6 @@ export const useDashboardState = (searchParams: ReadonlyURLSearchParams) => {
         router.push(url);
     };
 
-    // Persist sort to URL
     const setSortBy = (value: "newest" | "score" | "updated") => {
         setSortByState(value);
         const url = qs.stringifyUrl({
@@ -76,7 +70,6 @@ export const useDashboardState = (searchParams: ReadonlyURLSearchParams) => {
         router.push(url);
     };
 
-    // Persist view mode to URL
     const setViewMode = (value: "grid" | "list") => {
         setViewModeState(value);
         const url = qs.stringifyUrl({
@@ -89,7 +82,6 @@ export const useDashboardState = (searchParams: ReadonlyURLSearchParams) => {
         router.push(url);
     };
 
-    // Get score range based on filter
     const getScoreRange = (filter: string) => {
         switch (filter) {
             case "high":

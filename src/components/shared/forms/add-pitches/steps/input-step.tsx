@@ -4,7 +4,6 @@ import { useState } from "react"
 import { useDropzone } from "react-dropzone"
 import { cn } from "@/lib/utils"
 
-// UI Components
 import {
   Tabs,
   TabsContent,
@@ -16,14 +15,12 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 
-// Icons
 import {
   Upload,
   Mic,
   FileText,
 } from "lucide-react"
 
-// Custom Components
 import { AudioPreview } from "../audio-preview"
 import { FilePreview } from "../file-preview"
 

@@ -27,14 +27,12 @@ export const ScoreRadarChart = ({ data }: RadarChartProps) => {
   const [chartData, setChartData] = useState<RadarChartData[]>([]);
 
   useEffect(() => {
-    // Prepare initial data for animation
     const initialData = data.map((item) => ({
       category: item.criteria,
       score: 0,
     }));
     setChartData(initialData);
 
-    // Animate to actual scores
     const timer = setTimeout(() => {
       setChartData(
         data.map((item) => ({

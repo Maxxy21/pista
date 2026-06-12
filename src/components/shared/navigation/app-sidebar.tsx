@@ -19,7 +19,6 @@ import {
     useSidebar,
 } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
-// Organization switcher moved into user avatar menu for consistency
 import { InviteButton } from "../common/invite-button";
 import Link from "next/link";
 import LogoIcon from "@/components/ui/logo-icon";
@@ -85,7 +84,6 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
             </div>
 
             <SidebarFooter className="p-2 space-y-2">
-                {/* Action Buttons */}
                 <SidebarMenu className="space-y-1">
                     <SidebarMenuItem>
                         <SidebarMenuButton
@@ -104,7 +102,6 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
                         <InviteButton />
                     </SidebarMenuItem>
                     <SidebarMenuItem>
-                        {/* Organization switcher positioned at bottom of sidebar */}
                         <TeamSwitcher />
                     </SidebarMenuItem>
                 </SidebarMenu>

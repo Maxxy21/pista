@@ -42,23 +42,19 @@ import { PitchListItem } from "./pitch-list-item";
 
 
 export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>) {
-    // Router and navigation
     const router = useRouter();
     const params = useParams();
     const searchParams = useSearchParams();
-    
-    // Authentication and workspace context
+
     const { organization } = useOrganization();
     const workspace = useWorkspace();
     const { isLoaded: isAuthLoaded, isSignedIn } = useAuth();
     const { user } = useUser();
-    
-    // UI state
+
     const [search, setSearch] = React.useState("");
     const [debouncedSearch] = useDebounceValue(search, 500);
     const { state } = useSidebar();
 
-    // Sync search state with URL
     React.useEffect(() => {
         const searchQuery = searchParams.get("search") || "";
         if (searchQuery) {
@@ -66,7 +62,6 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
         }
     }, [searchParams]);
 
-    // Update URL when search changes
     React.useEffect(() => {
         const url = qs.stringifyUrl(
             {
@@ -86,14 +81,12 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
         setSearch(value);
     }, []);
 
-    // Query parameters based on workspace context
     const queryParams = isAuthLoaded && isSignedIn
         ? (workspace.mode === 'org' && workspace.orgId
             ? { orgId: workspace.orgId, search: debouncedSearch, sortBy: "date" as const }
             : user?.id ? { ownerUserId: user.id, search: debouncedSearch, sortBy: "date" as const } : "skip")
         : "skip";
-    
-    // Data queries
+
     const pitches = useQuery(api.pitches.getFilteredPitches, queryParams);
     const currentPitch = useQuery(
         api.pitches.getPitch,
@@ -102,13 +95,11 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
             : "skip"
     );
 
-    // API mutations
     const { mutate: updatePitch } = useApiMutation(api.pitches.update);
     const { mutate: onFavorite, pending: pendingFavorite } = useApiMutation(api.pitches.favorite);
     const { mutate: onUnfavorite, pending: pendingUnfavorite } = useApiMutation(api.pitches.unfavorite);
 
 
-    // Export current pitch as PDF
     const onExport = React.useCallback(() => {
         try {
             if (!currentPitch) return;
@@ -120,7 +111,6 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
         }
     }, [currentPitch]);
 
-    // Toggle favorite status for current pitch
     const toggleFavorite = React.useCallback(() => {
         if (!currentPitch) return;
         
@@ -147,7 +137,6 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
         }
     }, []);
 
-    // Share pitch feedback by copying to clipboard
     const onShare = React.useCallback(() => {
         if (!currentPitch) return;
         
@@ -159,7 +148,6 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
         copyToClipboard(feedbackText);
     }, [currentPitch, copyToClipboard]);
 
-    // Filter and limit pitches for display
     const displayPitches = React.useMemo(() => {
         if (!pitches) {
             return [] as UniversalPitchData[];
@@ -173,7 +161,6 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
         return limited as unknown as UniversalPitchData[];
     }, [pitches, params.id, debouncedSearch]);
 
-    // Redirect to sign-in if not authenticated
     React.useEffect(() => {
         if (isAuthLoaded && !isSignedIn) {
             router.push("/sign-in");
@@ -206,7 +193,6 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
         [router, searchParams]
     );
 
-    // Helper for pitch type badge - must be defined before conditional returns
     const renderTypeBadge = React.useCallback((type: string) => {
         switch (type) {
             case "audio":
@@ -218,7 +204,6 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
         }
     }, []);
 
-    // Loading state while authentication is being verified
     if (!isAuthLoaded) {
         return (
             <Sidebar collapsible="icon" className="border-r" {...props}>
@@ -375,7 +360,6 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
                                         tooltip="Search pitches"
                                         aria-label="Search pitches"
                                         onClick={() => {
-                                            // Expand sidebar to show search
                                             const sidebarTrigger = document.querySelector('[data-sidebar="trigger"]') as HTMLButtonElement;
                                             if (sidebarTrigger) {
                                                 sidebarTrigger.click();
@@ -413,7 +397,6 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
             </div>
 
             <SidebarFooter className="p-2 space-y-2">
-                {/* Action Buttons */}
                 <SidebarMenu className="space-y-1">
                     {currentPitch && (
                         <>

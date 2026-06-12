@@ -10,13 +10,11 @@ interface EvaluationSummaryProps {
 
 const formatFeedback = (text: string): ReactNode[] => {
     if (!text) return [];
-    // Split the text by numbered points pattern (e.g., "1. ", "2. ")
     const parts = text.split(/(\d+\.\s)/);
     const formattedParts: ReactNode[] = [];
 
     for (let i = 0; i < parts.length; i++) {
         if (i % 2 === 1) {
-            // Add spacing between points except for the first one
             if (i > 1) {
                 formattedParts.push(
                     <div key={`space-${i}`} className="mt-4" aria-hidden="true" />
@@ -45,7 +43,6 @@ export const EvaluationSummary: FC<EvaluationSummaryProps> = ({ data }) => {
     const feedback = getOverallFeedback(data.evaluation);
     const overallFeedback = typeof feedback === 'string' ? feedback : feedback.overallAssessment.summary;
 
-    // Memoize formatted feedback for performance
     const formattedFeedback = useMemo(
         () => formatFeedback(overallFeedback),
         [overallFeedback]

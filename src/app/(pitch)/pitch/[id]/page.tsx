@@ -10,22 +10,18 @@ import {ScrollArea} from "@/components/ui/scroll-area"
 import {SidebarInset} from "@/components/ui/sidebar"
 import {SkeletonCard} from "@/components/ui/skeleton-card"
 
-// Import the header component normally as it's needed immediately
 import {PitchHeader} from "./_components/sections/pitch-header"
 import {isStructuredEvaluationData} from "@/lib/types/evaluation"
 
-// Lazy load other components
 const TranscriptSection = lazy(() => import("./_components/sections/transcript-section").then(mod => ({default: mod.TranscriptSection})))
 const ScoreOverview = lazy(() => import("./_components/sections/score-overview").then(mod => ({default: mod.ScoreOverview})))
 const EvaluationSummary = lazy(() => import("./_components/analysis/evaluation-summary").then(mod => ({default: mod.EvaluationSummary})))
 const DetailedAnalysis = lazy(() => import("./_components/analysis/detailed-analysis").then(mod => ({default: mod.DetailedAnalysis})))
 const QuestionsSection = lazy(() => import("./_components/sections/questions-section").then(mod => ({default: mod.QuestionsSection})))
 
-// New structured components
 const StructuredEvaluationSummary = lazy(() => import("./_components/analysis/structured-evaluation-summary").then(mod => ({default: mod.StructuredEvaluationSummary})))
 const StructuredDetailedAnalysis = lazy(() => import("./_components/analysis/structured-detailed-analysis").then(mod => ({default: mod.StructuredDetailedAnalysis})))
 
-// Enhanced skeleton components for lazy-loaded sections
 const TranscriptSkeleton = () => (
     <div className="space-y-4">
         <div className="flex items-center gap-2 mb-4">
@@ -93,7 +89,6 @@ const PitchDetails = () => {
         </SidebarInset>
     )
 
-    // Determine if we should use structured or legacy components
     const useStructuredComponents = isStructuredEvaluationData(data.evaluation)
 
     return (

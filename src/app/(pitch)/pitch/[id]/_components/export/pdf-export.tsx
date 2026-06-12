@@ -26,14 +26,12 @@ export const ExportPDFButton = ({ data }: ExportPDFButtonProps) => {
     try {
       setIsExporting(true)
       
-      // Create new PDF document
       const doc = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
         format: 'a4',
       })
       
-      // Add title and date
       doc.setFontSize(24)
       doc.setTextColor(44, 62, 80)
       doc.text(data.title, 20, 20)
@@ -42,7 +40,6 @@ export const ExportPDFButton = ({ data }: ExportPDFButtonProps) => {
       doc.setTextColor(127, 140, 141)
       doc.text(`Created: ${new Date(data._creationTime).toLocaleDateString()}`, 20, 30)
       
-      // Add overall score
       doc.setFontSize(16)
       doc.setTextColor(44, 62, 80)
       doc.text('Overall Score', 20, 45)
@@ -54,7 +51,6 @@ export const ExportPDFButton = ({ data }: ExportPDFButtonProps) => {
       doc.setTextColor(scoreColor[0], scoreColor[1], scoreColor[2])
       doc.text(`${data.evaluation.overallScore.toFixed(1)}/10`, 20, 55)
       
-      // Add overall feedback
       doc.setFontSize(16)
       doc.setTextColor(44, 62, 80)
       doc.text('Evaluation Summary', 20, 70)
@@ -68,9 +64,7 @@ export const ExportPDFButton = ({ data }: ExportPDFButtonProps) => {
       
       let yPosition = 80 + (feedbackLines.length * 7)
       
-      // Add detailed evaluations if full report
       if (type === 'full') {
-        // Add transcript
         if (yPosition > 240) {
           doc.addPage()
           yPosition = 20
@@ -88,8 +82,7 @@ export const ExportPDFButton = ({ data }: ExportPDFButtonProps) => {
         doc.text(transcriptLines, 20, yPosition + 10)
         
         yPosition += 10 + (transcriptLines.length * 5)
-        
-        // Add detailed analysis
+
         const evaluations = getEvaluations(data.evaluation)
         evaluations.forEach((evaluation) => {
           if (yPosition > 240) {
@@ -97,7 +90,6 @@ export const ExportPDFButton = ({ data }: ExportPDFButtonProps) => {
             yPosition = 20
           }
           
-          // Category title and score
           doc.setFontSize(14)
           doc.setTextColor(44, 62, 80)
           doc.text(evaluation.criteria, 20, yPosition)
@@ -109,8 +101,7 @@ export const ExportPDFButton = ({ data }: ExportPDFButtonProps) => {
           doc.text(`${evaluation.score.toFixed(1)}/10`, 170, yPosition, { align: 'right' })
           
           yPosition += 10
-          
-          // Comment/Summary
+
           doc.setFontSize(10)
           doc.setTextColor(44, 62, 80)
           const comment = evaluation.summary || (evaluation as any).comment || ''
@@ -118,8 +109,7 @@ export const ExportPDFButton = ({ data }: ExportPDFButtonProps) => {
           doc.text(commentLines, 20, yPosition)
           
           yPosition += (commentLines.length * 5) + 5
-          
-          // Strengths
+
           doc.setFontSize(12)
           doc.setTextColor(39, 174, 96)
           doc.text('Strengths:', 20, yPosition)
@@ -136,8 +126,7 @@ export const ExportPDFButton = ({ data }: ExportPDFButtonProps) => {
           })
           
           yPosition += 5
-          
-          // Improvements
+
           doc.setFontSize(12)
           doc.setTextColor(231, 76, 60)
           doc.text('Areas for Improvement:', 20, yPosition)
@@ -157,7 +146,6 @@ export const ExportPDFButton = ({ data }: ExportPDFButtonProps) => {
         })
       }
       
-      // Add footer
       const pageCount = doc.getNumberOfPages()
       for (let i = 1; i <= pageCount; i++) {
         doc.setPage(i)
@@ -166,7 +154,6 @@ export const ExportPDFButton = ({ data }: ExportPDFButtonProps) => {
         doc.text(`Pista Evaluation Report - Page ${i} of ${pageCount}`, 105, 287, { align: 'center' })
       }
       
-      // Save the PDF
       doc.save(`${data.title.replace(/\s+/g, '_')}_${type === 'full' ? 'Full' : 'Summary'}_Report.pdf`)
       toast.success(`${type === 'full' ? 'Full' : 'Summary'} report downloaded successfully`)
     } catch (error) {

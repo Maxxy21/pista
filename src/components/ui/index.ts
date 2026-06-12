@@ -1,4 +1,3 @@
-// Core UI Components
 export { Button } from "./button";
 export { Card, CardContent, CardFooter, CardHeader, CardTitle } from "./card";
 export { Badge } from "./badge";
@@ -9,7 +8,6 @@ export { Separator } from "./separator";
 export { Progress } from "./progress";
 export { ScrollArea } from "./scroll-area";
 
-// Dialog Components
 export {
   Dialog,
   DialogContent,
@@ -21,7 +19,6 @@ export {
   DialogClose
 } from "./dialog";
 
-// Dropdown Components
 export {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,7 +26,6 @@ export {
   DropdownMenuTrigger
 } from "./dropdown-menu";
 
-// Form Components
 export {
   Tabs,
   TabsContent,
@@ -37,7 +33,6 @@ export {
   TabsTrigger
 } from "./tabs";
 
-// Sidebar Components
 export {
   Sidebar,
   SidebarContent,
@@ -52,7 +47,6 @@ export {
   useSidebar
 } from "./sidebar";
 
-// Specialized Components
 export { FileUpload } from "./file-upload";
 export { default as LogoIcon } from "./logo-icon";
 export { toast, useToast } from "./use-toast";
