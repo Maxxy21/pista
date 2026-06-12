@@ -40,7 +40,7 @@ export function SidebarNav({ currentView, collapsed, onNavigate }: SidebarNavPro
             {item.badge && (
               <SidebarMenuBadge
                 className="text-xs font-medium"
-                style={{ background: "#F2EAD3", color: "#0e0d0c" }}
+                style={{ background: "hsl(var(--gold))", color: "hsl(var(--gold-foreground))" }}
               >
                 {item.badge}
               </SidebarMenuBadge>

@@ -57,19 +57,13 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
             <SidebarHeader className="py-4">
                 {state === "collapsed" ? (
                     <div className="flex flex-col items-center space-y-3">
-                        <div
-                            className="h-5 w-6 rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0"
-                            style={{ background: "#F2EAD3" }}
-                        />
+                        <LogoIcon size="md" />
                     </div>
                 ) : (
                     <div className="px-4">
                         <div className="flex items-center gap-2.5">
-                            <div
-                                className="h-5 w-6 rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0"
-                                style={{ background: "#F2EAD3" }}
-                            />
-                            <h1 className="text-lg font-semibold tracking-tight" style={{ color: "#F2EAD3" }}>
+                            <LogoIcon size="md" />
+                            <h1 className="font-display text-lg font-semibold tracking-tight text-foreground">
                                 Pista
                             </h1>
                         </div>
@@ -97,7 +91,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
                         <SidebarMenuButton
                             asChild
                             className="font-medium transition-opacity duration-150 hover:opacity-85"
-                            style={{ background: "#F2EAD3", color: "#0e0d0c" }}
+                            style={{ background: "hsl(var(--gold))", color: "hsl(var(--gold-foreground))" }}
                             tooltip={state === "collapsed" ? "New Pitch" : undefined}
                         >
                             <Link href="/dashboard?view=new">
