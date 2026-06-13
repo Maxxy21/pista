@@ -1,3 +1,5 @@
+import { vi } from "vitest";
+
 const mockIntersectionObserver = vi.fn((callback: IntersectionObserverCallback) => {
     return {
         disconnect: vi.fn(),
