@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import LogoIcon from "@/components/ui/logo-icon";
+import { cn } from "@/lib/utils";
 
 interface AuthScreenProps {
   eyebrow: string;
@@ -12,7 +13,7 @@ interface AuthScreenProps {
 
 function Brand({ className }: { className?: string }) {
   return (
-    <Link href="/" className={`flex items-center gap-2.5 group w-fit ${className ?? ""}`}>
+    <Link href="/" className={cn("flex items-center gap-2.5 group w-fit", className)}>
       <LogoIcon size="md" />
       <span className="font-display text-lg font-semibold tracking-tight text-foreground">Pista</span>
     </Link>
@@ -23,7 +24,7 @@ export function AuthScreen({ eyebrow, title, subtitle, description, children }: 
   return (
     <div className="flex min-h-screen bg-background">
       <div className="relative hidden lg:flex lg:w-1/2 flex-col justify-between p-12 overflow-hidden">
-        <div className="pointer-events-none absolute inset-0 -z-10" aria-hidden>
+        <div className="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
           <div
             className="absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full opacity-15"
             style={{

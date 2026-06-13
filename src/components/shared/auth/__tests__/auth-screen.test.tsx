@@ -14,6 +14,7 @@ describe("AuthScreen", () => {
         <div data-testid="form-probe">form goes here</div>
       </AuthScreen>
     );
+    expect(screen.getByText("Test eyebrow")).toBeDefined();
     expect(screen.getByText("Welcome back.")).toBeDefined();
     expect(screen.getByText("Your pitches are waiting.")).toBeDefined();
     expect(screen.getByText("Sign in to keep refining your pitch.")).toBeDefined();
