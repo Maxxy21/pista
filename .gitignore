@@ -73,3 +73,6 @@ blob
 # local-only, never commit
 CLAUDE.md
 tempimages/
+
+# superpowers workflow artifacts (local-only)
+docs/superpowers/
