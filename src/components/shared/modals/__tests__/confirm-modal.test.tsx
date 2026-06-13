@@ -26,7 +26,7 @@ describe("ConfirmModal", () => {
     expect(onConfirm).toHaveBeenCalledOnce();
   });
 
-  it("uses the rust destructive action when destructive", () => {
+  it("uses the destructive action when destructive", () => {
     render(
       <ConfirmModal header="Delete pitch?" onConfirm={() => {}} destructive>
         <button>open</button>

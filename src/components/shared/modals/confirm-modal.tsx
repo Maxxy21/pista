@@ -35,10 +35,10 @@ export const ConfirmModal = ({
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>{children}</AlertDialogTrigger>
-      <AlertDialogContent>
+      <AlertDialogContent {...(!description && { "aria-describedby": undefined })}>
         <AlertDialogHeader>
           <AlertDialogTitle className="flex items-center gap-2">
-            {destructive && <AlertTriangle className="h-5 w-5 text-destructive" />}
+            {destructive && <AlertTriangle aria-hidden="true" className="h-5 w-5 text-destructive" />}
             {header}
           </AlertDialogTitle>
           {description && <AlertDialogDescription>{description}</AlertDialogDescription>}
