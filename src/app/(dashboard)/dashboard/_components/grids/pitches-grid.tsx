@@ -40,11 +40,11 @@ interface PitchesGridProps {
 const SkeletonPitchCard: React.FC<{ viewMode: "grid" | "list" }> = ({ viewMode }) => (
     <div
         className={cn(
-            "rounded-lg overflow-hidden border border-border",
+            "rounded-2xl overflow-hidden border border-border",
             viewMode === "list" ? "h-[120px]" : "h-[250px]"
         )}
     >
-        <div className="p-6 h-full flex flex-col">
+        <div className="p-5 h-full flex flex-col">
             <div className="flex justify-between items-start mb-4">
                 <Skeleton className="h-6 w-2/3" />
                 <Skeleton className="h-8 w-8 rounded-full" />
