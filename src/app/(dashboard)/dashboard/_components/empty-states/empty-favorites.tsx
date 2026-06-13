@@ -1,3 +1,4 @@
+import { Star } from "lucide-react";
 import { EmptyState } from "@/components/ui/empty-state";
 
 export const EmptyFavorites = () => {
@@ -5,9 +6,8 @@ export const EmptyFavorites = () => {
         <EmptyState
             title="No favorite pitches!"
             description="Try favoriting a pitch to see it here"
-            imageSrc="/empty-favorites.svg"
-            imageAlt="No favorites"
+            icon={<Star className="h-7 w-7" />}
             className="min-h-[60vh]"
         />
     );
-}; 
+};
