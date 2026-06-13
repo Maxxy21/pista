@@ -1,6 +1,5 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { OptimizedImage } from "@/components/ui/optimized-image";
 import { useOptimizedAnimations } from "@/hooks/use-optimized-animations";
 import { LazyLoadSection } from "@/components/shared/common/lazy-load-section";
 import { cn } from "@/lib/utils";
@@ -8,29 +7,16 @@ import { cn } from "@/lib/utils";
 interface EmptyStateProps {
     title: string;
     description: string;
-    imageSrc: string;
-    imageAlt?: string;
-    imageSize?: number;
+    icon: React.ReactNode;
     action?: React.ReactNode;
     className?: string;
 }
 
-export function EmptyState({
-    title,
-    description,
-    imageSrc,
-    imageAlt = "Empty state illustration",
-    imageSize = 140,
-    action,
-    className
-}: EmptyStateProps) {
+export function EmptyState({ title, description, icon, action, className }: EmptyStateProps) {
     const { animations } = useOptimizedAnimations();
 
     return (
-        <LazyLoadSection className={cn(
-            "flex flex-col items-center justify-center py-10",
-            className
-        )}>
+        <LazyLoadSection className={cn("flex flex-col items-center justify-center py-10", className)}>
             <motion.div
                 initial="hidden"
                 animate="visible"
@@ -38,38 +24,31 @@ export function EmptyState({
                 className="flex flex-col items-center"
             >
                 <motion.div variants={animations.fadeIn}>
-                    <OptimizedImage
-                        src={imageSrc}
-                        height={imageSize}
-                        width={imageSize}
-                        alt={imageAlt}
-                        className="mx-auto mb-6"
-                    />
+                    <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full border border-border bg-card text-[hsl(var(--gold))]">
+                        {icon}
+                    </div>
                 </motion.div>
-                
-                <motion.h2 
-                    className="text-2xl font-semibold text-center"
+
+                <motion.h2
+                    className="text-center font-display text-2xl font-semibold"
                     variants={animations.slideUp}
                 >
                     {title}
                 </motion.h2>
-                
-                <motion.p 
-                    className="text-muted-foreground text-sm mt-2 text-center max-w-md"
+
+                <motion.p
+                    className="mt-2 max-w-md text-center text-sm text-muted-foreground"
                     variants={animations.slideUp}
                 >
                     {description}
                 </motion.p>
-                
+
                 {action && (
-                    <motion.div 
-                        className="mt-6"
-                        variants={animations.scale}
-                    >
+                    <motion.div className="mt-6" variants={animations.scale}>
                         {action}
                     </motion.div>
                 )}
             </motion.div>
         </LazyLoadSection>
     );
-} 
+}
