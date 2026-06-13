@@ -16,11 +16,11 @@ export function SkeletonCard({
   if (variant === "pitch") {
     return (
       <div className={cn(
-        "rounded-lg overflow-hidden border border-border bg-card transition-all duration-200 hover:shadow-md",
+        "rounded-2xl overflow-hidden border border-border bg-card transition-all duration-200 hover:shadow-md",
         height,
         className
       )}>
-        <div className="p-6 h-full flex flex-col space-y-3">
+        <div className="p-5 h-full flex flex-col space-y-3">
           <div className="flex justify-between items-start">
             <Skeleton className="h-6 w-2/3" />
             <Skeleton className="h-8 w-8 rounded-full" />

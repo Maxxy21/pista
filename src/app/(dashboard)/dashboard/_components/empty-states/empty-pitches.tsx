@@ -1,3 +1,4 @@
+import { FileText } from "lucide-react";
 import { EmptyState } from "@/components/ui/empty-state";
 import { NewPitchButton } from "../new-pitch-button";
 
@@ -10,16 +11,9 @@ export const EmptyPitches = ({ orgId }: EmptyPitchesProps) => {
         <EmptyState
             title="Create your first pitch!"
             description="Start by uploading or writing your pitch"
-            imageSrc="/empty-favorites.svg"
-            imageAlt="No pitches"
-            imageSize={110}
+            icon={<FileText className="h-7 w-7" />}
             className="min-h-[60vh]"
-            action={
-                <NewPitchButton 
-                    orgId={orgId}
-                    className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
-                />
-            }
+            action={<NewPitchButton orgId={orgId} variant="gold" showIcon />}
         />
     );
-}; 
+};
