@@ -59,10 +59,10 @@ export const RenameModal = () => {
           <DialogTitle>
             Edit pitch title
           </DialogTitle>
+          <DialogDescription>
+            Enter a new title for this pitch
+          </DialogDescription>
         </DialogHeader>
-        <DialogDescription>
-          Enter a new title for this pitch
-        </DialogDescription>
         <form onSubmit={onSubmit} className="space-y-4">
           <Input
             disabled={pending}
@@ -78,7 +78,7 @@ export const RenameModal = () => {
                 Cancel
               </Button>
             </DialogClose>
-            <Button disabled={pending} type="submit">
+            <Button disabled={pending} type="submit" variant="gold">
               Save
             </Button>
           </DialogFooter>

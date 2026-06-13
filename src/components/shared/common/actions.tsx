@@ -64,6 +64,7 @@ export const Actions = ({
           description="This will delete the pitch and all of its contents."
           disabled={pending}
           onConfirm={onDelete}
+          destructive
         >
           <Button
             variant="ghost"
