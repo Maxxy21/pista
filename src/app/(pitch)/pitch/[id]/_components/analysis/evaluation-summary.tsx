@@ -51,11 +51,7 @@ export const EvaluationSummary: FC<EvaluationSummaryProps> = ({ data }) => {
     return (
         <div>
             <h2 className="font-display text-xl font-semibold mb-4">Evaluation Summary</h2>
-            <Card className="relative overflow-hidden border-primary/20">
-                <div
-                    className="absolute -right-20 -top-20 w-40 h-40 rounded-full bg-primary/5 blur-2xl"
-                    aria-hidden="true"
-                />
+            <Card>
                 <CardHeader className="flex flex-row items-center justify-end pb-2">
                     <CopyButton text={overallFeedback} />
                 </CardHeader>
