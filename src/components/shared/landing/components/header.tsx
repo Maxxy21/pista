@@ -49,11 +49,7 @@ const Header = () => {
                     </Link>
                     <Link
                         href="/sign-up"
-                        className="px-5 py-2 text-sm font-medium rounded-full transition-opacity duration-150 hover:opacity-85"
-                        style={{
-                            background: "hsl(var(--gold))",
-                            color: "hsl(var(--gold-foreground))",
-                        }}
+                        className="px-5 py-2 text-sm font-medium rounded-full transition-opacity duration-150 hover:opacity-85 bg-gold text-gold-foreground"
                     >
                         Get started
                     </Link>
