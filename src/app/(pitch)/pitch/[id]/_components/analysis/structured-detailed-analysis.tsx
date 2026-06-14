@@ -58,7 +58,7 @@ export const StructuredDetailedAnalysis: FC<StructuredDetailedAnalysisProps> = (
 
   return (
     <div>
-      <h2 className="font-display text-2xl font-bold mb-4">Detailed Analysis</h2>
+      <h2 className="font-display text-xl font-semibold mb-4">Detailed Analysis</h2>
       <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
         {evaluations.map((evaluation) => (
           <Card key={evaluation.criteria} className="h-full">
