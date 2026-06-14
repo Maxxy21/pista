@@ -76,7 +76,7 @@ export function SearchForm({
             >
                 <div className={cn(
                     "relative rounded-lg transition-all duration-200",
-                    isFocused && "ring-1 ring-primary/50 bg-muted/40"
+                    isFocused && "ring-1 ring-gold/40 bg-muted/40"
                 )}>
                     <Search
                         className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
@@ -119,7 +119,7 @@ export function SearchForm({
         >
             <div className={cn(
                 "relative rounded-lg transition-all duration-200",
-                isFocused && "ring-1 ring-primary/50 bg-muted/40"
+                isFocused && "ring-1 ring-gold/40 bg-muted/40"
             )}>
                 <Search
                     className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
