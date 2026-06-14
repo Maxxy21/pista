@@ -17,7 +17,7 @@ export function FavoriteToggleButton({ isFavorite, disabled, onToggle }: Favorit
       variant="ghost"
       size="icon"
       className={cn(
-        "h-8 w-8 rounded-full bg-white/80 dark:bg-black/50 backdrop-blur-sm shadow-sm hover:bg-white dark:hover:bg-black/70",
+        "h-8 w-8 rounded-full bg-card/80 backdrop-blur-sm shadow-sm hover:bg-card",
         disabled && "opacity-50 cursor-not-allowed"
       )}
       tabIndex={-1}
@@ -26,7 +26,7 @@ export function FavoriteToggleButton({ isFavorite, disabled, onToggle }: Favorit
       <Star
         className={cn(
           "h-4 w-4 transition-colors",
-          isFavorite ? "fill-yellow-400 text-yellow-400" : "text-gray-600 dark:text-gray-400"
+          isFavorite ? "fill-gold text-gold" : "text-muted-foreground"
         )}
       />
     </Button>
