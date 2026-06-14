@@ -152,9 +152,9 @@ export function NewPitchPanel() {
                 <Button
                   onClick={handleSubmit}
                   disabled={!canSubmitWithFile || submission.processing || submission.pending}
+                  variant="gold"
                   className="w-full sm:w-auto h-11 text-sm font-medium touch-manipulation"
                   size="lg"
-                  style={{ background: "hsl(var(--gold))", color: "hsl(var(--gold-foreground))" }}
                 >
                   {submission.processing || submission.pending ? (
                     <div className="flex items-center gap-2">
