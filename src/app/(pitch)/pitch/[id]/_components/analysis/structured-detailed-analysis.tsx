@@ -64,7 +64,7 @@ export const StructuredDetailedAnalysis: FC<StructuredDetailedAnalysisProps> = (
           <Card key={evaluation.criteria} className="h-full">
               <CardHeader className="pb-3">
                 <div className="flex justify-between items-start">
-                  <CardTitle className="font-display text-base flex items-center gap-2">
+                  <CardTitle className="text-base flex items-center gap-2">
                     <Star className="h-4 w-4 text-foreground" />
                     {evaluation.criteria}
                   </CardTitle>

@@ -97,7 +97,7 @@ Execution Capability: ${feedback.foundersAssessment.executionCapability}
         <CardHeader className="flex flex-row items-center justify-between pb-3">
           <div className="flex items-center gap-2">
             <CheckCircle className="h-4 w-4 text-foreground" />
-            <CardTitle className="font-display text-base">Overall Assessment</CardTitle>
+            <CardTitle className="text-base">Overall Assessment</CardTitle>
           </div>
           <div className="flex items-center gap-2">
             {metadata && (
@@ -158,7 +158,7 @@ Execution Capability: ${feedback.foundersAssessment.executionCapability}
           <CardHeader className="pb-3">
             <div className="flex items-center gap-2">
               <TrendingUp className="h-4 w-4 text-foreground" />
-              <CardTitle className="font-display text-base">Investment Thesis</CardTitle>
+              <CardTitle className="text-base">Investment Thesis</CardTitle>
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -190,7 +190,7 @@ Execution Capability: ${feedback.foundersAssessment.executionCapability}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <AlertTriangle className="h-4 w-4 text-foreground" />
-                <CardTitle className="font-display text-base">Risk Assessment</CardTitle>
+                <CardTitle className="text-base">Risk Assessment</CardTitle>
               </div>
               <Badge variant="outline" className="font-mono text-xs">
                 {feedback.riskAssessment.riskScore}/10
@@ -217,7 +217,7 @@ Execution Capability: ${feedback.foundersAssessment.executionCapability}
           <CardHeader className="pb-3">
             <div className="flex items-center gap-2">
               <Target className="h-4 w-4 text-foreground" />
-              <CardTitle className="font-display text-base">Next Steps</CardTitle>
+              <CardTitle className="text-base">Next Steps</CardTitle>
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -261,7 +261,7 @@ Execution Capability: ${feedback.foundersAssessment.executionCapability}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Users className="h-4 w-4 text-foreground" />
-                <CardTitle className="font-display text-base">Team Assessment</CardTitle>
+                <CardTitle className="text-base">Team Assessment</CardTitle>
               </div>
               <Badge className={getExecutionColor(feedback.foundersAssessment.executionCapability)}>
                 {feedback.foundersAssessment.executionCapability}
@@ -306,7 +306,7 @@ Execution Capability: ${feedback.foundersAssessment.executionCapability}
       {(feedback.competitivePosition.marketOpportunity || feedback.competitivePosition.strengths.length > 0 || feedback.competitivePosition.weaknesses.length > 0) && (
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="font-display text-base">Competitive Position</CardTitle>
+            <CardTitle className="text-base">Competitive Position</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {feedback.competitivePosition.marketOpportunity && (

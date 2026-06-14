@@ -110,7 +110,7 @@ export const DetailedAnalysis: FC<DetailedAnalysisProps> = ({ data }) => {
                     <Card key={evaluation.criteria} className="h-full">
                         <CardHeader className="pb-2">
                             <div className="flex justify-between items-center gap-2">
-                                <CardTitle className="font-display text-lg">{evaluation.criteria}</CardTitle>
+                                <CardTitle className="text-lg">{evaluation.criteria}</CardTitle>
                                 <div className="flex items-center gap-2 shrink-0">
                                     <Badge className={cn(getScoreColor(evaluation.score))}>
                                         {evaluation.score.toFixed(1)}
