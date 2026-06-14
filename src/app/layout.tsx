@@ -53,7 +53,7 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en" className={`${hanken.variable} ${fraunces.variable} ${jetbrainsMono.variable}`}>
+        <html lang="en" suppressHydrationWarning className={`${hanken.variable} ${fraunces.variable} ${jetbrainsMono.variable}`}>
         <body className={hanken.className}>
         <Suspense fallback={<Loading/>}>
             <ThemeProvider
