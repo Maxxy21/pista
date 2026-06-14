@@ -89,7 +89,7 @@ export function PitchCard({
         >
             <Card
                 onClick={onClick}
-                className="group relative flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl border-border bg-card p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-[hsl(var(--foreground)/0.28)]"
+                className="group relative flex h-full cursor-pointer flex-col overflow-hidden border-border bg-card p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-[hsl(var(--foreground)/0.28)]"
                 tabIndex={0}
                 aria-label={`Pitch: ${title}`}
             >
