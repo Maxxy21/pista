@@ -49,4 +49,3 @@ export {
 
 export { FileUpload } from "./file-upload";
 export { default as LogoIcon } from "./logo-icon";
-export { toast, useToast } from "./use-toast";
