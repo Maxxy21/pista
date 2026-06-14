@@ -424,8 +424,7 @@ export function PitchDetailsSidebar(props: React.ComponentProps<typeof Sidebar>)
                     )}
                     <SidebarMenuItem>
                         <SidebarMenuButton
-                            className="font-medium transition-opacity duration-150 hover:opacity-85"
-                            style={{ background: "hsl(var(--gold))", color: "hsl(var(--gold-foreground))" }}
+                            className="font-medium transition-opacity duration-150 hover:opacity-85 bg-gold text-gold-foreground hover:bg-gold hover:text-gold-foreground"
                             onClick={() => router.push('/dashboard?view=new')}
                             tooltip={state === "collapsed" ? "New Pitch" : undefined}
                         >
