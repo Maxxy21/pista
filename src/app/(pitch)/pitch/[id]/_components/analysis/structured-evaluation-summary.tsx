@@ -91,7 +91,9 @@ Execution Capability: ${feedback.foundersAssessment.executionCapability}
 `.trim();
 
   return (
-    <div className="space-y-4">
+    <div>
+      <h2 className="font-display text-xl font-semibold mb-4">Evaluation Summary</h2>
+      <div className="space-y-4">
       {/* Overall Assessment */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between pb-3">
@@ -350,6 +352,7 @@ Execution Capability: ${feedback.foundersAssessment.executionCapability}
           </CardContent>
         </Card>
       )}
+    </div>
     </div>
   );
 };

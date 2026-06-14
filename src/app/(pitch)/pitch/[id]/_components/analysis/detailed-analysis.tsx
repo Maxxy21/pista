@@ -104,7 +104,7 @@ export const DetailedAnalysis: FC<DetailedAnalysisProps> = ({ data }) => {
     
     return (
         <div>
-            <h2 className="font-display text-2xl font-bold mb-6">Detailed Analysis</h2>
+            <h2 className="font-display text-xl font-semibold mb-4">Detailed Analysis</h2>
             <div className="grid gap-6 md:grid-cols-2">
                 {evaluations.map((evaluation) => (
                     <Card key={evaluation.criteria} className="h-full">
